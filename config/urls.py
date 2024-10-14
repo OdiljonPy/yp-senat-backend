@@ -24,15 +24,15 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
 
-admin.site.site_header = 'CRM Admin'
-admin.site.site_title = 'CRM Admin'
+admin.site.site_header = 'YP Senat Admin'
+admin.site.site_title = 'YP Senat Admin'
 admin.site.index_title = 'Welcome to dashboard'
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="CRM APIv1",
+        title="YP Senat APIv1",
         default_version="v1",
-        description="API for project CRM",
+        description="API for project YP Senat",
         terms_of_service="",
         contact=openapi.Contact(email="odiljonabduvaitov@gmail.com"),
         license=openapi.License(name="BSD License"),
