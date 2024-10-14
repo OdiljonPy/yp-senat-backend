@@ -98,3 +98,15 @@ class News(BaseModel):
     def __str__(self):
         return self.short_description
 
+class PollQuestion(BaseModel):
+    question = models.CharField(max_length=600)
+
+class PollAnswer(BaseModel):
+    answer = models.CharField(max_length=600)
+    question = models.ForeignKey(PollQuestion, on_delete=models.CASCADE)
+    is_true = models.BooleanField(default=False)
+
+
+class Opinion(BaseModel):
+    full_name = models.CharField(max_length=150)
+    text = models.TextField()
