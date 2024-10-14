@@ -1,5 +1,3 @@
-from math import trunc
-
 from django.db import models
 from abstract_models.base_model import BaseModel
 
