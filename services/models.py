@@ -52,7 +52,7 @@ class CommissionMember(BaseModel):
 class Projects(BaseModel):
     name = models.CharField(max_length=100)
     short_description = models.CharField(max_length=500)
-    image = models.ImageField(upload_to="media/project/")
+    image = models.ImageField(upload_to="project/")
     status = models.PositiveIntegerField(choices=PROJECT_STATUS, default=2)
 
     def __str__(self):
@@ -90,4 +90,11 @@ class Appeal(BaseModel):
     def __str__(self):
         return self.name
 
+class News(BaseModel):
+    image = models.ImageField(upload_to='news/')
+    short_description = models.CharField(max_length=300)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.short_description
 
