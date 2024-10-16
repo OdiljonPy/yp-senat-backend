@@ -1,6 +1,10 @@
 from django.db import models
 from abstract_models.base_model import BaseModel
+
+from utils.validations import phone_number_validation
+
 from django_ckeditor_5.fields import CKEditor5Field
+
 
 GENDER = (
     (1, 'Male'),
@@ -79,7 +83,7 @@ class AppealMember(BaseModel):
 
     full_name = models.CharField(max_length=100)
     message = models.TextField()
-    phone_number = models.CharField(max_length=14)
+    phone_number = models.CharField(max_length=14, validators=phone_number_validation)
     address = models.CharField(max_length=300)
     email = models.EmailField()
     gender = models.PositiveIntegerField(choices=GENDER, default=1)
@@ -90,8 +94,10 @@ class AppealMember(BaseModel):
 
 
 class Appeal(BaseModel):
-    full_name = models.CharField(max_length=100)
-    phone_number = models.CharField(max_length=14)
+
+    full_name = models.CharField(max_length=120)
+    phone_number = models.CharField(max_length=14, validators=phone_number_validation)
+
     email = models.EmailField()
     message = models.TextField()
 
@@ -114,7 +120,7 @@ class News(BaseModel):
 
 class Opinion(BaseModel):
     full_name = models.CharField(max_length=100)
-    phone_number = models.CharField(max_length=14)
+    phone_number = models.CharField(max_length=14, validators=phone_number_validation)
     message = models.TextField()
 
     def __str__(self):
