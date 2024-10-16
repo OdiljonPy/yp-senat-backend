@@ -83,7 +83,7 @@ class AppealMember(BaseModel):
 
     full_name = models.CharField(max_length=100)
     message = models.TextField()
-    phone_number = models.CharField(max_length=14)
+    phone_number = models.CharField(max_length=14, validators=phone_number_validation)
     address = models.CharField(max_length=300)
     email = models.EmailField()
     gender = models.PositiveIntegerField(choices=GENDER, default=1)

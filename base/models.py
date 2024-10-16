@@ -1,9 +1,7 @@
 from django.db import models
 
 from abstract_models.base_model import BaseModel
-
 from utils.validations import phone_number_validation
-
 from django_ckeditor_5.fields import CKEditor5Field
 
 
