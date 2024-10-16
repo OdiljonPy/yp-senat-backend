@@ -23,7 +23,7 @@ class CommissionCategorySerializer(serializers.ModelSerializer):
 class CommissionMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommissionMember
-        fields = ['id', 'name', 'commission_category', 'region', 'type', 'description', 'position', 'birthdate',
+        fields = ['id', 'full_name', 'commission_category', 'region', 'type', 'description', 'position', 'birthdate',
                   'nation', 'education_degree', 'speciality', 'email', 'telegram_url', 'youtube_url', 'instagram_url']
 
 
@@ -42,7 +42,7 @@ class NewsSerializer(serializers.ModelSerializer):
 class AppealMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppealMember
-        fields = ['id', 'commission_member', 'region', 'name', 'message', 'phone_number', 'address', 'email', 'gender', 'birthdate']
+        fields = ['id', 'commission_member', 'region', 'full_name', 'message', 'phone_number', 'address', 'email', 'gender', 'birthdate']
 
 
 class AppealSerializer(serializers.ModelSerializer):
