@@ -6,6 +6,7 @@ from rest_framework import status
 from exceptions import error_messages, exception
 from drf_yasg.utils import swagger_auto_schema
 
+
 class FAQViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='FAQ',
@@ -15,7 +16,8 @@ class FAQViewSet(ViewSet):
     )
     def faq_get(self, request):
         faqs = FAQ.objects.all()
-        return Response(data={'result': FAQSerializer(faqs, many=True).data}, status=status.HTTP_200_OK)
+        return Response(data={'result': FAQSerializer(faqs, many=True, context={'request': request}).data, 'ok': True},
+                        status=status.HTTP_200_OK)
 
 
 class AboutUsViewSet(ViewSet):
@@ -27,7 +29,9 @@ class AboutUsViewSet(ViewSet):
     )
     def about_us_get(self, request):
         data = AboutUs.objects.all()
-        return Response(data={'result': AboutUsSerializer(data, many=True).data}, status=status.HTTP_200_OK)
+        return Response(
+            data={'result': AboutUsSerializer(data, many=True, context={'request': request}).data, 'ok': True},
+            status=status.HTTP_200_OK)
 
 
 class AdditionalLinksViewSet(ViewSet):
@@ -39,7 +43,9 @@ class AdditionalLinksViewSet(ViewSet):
     )
     def additional_links_get(self, request):
         links = AdditionalLinks.objects.all()
-        return Response(data={'result': AdditionalLinksSerializer(links, many=True).data}, status=status.HTTP_200_OK)
+        return Response(
+            data={'result': AdditionalLinksSerializer(links, many=True, context={'request': request}).data, 'ok': True},
+            status=status.HTTP_200_OK)
 
 
 class ContactUsViewSet(ViewSet):
@@ -51,4 +57,6 @@ class ContactUsViewSet(ViewSet):
     )
     def contact_us_get(self, request):
         data = ContactUs.objects.all()
-        return Response(data={'result': ContactUsSerializer(data, many=True).data}, status=status.HTTP_200_OK)
+        return Response(
+            data={'result': ContactUsSerializer(data, many=True, context={'request': request}).data, 'ok': True},
+            status=status.HTTP_200_OK)
