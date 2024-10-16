@@ -21,6 +21,24 @@ MEMBER_TYPE = (
     (2, "Regional"),
 )
 
+REGIONS_CHOICE = (
+    (1, 'Tashkent'),
+    (2, 'Bukhara region'),
+    (3, 'Fergana region'),
+    (4, 'Andijan region'),
+    (5, 'Jizzakh region'),
+    (6, 'Namangan region'),
+    (7, 'Navoiy region'),
+    (8, 'Qashqadaryo region'),
+    (9, 'Samarqand region'),
+    (10, 'Sirdaryo region'),
+    (11, 'Surxondaryo region'),
+    (12, 'Tashkent region'),
+    (13, 'Xorazim region'),
+    (14, 'Republic of Karakalpakstan')
+
+)
+
 
 class Banner(BaseModel):
     image = models.ImageField(upload_to='banner/')
@@ -31,10 +49,10 @@ class Banner(BaseModel):
 
 
 class Region(BaseModel):
-    name = models.CharField(max_length=150, unique=True)
+    name = models.PositiveIntegerField(choices=REGIONS_CHOICE, default=1)
 
     def __str__(self):
-        return self.name
+        return str(self.id) or ''
 
 
 class CommissionCategory(BaseModel):
@@ -83,7 +101,7 @@ class AppealMember(BaseModel):
 
     full_name = models.CharField(max_length=100)
     message = models.TextField()
-    phone_number = models.CharField(max_length=14, validators=phone_number_validation)
+    phone_number = models.CharField(max_length=14, validators=[phone_number_validation])
     address = models.CharField(max_length=300)
     email = models.EmailField()
     gender = models.PositiveIntegerField(choices=GENDER, default=1)
@@ -95,7 +113,7 @@ class AppealMember(BaseModel):
 
 class Appeal(BaseModel):
     full_name = models.CharField(max_length=100)
-    phone_number = models.CharField(max_length=14, validators=phone_number_validation)
+    phone_number = models.CharField(max_length=14, validators=[phone_number_validation])
     email = models.EmailField()
     message = models.TextField()
 
@@ -118,7 +136,7 @@ class News(BaseModel):
 
 class Opinion(BaseModel):
     full_name = models.CharField(max_length=100)
-    phone_number = models.CharField(max_length=14, validators=phone_number_validation)
+    phone_number = models.CharField(max_length=14, validators=[phone_number_validation])
     message = models.TextField()
 
     def __str__(self):

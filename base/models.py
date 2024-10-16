@@ -33,7 +33,7 @@ class AdditionalLinks(BaseModel):
 
 class ContactUs(BaseModel):
     email = models.EmailField()
-    phone_number = models.CharField(max_length=14, validators=phone_number_validation)
+    phone_number = models.CharField(max_length=14, validators=[phone_number_validation])
     address = models.CharField(max_length=300)
 
     def __str__(self):
