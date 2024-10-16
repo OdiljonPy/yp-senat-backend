@@ -1,9 +1,7 @@
 import re
-
-from exceptions.error_messages import ErrorCodes
-from exceptions.exception import CustomApiException
+from django.core.exceptions import ValidationError
 
 
 def phone_number_validation(value):
-    if not re.match('^+998\d{9}$', value):
-        raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT, message='Phone number is invalid.')
+    if not re.match(r'^\+998\d{9}$', value):
+        raise ValidationError(message='Phone number is invalid.')
