@@ -20,16 +20,18 @@ class AboutUs(BaseModel):
 
 
 class AdditionalLinks(BaseModel):
-    title = models.CharField(max_length=200)
-    url = models.URLField()
+    short_description = models.CharField(max_length=500)
+    link = models.URLField()
+    image = models.ImageField(upload_to='additional_links/')
 
     def __str__(self):
-        return self.title
+        return str(self.id) or ''
 
 
 class ContactUs(BaseModel):
-    title = models.CharField(max_length=200)
     email = models.EmailField()
+    phone_number = models.CharField(max_length=14)
+    address = models.CharField(max_length=300)
 
     def __str__(self):
-        return self.title
+        return str(self.id) or ''

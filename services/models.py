@@ -1,3 +1,5 @@
+from random import choices
+
 from django.db import models
 from abstract_models.base_model import BaseModel
 
@@ -11,18 +13,26 @@ PROJECT_STATUS = (
     (2, "In_proces"),
 )
 
+MEMBER_TYPE = (
+    (1, 'Constant'),
+    (2, "Regional"),
+)
+
+
+class Banner(BaseModel):
+    image = models.ImageField(upload_to='banner/')
+    short_description = models.CharField(max_length=350)
+
+    def __str__(self):
+        return str(self.id) or ''
+
+
 class Region(BaseModel):
     name = models.CharField(max_length=150, unique=True)
 
     def __str__(self):
         return self.name
 
-class District(BaseModel):
-    region = models.ForeignKey(Region, on_delete=models.CASCADE)
-    name = models.CharField(max_length=150)
-
-    def __str__(self):
-        return self.name
 
 class CommissionCategory(BaseModel):
     name = models.CharField(max_length=250)
@@ -30,11 +40,13 @@ class CommissionCategory(BaseModel):
     def __str__(self):
         return self.name
 
+
 class CommissionMember(BaseModel):
-    commission_category = models.ForeignKey(CommissionCategory, on_delete=models.CASCADE)
-    region = models.ForeignKey(Region, on_delete=models.CASCADE)
+    commission_category = models.ForeignKey(CommissionCategory, on_delete=models.CASCADE, blank=True, null=True)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=True, null=True)
 
     name = models.CharField(max_length=100)
+    type = models.PositiveIntegerField(choices=MEMBER_TYPE, default=1)
     description = models.TextField()
     position = models.CharField(max_length=80)
     birthdate = models.DateTimeField()
@@ -42,39 +54,29 @@ class CommissionMember(BaseModel):
     education_degree = models.CharField(max_length=100)
     speciality = models.CharField(max_length=150)
     email = models.EmailField()
-    membership = models.CharField(max_length=250)
+
+    telegram_url = models.URLField(blank=True, null=True)
+    youtube_url = models.URLField(blank=True, null=True)
+    instagram_url = models.URLField(blank=True, null=True)
 
     def __str__(self):
         return self.name
 
+
 class Projects(BaseModel):
     name = models.CharField(max_length=100)
     short_description = models.CharField(max_length=500)
-    image = models.ImageField(upload_to="project/")
+    description = models.TextField()
+    file = models.FileField(upload_to="project/")
     status = models.PositiveIntegerField(choices=PROJECT_STATUS, default=2)
 
     def __str__(self):
         return self.name
 
-class ProjectComment(BaseModel):
-    project = models.ForeignKey(Projects, on_delete=models.CASCADE)
-    comment = models.TextField()
-    is_visible = models.BooleanField(default=True)
 
-    def __str__(self):
-        return self.project.name
-
-
-class AppealType(BaseModel):
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-class Appeal(BaseModel):
+class AppealMember(BaseModel):
     commission_member = models.ForeignKey(CommissionMember, on_delete=models.CASCADE)
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
-    district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True, blank=True)
     appeal_category = models.ForeignKey(AppealType, on_delete=models.CASCADE)
 
     name = models.CharField(max_length=120)
@@ -88,16 +90,33 @@ class Appeal(BaseModel):
     def __str__(self):
         return self.name
 
+
+class Appeal(BaseModel):
+    full_name = models.CharField(max_length=120)
+    phone_number = models.CharField(max_length=14)
+    email = models.EmailField()
+    message = models.TextField()
+
+    def __str__(self):
+        return self.full_name
+
+
 class News(BaseModel):
     image = models.ImageField(upload_to='news/')
     short_description = models.CharField(max_length=300)
     description = models.TextField()
 
+    telegram_url = models.URLField()
+    instagram_url = models.URLField()
+    facebook_url = models.URLField()
+
     def __str__(self):
         return self.short_description
 
+
 class PollQuestion(BaseModel):
     question = models.CharField(max_length=600)
+
 
 class PollAnswer(BaseModel):
     answer = models.CharField(max_length=600)
@@ -106,5 +125,9 @@ class PollAnswer(BaseModel):
 
 
 class Opinion(BaseModel):
-    full_name = models.CharField(max_length=150)
-    text = models.TextField()
+    full_name = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=14)
+    message = models.TextField()
+
+    def __str__(self):
+        return self.full_name
