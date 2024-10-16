@@ -22,8 +22,8 @@ class CommissionCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(CommissionMember)
 class CommissionMemberAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'type')
-    list_display_links = ('id', 'name')
+    list_display = ('id', 'full_name', 'type')
+    list_display_links = ('id', 'full_name')
 
 
 @admin.register(Projects)
@@ -34,8 +34,8 @@ class ProjectsAdmin(admin.ModelAdmin):
 
 @admin.register(AppealMember)
 class AppealMemberAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'phone_number')
-    list_display_links = ('id', 'name')
+    list_display = ('id', 'full_name', 'phone_number')
+    list_display_links = ('id', 'full_name')
 
 
 @admin.register(Appeal)
