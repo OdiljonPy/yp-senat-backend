@@ -1,57 +1,57 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
 from .models import (Banner, Region, CommissionCategory, CommissionMember, Projects, News, AppealMember, Appeal, Opinion)
 
 
-class BannerSerializer(ModelSerializer):
+class BannerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Banner
         fields = ['id', 'image', 'short_description', 'created_at']
 
 
-class RegionSerializer(ModelSerializer):
+class RegionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Region
         fields = ['id', 'name']
 
 
-class CommissionCategorySerializer(ModelSerializer):
+class CommissionCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = CommissionCategory
         fields = ['id', 'name']
 
 
-class CommissionMemberSerializer(ModelSerializer):
+class CommissionMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommissionMember
         fields = ['id', 'name', 'commission_category', 'region', 'type', 'description', 'position', 'birthdate',
                   'nation', 'education_degree', 'speciality', 'email', 'telegram_url', 'youtube_url', 'instagram_url']
 
 
-class ProjectsSerializer(ModelSerializer):
+class ProjectsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Projects
         fields = ['id', 'name', 'short_description', 'description', 'file', 'status']
 
 
-class NewsSerializer(ModelSerializer):
+class NewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
         fields = ['id', 'image', 'short_description', 'description', 'telegram_url', 'youtube_url', 'instagram_url']
 
 
-class AppealMemberSerializer(ModelSerializer):
+class AppealMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppealMember
         fields = ['id', 'commission_member', 'region', 'name', 'message', 'phone_number', 'address', 'email', 'gender', 'birthdate']
 
 
-class AppealSerializer(ModelSerializer):
+class AppealSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appeal
         fields = ['id', 'full_name', 'phone_number', 'email', 'message']
 
 
-class OpinionSerializer(ModelSerializer):
+class OpinionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Opinion
         fields = ['id', 'full_name', 'phone_number', 'message']
