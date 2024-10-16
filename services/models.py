@@ -1,7 +1,10 @@
-from random import choices
-
 from django.db import models
 from abstract_models.base_model import BaseModel
+
+from utils.validations import phone_number_validation
+
+from django_ckeditor_5.fields import CKEditor5Field
+
 
 GENDER = (
     (1, 'Male'),
@@ -45,9 +48,9 @@ class CommissionMember(BaseModel):
     commission_category = models.ForeignKey(CommissionCategory, on_delete=models.CASCADE, blank=True, null=True)
     region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=True, null=True)
 
-    name = models.CharField(max_length=100)
+    full_name = models.CharField(max_length=100)
     type = models.PositiveIntegerField(choices=MEMBER_TYPE, default=1)
-    description = models.TextField()
+    description = CKEditor5Field()
     position = models.CharField(max_length=80)
     birthdate = models.DateTimeField()
     nation = models.CharField(max_length=100)
@@ -60,13 +63,13 @@ class CommissionMember(BaseModel):
     instagram_url = models.URLField(blank=True, null=True)
 
     def __str__(self):
-        return self.name
+        return self.full_name
 
 
 class Projects(BaseModel):
     name = models.CharField(max_length=100)
     short_description = models.CharField(max_length=500)
-    description = models.TextField()
+    description = CKEditor5Field()
     file = models.FileField(upload_to="project/")
     status = models.PositiveIntegerField(choices=PROJECT_STATUS, default=2)
 
@@ -78,7 +81,7 @@ class AppealMember(BaseModel):
     commission_member = models.ForeignKey(CommissionMember, on_delete=models.CASCADE)
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
 
-    name = models.CharField(max_length=120)
+    full_name = models.CharField(max_length=100)
     message = models.TextField()
     phone_number = models.CharField(max_length=14)
     address = models.CharField(max_length=300)
@@ -87,12 +90,12 @@ class AppealMember(BaseModel):
     birthdate = models.DateField()
 
     def __str__(self):
-        return self.name
+        return self.full_name
 
 
 class Appeal(BaseModel):
-    full_name = models.CharField(max_length=120)
-    phone_number = models.CharField(max_length=14)
+    full_name = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=14, validators=phone_number_validation)
     email = models.EmailField()
     message = models.TextField()
 
@@ -103,7 +106,7 @@ class Appeal(BaseModel):
 class News(BaseModel):
     image = models.ImageField(upload_to='news/')
     short_description = models.CharField(max_length=300)
-    description = models.TextField()
+    description = CKEditor5Field()
 
     telegram_url = models.URLField()
     instagram_url = models.URLField()
@@ -113,19 +116,9 @@ class News(BaseModel):
         return self.short_description
 
 
-class PollQuestion(BaseModel):
-    question = models.CharField(max_length=600)
-
-
-class PollAnswer(BaseModel):
-    answer = models.CharField(max_length=600)
-    question = models.ForeignKey(PollQuestion, on_delete=models.CASCADE)
-    is_true = models.BooleanField(default=False)
-
-
 class Opinion(BaseModel):
     full_name = models.CharField(max_length=100)
-    phone_number = models.CharField(max_length=14)
+    phone_number = models.CharField(max_length=14, validators=phone_number_validation)
     message = models.TextField()
 
     def __str__(self):
