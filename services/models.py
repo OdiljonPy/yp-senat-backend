@@ -77,7 +77,6 @@ class Projects(BaseModel):
 class AppealMember(BaseModel):
     commission_member = models.ForeignKey(CommissionMember, on_delete=models.CASCADE)
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
-    appeal_category = models.ForeignKey(AppealType, on_delete=models.CASCADE)
 
     name = models.CharField(max_length=120)
     message = models.TextField()
