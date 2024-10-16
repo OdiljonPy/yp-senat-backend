@@ -88,6 +88,7 @@ class ProjectViewSet(ViewSet):
 
 class AppealViewSet(ViewSet):
     @swagger_auto_schema(
+        request_body=AppealSerializer(),
         operation_summary='Create Appeal',
         operation_description='Create appeal',
         responses={201: AppealSerializer()},
@@ -102,6 +103,7 @@ class AppealViewSet(ViewSet):
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_201_CREATED)
 
     @swagger_auto_schema(
+        request_body=AppealMemberSerializer(),
         operation_summary='Create Appeal Member',
         operation_description='Create appeal member',
         responses={201: AppealMemberSerializer()},
@@ -131,6 +133,7 @@ class NewsViewSet(ViewSet):
 
 class OpinionViewSet(ViewSet):
     @swagger_auto_schema(
+        request_body=OpinionSerializer(),
         operation_summary='Create Opinion',
         operation_description='Create opinion',
         responses={201: OpinionSerializer()},
