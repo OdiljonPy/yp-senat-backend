@@ -1,7 +1,6 @@
 from rest_framework.viewsets import ViewSet
 from rest_framework import status
 from rest_framework.response import Response
-from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
 from exceptions.error_messages import ErrorCodes
@@ -132,12 +131,15 @@ class NewsViewSet(ViewSet):
 
 class OpinionViewSet(ViewSet):
     @swagger_auto_schema(
-        operation_summary='List Of opinions',
-        operation_description='List of opinions',
-        responses={200: OpinionSerializer()},
+        operation_summary='Create Opinion',
+        operation_description='Create opinion',
+        responses={201: OpinionSerializer()},
         tags=['Opinion']
     )
-    def opinion_list(self, request):
-        opinions = Opinion.objects.all()
-        serializer = OpinionSerializer(opinions, many=True, context={'request': request})
+    def create_opinion(self, request):
+        data = request.data
+        serializer = OpinionSerializer(data=data, context={'request': request})
+        if not serializer.is_valid():
+            raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT, message=serializer.errors)
+        serializer.save()
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
