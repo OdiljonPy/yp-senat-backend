@@ -37,6 +37,7 @@ INSTALLED_APPS = [
 
     #apps
     'services',
+    'base',
 ]
 
 MIDDLEWARE = [
