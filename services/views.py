@@ -6,8 +6,10 @@ from drf_yasg.utils import swagger_auto_schema
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
 from .models import Banner, Region, CommissionCategory, CommissionMember, Projects, AppealMember, Appeal, News, Opinion
-from .serializers import BannerSerializer, RegionSerializer, CommissionMemberSerializer, ProjectsSerializer, \
-    CommissionCategorySerializer, AppealSerializer, AppealMemberSerializer, NewsSerializer, OpinionSerializer
+from .serializers import (
+    BannerSerializer, RegionSerializer, CommissionMemberSerializer, ProjectsSerializer, CommissionCategorySerializer,
+    AppealSerializer, AppealMemberSerializer, NewsSerializer, OpinionSerializer
+)
 
 
 class BannerViewSet(ViewSet):
