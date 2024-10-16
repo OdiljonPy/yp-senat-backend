@@ -1,7 +1,9 @@
 from django.db import models
 
 from abstract_models.base_model import BaseModel
+from utils.validations import phone_number_validation
 from django_ckeditor_5.fields import CKEditor5Field
+
 
 
 class FAQ(BaseModel):
@@ -31,7 +33,7 @@ class AdditionalLinks(BaseModel):
 
 class ContactUs(BaseModel):
     email = models.EmailField()
-    phone_number = models.CharField(max_length=14)
+    phone_number = models.CharField(max_length=14, validators=phone_number_validation)
     address = models.CharField(max_length=300)
 
     def __str__(self):
