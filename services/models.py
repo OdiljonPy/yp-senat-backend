@@ -59,7 +59,7 @@ class CommissionMember(BaseModel):
     instagram_url = models.URLField(blank=True, null=True)
 
     def __str__(self):
-        return self.name
+        return self.full_name
 
 
 class Projects(BaseModel):
@@ -86,7 +86,7 @@ class AppealMember(BaseModel):
     birthdate = models.DateField()
 
     def __str__(self):
-        return self.name
+        return self.full_name
 
 
 class Appeal(BaseModel):
