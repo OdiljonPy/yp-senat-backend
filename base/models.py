@@ -1,6 +1,7 @@
 from django.db import models
 
 from abstract_models.base_model import BaseModel
+from django_ckeditor_5.fields import CKEditor5Field
 
 
 class FAQ(BaseModel):
@@ -13,7 +14,7 @@ class FAQ(BaseModel):
 
 class AboutUs(BaseModel):
     title = models.CharField(max_length=200)
-    description = models.TextField()
+    description = CKEditor5Field()
 
     def __str__(self):
         return self.title

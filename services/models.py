@@ -102,7 +102,7 @@ class Appeal(BaseModel):
 class News(BaseModel):
     image = models.ImageField(upload_to='news/')
     short_description = models.CharField(max_length=300)
-    description = models.TextField()
+    description = CKEditor5Field()
 
     telegram_url = models.URLField()
     instagram_url = models.URLField()
