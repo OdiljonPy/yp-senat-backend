@@ -1,7 +1,21 @@
 from rest_framework import serializers
 from config import settings
-from .models import (Banner, Region, CommissionCategory, CommissionMember, Projects, News, AppealMember, Appeal,
-                     Opinion)
+from .models import (
+    Banner, Region, CommissionCategory, CommissionMember, Projects, News, AppealMember, Appeal, Opinion, PROJECT_STATUS)
+from exceptions.exception import CustomApiException
+from exceptions.error_messages import ErrorCodes
+
+
+class ParamValidateSerializer(serializers.Serializer):
+    page = serializers.IntegerField(required=False, default=1)
+    page_size = serializers.IntegerField(required=False, default=10)
+    status = serializers.ChoiceField(PROJECT_STATUS, required=False)
+
+    def validate(self, data):
+        if (data.get('page_size') and data.get('page_size') < 1) or (data.get('page') and data.get('page') < 1):
+            raise CustomApiException(ErrorCodes.VALIDATION_FAILED,
+                                     message='page and page_size must be positive integer')
+        return data
 
 
 class BannerSerializer(serializers.ModelSerializer):
