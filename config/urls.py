@@ -27,7 +27,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("ckeditor5/", include('django_ckeditor_5.urls')),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
     path('api/v1/', include('services.urls')),
     path('api/v1/base/', include('base.urls')),
 
