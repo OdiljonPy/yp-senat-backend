@@ -1,10 +1,10 @@
+from django.contrib.admin import ModelAdmin
 from django.db import models
 from abstract_models.base_model import BaseModel
 
 from utils.validations import phone_number_validation
 
 from django_ckeditor_5.fields import CKEditor5Field
-
 
 GENDER = (
     (1, 'Male'),
@@ -20,7 +20,6 @@ MEMBER_TYPE = (
     (1, 'Constant'),
     (2, "Regional"),
 )
-
 
 
 class Banner(BaseModel):
@@ -104,10 +103,14 @@ class Appeal(BaseModel):
         return self.full_name
 
 
-class News(BaseModel):
+class Post(BaseModel):
     image = models.ImageField(upload_to='news/')
     short_description = models.CharField(max_length=200)
     description = CKEditor5Field()
+
+    commission_member = models.ForeignKey(CommissionMember, on_delete=models.CASCADE, blank=True, null=True)
+
+    views_count = models.IntegerField(default=0)
 
     telegram_url = models.URLField(default='telegram.org')
     instagram_url = models.URLField(default='instagram.com')
@@ -115,6 +118,10 @@ class News(BaseModel):
 
     def __str__(self):
         return self.short_description
+
+    def counts_view(self):
+        self.views_count += 1
+        self.save()
 
 
 class Opinion(BaseModel):

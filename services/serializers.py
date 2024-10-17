@@ -57,3 +57,11 @@ class OpinionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Opinion
         fields = ['id', 'full_name', 'phone_number', 'message']
+
+class FilterSerializer(serializers.Serializer):
+    q = serializers.CharField(required=False)
+    page = serializers.IntegerField(required=False, default=1)
+    page_size = serializers.IntegerField(required=False, default=10)
+    date = serializers.DateTimeField(required=False)
+
+

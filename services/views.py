@@ -1,14 +1,16 @@
+from drf_yasg import openapi
 from rest_framework.viewsets import ViewSet
 from rest_framework import status
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
+from django.db.models import Q
 
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
-from .models import Banner, Region, CommissionCategory, CommissionMember, Projects, AppealMember, Appeal, News, Opinion
+from .models import Banner, Region, CommissionCategory, CommissionMember, Projects, AppealMember, Appeal, Post, Opinion
 from .serializers import (
     BannerSerializer, RegionSerializer, CommissionMemberSerializer, ProjectsSerializer, CommissionCategorySerializer,
-    AppealSerializer, AppealMemberSerializer, NewsSerializer, OpinionSerializer
+    AppealSerializer, AppealMemberSerializer, NewsSerializer, OpinionSerializer, FilterSerializer
 )
 
 
@@ -128,7 +130,7 @@ class NewsViewSet(ViewSet):
         tags=['News']
     )
     def news_list(self, request):
-        news = News.objects.all()
+        news = Post.objects.all()
         serializer = NewsSerializer(news, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
@@ -148,3 +150,72 @@ class OpinionViewSet(ViewSet):
             raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT, message=serializer.errors)
         serializer.save()
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+
+
+class ViewsCountViewSet(ViewSet):
+    # @swagger_auto_schema(
+    #     operation_summary='count news',
+    #     operation_description='count news',
+    #     tags=['Commission']
+    # )
+    # def count_views(self, request, pk=None):
+    #     obj = News.objects.filter(id=pk).first()
+    #     if obj:
+    #         obj.counts_view()
+    #         serializer = NewsSerializer(obj)
+    #         return Response(data={'data': serializer.data, 'ok': False}, status=status.HTTP_200_OK)
+    #     raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
+
+    @swagger_auto_schema(
+        operation_summary='count news',
+        operation_description='count news',
+        tags=['Views count']
+    )
+    def count_views(self, request, pk=None):
+        obj = Post.objects.filter(id=pk).first()
+        user_ip = request.META.get('REMOTE_ADDR')
+        print(request.COOKIES)
+
+        viewed_news = request.COOKIES.get('viewed_news', '')
+        print('first', viewed_news)
+        if viewed_news:
+            viewed_news = viewed_news.split(',')
+        else:
+            viewed_news = []
+
+        print(viewed_news)
+
+        if f"{obj.id}-{user_ip}" not in viewed_news:
+            obj.views_count += 1
+            obj.save()
+            viewed_news.append(f"{obj.id}-{user_ip}")
+        serializer = NewsSerializer(obj)
+        response = Response(serializer.data)
+        response.set_cookie('viewed_articles', ','.join(viewed_news), max_age=3600 * 24 * 30)  # 30 days
+
+        return response
+
+
+class FilteringViewSet(ViewSet):
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                name='q', in_=openapi.IN_QUERY, description='Search q', type=openapi.TYPE_STRING),
+        ],
+        operation_summary='News filter ',
+        operation_description="News filter",
+        responses={200: NewsSerializer()},
+        tags=['News'])
+    def filtering_by_news(self, request):
+        serializer_params = FilterSerializer(data=request.query_params.copy(), context={'request': request})
+        if not serializer_params.is_valid():
+            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
+
+        q = serializer_params.validated_data.get('q', '')
+        filter_ = Q()
+        if q:
+            filter_ &= (Q(short_description__icontains=q) | Q(description__icontains=q))
+
+        news = Post.objects.filter(filter_).order_by('-created_at')
+
+        return Response(data={'data': NewsSerializer(news, many=True, context={'request': request}).data})
