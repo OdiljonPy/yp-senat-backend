@@ -32,7 +32,7 @@ INSTALLED_APPS = [
 
     #packages
     'rest_framework',
-    'drf-yasg',
+    'drf_yasg',
     'django_ckeditor_5',
 
     #apps

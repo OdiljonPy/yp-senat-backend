@@ -11,5 +11,6 @@ psycopg2-binary==2.9.10
 python-dotenv==1.0.1
 pytz==2024.2
 PyYAML==6.0.2
+setuptools==75.2.0
 sqlparse==0.5.1
 uritemplate==4.1.1
