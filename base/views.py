@@ -76,7 +76,7 @@ class PollViewSet(ViewSet):
     def get_polls(self, request):
         polls = Poll.objects.all()
         serializer = PollSerializer(polls, many=True, context={'request': request})
-        return Response(data={'result': serializer.data}, status=status.HTTP_200_OK)
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         operation_summary='Detail Poll',
@@ -90,4 +90,4 @@ class PollViewSet(ViewSet):
             raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
 
         serializer = PollSerializer(poll, context={'request': request})
-        return Response(data={'result': serializer.data}, status=status.HTTP_200_OK)
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)

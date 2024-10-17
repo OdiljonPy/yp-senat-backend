@@ -34,7 +34,7 @@ class PollAdmin(admin.ModelAdmin):
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'poll', 'text', 'type')
+    list_display = ('id', 'poll', 'type')
     list_display_links = ('id', 'poll')
 
 
