@@ -124,7 +124,7 @@ TIME_ZONE = 'Asia/Tashkent'
 
 USE_I18N = True
 
-USE_TZ = False
+USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
@@ -140,24 +140,24 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'jwt': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header'
-        }
-    },
-    'SWAGGER_UI_REQUEST_HEADERS': [
-        {
-            'name': 'Authorization',
-            'description': 'JWT Token',
-            'value': 'Bearer <your_jwt_token_here>'
-        },
-    ],
-    'LOGIN_URL': 'api/v1/auth/login',
-    "DEFAULT_MODEL_RENDERING": "example"
-}
+# SWAGGER_SETTINGS = {
+#     'SECURITY_DEFINITIONS': {
+#         'jwt': {
+#             'type': 'apiKey',
+#             'name': 'Authorization',
+#             'in': 'header'
+#         }
+#     },
+#     'SWAGGER_UI_REQUEST_HEADERS': [
+#         {
+#             'name': 'Authorization',
+#             'description': 'JWT Token',
+#             'value': 'Bearer <your_jwt_token_here>'
+#         },
+#     ],
+#     'LOGIN_URL': 'api/v1/auth/login',
+#     "DEFAULT_MODEL_RENDERING": "example"
+# }
 
 customColorPalette = [
     {

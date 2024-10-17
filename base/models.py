@@ -1,3 +1,5 @@
+from math import trunc
+
 from django.db import models
 
 from abstract_models.base_model import BaseModel
@@ -18,12 +20,16 @@ class AboutUs(BaseModel):
     title = models.CharField(max_length=200)
     description = CKEditor5Field()
 
+    telegram_url = models.URLField(default='telegram.org')
+    instagram_url = models.URLField(default='instagram.com')
+    facebook_url = models.URLField(default='facebook.com')
+
     def __str__(self):
         return self.title
 
 
 class AdditionalLinks(BaseModel):
-    short_description = models.CharField(max_length=500)
+    title = models.CharField(max_length=250)
     link = models.URLField()
     image = models.ImageField(upload_to='additional_links/')
 
