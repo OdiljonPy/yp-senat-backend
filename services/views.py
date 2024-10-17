@@ -1,20 +1,21 @@
+from django.db.models import Q
 from drf_yasg import openapi
-from rest_framework.viewsets import ViewSet
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
-from drf_yasg.utils import swagger_auto_schema
-from django.db.models import Q
+from rest_framework.viewsets import ViewSet
 
 from drf_yasg import openapi
 from .repository.get_project_filter import get_projects_filter
 from django.db.models import Q
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
-from .models import Banner, Region, CommissionCategory, CommissionMember, Projects, AppealMember, Appeal, Post, Opinion
+from .models import Banner, Region, CommissionCategory, CommissionMember, Projects, Post
+from .repository.get_posts_list import get_post_list
 from .serializers import (
     BannerSerializer, RegionSerializer, CommissionMemberSerializer, ProjectsSerializer, CommissionCategorySerializer,
     AppealSerializer, AppealMemberSerializer, NewsSerializer, OpinionSerializer, ParamValidateSerializer
-    AppealSerializer, AppealMemberSerializer, NewsSerializer, OpinionSerializer, FilterSerializer
+    AppealSerializer, AppealMemberSerializer, PostSerializer, OpinionSerializer, FilterSerializer
 )
 
 
@@ -182,12 +183,12 @@ class NewsViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='List Of News',
         operation_description='List of news',
-        responses={200: NewsSerializer()},
+        responses={200: PostSerializer()},
         tags=['News']
     )
     def news_list(self, request):
         news = Post.objects.all()
-        serializer = NewsSerializer(news, many=True, context={'request': request})
+        serializer = PostSerializer(news, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
 
@@ -245,7 +246,7 @@ class ViewsCountViewSet(ViewSet):
             obj.views_count += 1
             obj.save()
             viewed_news.append(f"{obj.id}-{user_ip}")
-        serializer = NewsSerializer(obj)
+        serializer = PostSerializer(obj)
         response = Response(serializer.data)
         response.set_cookie('viewed_articles', ','.join(viewed_news), max_age=3600 * 24 * 30)  # 30 days
 
@@ -257,21 +258,34 @@ class FilteringViewSet(ViewSet):
         manual_parameters=[
             openapi.Parameter(
                 name='q', in_=openapi.IN_QUERY, description='Search q', type=openapi.TYPE_STRING),
+            openapi.Parameter(
+                name='page', in_=openapi.IN_QUERY, description='Page', type=openapi.TYPE_INTEGER),
+            openapi.Parameter(
+                name='page_size', in_=openapi.IN_QUERY, description='Page size', type=openapi.TYPE_INTEGER),
+            openapi.Parameter(
+                name='member', in_=openapi.IN_QUERY, description='Page size', type=openapi.TYPE_INTEGER),
+
         ],
         operation_summary='News filter ',
         operation_description="News filter",
-        responses={200: NewsSerializer()},
+        responses={200: PostSerializer()},
         tags=['News'])
     def filtering_by_news(self, request):
         serializer_params = FilterSerializer(data=request.query_params.copy(), context={'request': request})
         if not serializer_params.is_valid():
             raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
-
+        member = serializer_params.validated_data.get('member', '')
         q = serializer_params.validated_data.get('q', '')
         filter_ = Q()
         if q:
             filter_ &= (Q(short_description__icontains=q) | Q(description__icontains=q))
 
-        news = Post.objects.filter(filter_).order_by('-created_at')
+        if 'member' in serializer_params.data:
+            filter_ &= Q(commission_member=member)
 
-        return Response(data={'data': NewsSerializer(news, many=True, context={'request': request}).data})
+        posts = Post.objects.filter(filter_).order_by('-created_at')
+        response = get_post_list(context={'request': request, 'query': posts},
+                                 page=serializer_params.data.get('page', 1),
+                                 page_size=serializer_params.data.get('page_size', 10))
+
+        return Response(data={'result': response.data, 'ok': True}, status=status.HTTP_200_OK)

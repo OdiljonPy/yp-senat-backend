@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from config import settings
 from .models import (
-    Banner, Region, CommissionCategory, CommissionMember, Projects, News, AppealMember, Appeal, Opinion, PROJECT_STATUS)
+    Banner, Region, CommissionCategory, CommissionMember, Projects, Post, AppealMember, Appeal, Opinion, PROJECT_STATUS)
 from exceptions.exception import CustomApiException
 from exceptions.error_messages import ErrorCodes
 
@@ -16,6 +16,7 @@ class ParamValidateSerializer(serializers.Serializer):
             raise CustomApiException(ErrorCodes.VALIDATION_FAILED,
                                      message='page and page_size must be positive integer')
         return data
+
 
 
 class BannerSerializer(serializers.ModelSerializer):
@@ -96,7 +97,7 @@ class ProjectsSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'short_description', 'description', 'file', 'status', 'created_at', 'is_published']
 
 
-class NewsSerializer(serializers.ModelSerializer):
+class PostSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         request = self.context.get('request')
@@ -107,9 +108,10 @@ class NewsSerializer(serializers.ModelSerializer):
         self.fields['description'] = serializers.CharField(source=f'description_{language}')
 
     class Meta:
-        model = News
-        fields = ['id', 'image', 'short_description', 'description', 'telegram_url', 'instagram_url', 'facebook_url',
-                  'created_at', 'is_published']
+        model = Post
+        fields = ['id', 'image', 'short_description', 'description', 'commission_member', 'telegram_url',
+                  'instagram_url', 'facebook_url', 'created_at', 'is_published']
+
 
 
 class AppealMemberSerializer(serializers.ModelSerializer):
@@ -159,10 +161,9 @@ class OpinionSerializer(serializers.ModelSerializer):
         model = Opinion
         fields = ['id', 'full_name', 'phone_number', 'message', 'created_at']
 
+
 class FilterSerializer(serializers.Serializer):
     q = serializers.CharField(required=False)
     page = serializers.IntegerField(required=False, default=1)
     page_size = serializers.IntegerField(required=False, default=10)
     date = serializers.DateTimeField(required=False)
-
-

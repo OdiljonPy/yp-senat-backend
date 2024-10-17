@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Banner, Region, CommissionCategory, CommissionMember, Projects, AppealMember, Appeal, News, Opinion
+from .models import Banner, Region, CommissionCategory, CommissionMember, Projects, AppealMember, Appeal, Post, Opinion
 
 
 @admin.register(Banner)
@@ -44,7 +44,7 @@ class AppealAdmin(admin.ModelAdmin):
     list_display_links = ('id', 'full_name')
 
 
-@admin.register(News)
+@admin.register(Post)
 class NewsAdmin(admin.ModelAdmin):
     list_display = ('id',)
     list_display_links = ('id',)

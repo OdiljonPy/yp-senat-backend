@@ -1,3 +1,4 @@
+from django.contrib.admin import ModelAdmin
 from django.db import models
 from abstract_models.base_model import BaseModel
 
@@ -106,6 +107,7 @@ class Appeal(BaseModel):
 
 
 class Post(BaseModel):
+    title = models.CharField(max_length=255)
     image = models.ImageField(upload_to='news/')
     short_description = models.CharField(max_length=200)
     description = RichTextField()
