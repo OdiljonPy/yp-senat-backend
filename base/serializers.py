@@ -17,7 +17,7 @@ class AboutUsSerializer(serializers.ModelSerializer):
 class AdditionalLinksSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdditionalLinks
-        fields = ('id', 'short_description', 'link')
+        fields = ('id', 'title', 'link')
 
 
 class ContactUsSerializer(serializers.ModelSerializer):
