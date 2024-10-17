@@ -44,8 +44,8 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("ckeditor5/", include('django_ckeditor_5.urls')),
-    path('', include('services.urls')),
-    path('base/', include('base.urls')),
+    path('api/v1/', include('services.urls')),
+    path('api/v1/base/', include('base.urls')),
 
 
     re_path(r'static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),

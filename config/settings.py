@@ -6,7 +6,6 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -19,7 +18,6 @@ DEBUG = int(os.getenv('DEBUG', 1))
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1').split(',')
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -30,12 +28,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    #packages
+    # packages
     'rest_framework',
     'drf_yasg',
     'django_ckeditor_5',
 
-    #apps
+    # apps
     'services',
     'base',
 ]
@@ -78,7 +76,6 @@ CORS_ALLOW_HEADERS = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -118,7 +115,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -129,7 +125,6 @@ TIME_ZONE = 'Asia/Tashkent'
 USE_I18N = True
 
 USE_TZ = False
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
@@ -241,5 +236,3 @@ CKEDITOR_5_CONFIGS = {
         }
     }
 }
-
-BASE_URL = os.getenv('BASE_URL', '')
