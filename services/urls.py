@@ -14,7 +14,7 @@ urlpatterns = [
     path('commission/', CommissionViewSet.as_view({'get': 'commission_member_list'}), name='commission_list'),
     path('commission/<int:pk>/', CommissionViewSet.as_view({'get': 'commission_member_detail'}),
          name='commission_detail'),
-    path('region_commission/<int:pk>/', CommissionViewSet.as_view({'get': 'commission_member_by_region'}),
+    path('region/commissions/<int:pk>/', CommissionViewSet.as_view({'get': 'commission_member_by_region_id'}),
          name='region_commission'),
     path('commission/category/', CommissionViewSet.as_view({'get': 'commission_category_list'}),
          name='commission_category'),

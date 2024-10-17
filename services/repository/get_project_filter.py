@@ -1,6 +1,6 @@
 from django.core.paginator import Paginator
 from django.db.models import Count
-from .serializers import ProjectsSerializer
+from services.serializers import ProjectsSerializer
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
 

@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from .utils import get_projects_filter
+from .repository.get_project_filter import get_projects_filter
 from django.db.models import Q
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
@@ -66,8 +66,8 @@ class CommissionViewSet(ViewSet):
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
-        operation_summary='Commission members by region',
-        operation_description='List of commission members by region',
+        operation_summary='Commission members by region id',
+        operation_description='List of commission members by region id',
         responses={200: CommissionMemberSerializer()},
         tags=['Commission']
     )
@@ -76,8 +76,9 @@ class CommissionViewSet(ViewSet):
         if not commission_members:
             raise CustomApiException(ErrorCodes.NOT_FOUND, message='Commission members not found')
         return Response(
-            data={'result': CommissionMemberSerializer(commission_members, many=True, context={'request': request}).data,
-                  'ok': True})
+            data={
+                'result': CommissionMemberSerializer(commission_members, many=True, context={'request': request}).data,
+                'ok': True})
 
     @swagger_auto_schema(
         operation_summary='List Of Commission Categories',
@@ -103,7 +104,6 @@ class ProjectViewSet(ViewSet):
         serializer = ProjectsSerializer(projects, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
-
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
@@ -113,7 +113,7 @@ class ProjectViewSet(ViewSet):
             openapi.Parameter(
                 name='status', in_=openapi.IN_QUERY, description='Status', type=openapi.TYPE_INTEGER)
         ],
-        operation_summary='List Of Projects by Type',
+        operation_summary='List of projects by type',
         operation_description='List of projects by type',
         responses={200: ProjectsSerializer()},
         tags=['Project']
@@ -128,11 +128,9 @@ class ProjectViewSet(ViewSet):
         query = Q()
         if status_:
             query &= Q(status=status_)
-        # if status_:
         projects = Projects.objects.filter(query).order_by('id')
-        # else:
-        #     projects = Projects.objects.all().order_by('id')
-        response = get_projects_filter(context={'request': request, 'project_param': projects}, page=page, page_size=page_size)
+        response = get_projects_filter(
+            context={'request': request, 'project_param': projects}, page=page, page_size=page_size)
         return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
 
 
