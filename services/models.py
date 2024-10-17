@@ -3,8 +3,7 @@ from abstract_models.base_model import BaseModel
 
 from utils.validations import phone_number_validation
 
-from django_ckeditor_5.fields import CKEditor5Field
-
+from ckeditor.fields import RichTextField
 
 GENDER = (
     (1, 'Male'),
@@ -26,6 +25,7 @@ MEMBER_TYPE = (
 class Banner(BaseModel):
     image = models.ImageField(upload_to='banner/')
     short_description = models.CharField(max_length=255)
+    is_published = models.BooleanField(default=True)
 
     def __str__(self):
         return str(self.id) or ''
@@ -51,7 +51,7 @@ class CommissionMember(BaseModel):
 
     full_name = models.CharField(max_length=100)
     type = models.PositiveIntegerField(choices=MEMBER_TYPE, default=1)
-    description = CKEditor5Field()
+    description = RichTextField()
     position = models.CharField(max_length=80)
     birthdate = models.DateTimeField()
     nation = models.CharField(max_length=100)
@@ -70,9 +70,10 @@ class CommissionMember(BaseModel):
 class Projects(BaseModel):
     name = models.CharField(max_length=100)
     short_description = models.CharField(max_length=200)
-    description = CKEditor5Field()
+    description = RichTextField()
     file = models.FileField(upload_to="project/")
     status = models.PositiveIntegerField(choices=PROJECT_STATUS, default=2)
+    is_published = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -107,7 +108,8 @@ class Appeal(BaseModel):
 class News(BaseModel):
     image = models.ImageField(upload_to='news/')
     short_description = models.CharField(max_length=200)
-    description = CKEditor5Field()
+    description = RichTextField()
+    is_published = models.BooleanField(default=True)
 
     telegram_url = models.URLField(default='telegram.org')
     instagram_url = models.URLField(default='instagram.com')
