@@ -1,9 +1,13 @@
-from .models import FAQ, AboutUs, AdditionalLinks, ContactUs
-from .serializers import FAQSerializer, AdditionalLinksSerializer, AboutUsSerializer, ContactUsSerializer
+from .models import FAQ, AboutUs, AdditionalLinks, ContactUs, Poll, Question, Option, PollResult, PollAnswer
+from .serializers import (
+    FAQSerializer, AdditionalLinksSerializer, AboutUsSerializer, ContactUsSerializer, PollSerializer,
+    QuestionSerializer, OptionSerializer, PollResultSerializer, PollAnswerSerializer
+)
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
-from exceptions import error_messages, exception
+from exceptions.error_messages import ErrorCodes
+from exceptions.exception import CustomApiException
 from drf_yasg.utils import swagger_auto_schema
 
 
@@ -60,3 +64,30 @@ class ContactUsViewSet(ViewSet):
         return Response(
             data={'result': ContactUsSerializer(data, many=True, context={'request': request}).data, 'ok': True},
             status=status.HTTP_200_OK)
+
+
+class PollViewSet(ViewSet):
+    @swagger_auto_schema(
+        operation_summary='List Of Polls',
+        operation_description='List of polls',
+        responses={200: PollSerializer()},
+        tags=['Poll']
+    )
+    def get_polls(self, request):
+        polls = Poll.objects.all()
+        serializer = PollSerializer(polls, many=True, context={'request': request})
+        return Response(data={'result': serializer.data}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary='Detail Poll',
+        operation_description='Detail poll',
+        responses={200: PollSerializer()},
+        tags=['Poll']
+    )
+    def get_poll_detail(self, request, pk):
+        poll = Poll.objects.filter(id=pk).first()
+        if not poll:
+            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
+
+        serializer = PollSerializer(poll, context={'request': request})
+        return Response(data={'result': serializer.data}, status=status.HTTP_200_OK)
