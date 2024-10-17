@@ -17,5 +17,5 @@ urlpatterns = [
          name='commission_category'),
 
     path('appeal/', AppealViewSet.as_view({'post': 'create_appeal'}), name='appeal'),
-    path('appeal/member/', AppealViewSet.as_view({'get': 'create_appeal_member'}), name='appeal_member'),
+    path('appeal/member/', AppealViewSet.as_view({'post': 'create_appeal_member'}), name='appeal_member'),
 ]
