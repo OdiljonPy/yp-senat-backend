@@ -36,7 +36,7 @@ class ProjectsSerializer(serializers.ModelSerializer):
 class NewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
-        fields = ['id', 'image', 'short_description', 'description', 'telegram_url', 'youtube_url', 'instagram_url']
+        fields = ['id', 'image', 'short_description', 'description', 'telegram_url', 'instagram_url', 'facebook_url']
 
 
 class AppealMemberSerializer(serializers.ModelSerializer):
