@@ -7,7 +7,6 @@ from exceptions.exception import CustomApiException
 def get_projects_filter(context: dict, page: int, page_size: int):
     projects = context.get('project_param')
     total_projects = projects.aggregate(count=Count('id'))['count']
-    total_count = projects.count()
     paginator = Paginator(projects, page_size)
     if page > paginator.num_pages:
         raise CustomApiException(ErrorCodes.NOT_FOUND, message='Page do not exists')
@@ -21,7 +20,7 @@ def get_projects_filter(context: dict, page: int, page_size: int):
         "numberOfElements": len(page_obj),
         "first": not page_obj.has_previous(),
         "last": not page_obj.has_next(),
-        "empty": total_count == 0,
+        "empty": total_projects == 0,
         "content": ProjectsSerializer(page_obj, many=True, context=context).data,
     }
     return responses

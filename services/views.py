@@ -53,6 +53,17 @@ class CommissionViewSet(ViewSet):
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
+        operation_summary='List Of Commission Members By Category ID',
+        operation_description='List of commission members by category id',
+        responses={200: CommissionMemberSerializer()},
+        tags=['Commission']
+    )
+    def commission_members_by_category(self, request, pk):
+        members = CommissionMember.objects.filter(commission_category_id=pk)
+        serializer = CommissionMemberSerializer(members, many=True, context={'request': request})
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
         operation_summary='Detail Of Commission Member',
         operation_description='Detail of commission member',
         responses={200: CommissionMemberSerializer()},
@@ -73,12 +84,9 @@ class CommissionViewSet(ViewSet):
     )
     def commission_member_by_region(self, request, pk):
         commission_members = CommissionMember.objects.filter(region_id=pk)
-        if not commission_members:
-            raise CustomApiException(ErrorCodes.NOT_FOUND, message='Commission members not found')
         return Response(
-            data={
-                'result': CommissionMemberSerializer(commission_members, many=True, context={'request': request}).data,
-                'ok': True})
+            data={'result': CommissionMemberSerializer(commission_members, many=True, context={'request': request}
+                                                       ).data, 'ok': True})
 
     @swagger_auto_schema(
         operation_summary='List Of Commission Categories',
