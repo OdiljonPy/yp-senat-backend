@@ -121,8 +121,5 @@ class AppealSerializer(serializers.ModelSerializer):
         fields = ['id', 'full_name', 'phone_number', 'email', 'message']
 
 
-class FilterSerializer(serializers.Serializer):
+class PostFilterSerializer(ParamValidateSerializer):
     q = serializers.CharField(required=False)
-    page = serializers.IntegerField(required=False, default=1)
-    page_size = serializers.IntegerField(required=False, default=10)
-    date = serializers.DateTimeField(required=False)
