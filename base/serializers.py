@@ -58,7 +58,7 @@ class ContactUsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ContactUs
-        fields = ('id', 'email', 'phone_number', 'address')
+        fields = ('id', 'email', 'phone_number', 'address', 'latitude', 'longitude')
 
 
 class PollSerializer(serializers.ModelSerializer):
@@ -78,6 +78,7 @@ class PollSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data['questions'] = QuestionSerializer(Question.objects.filter(poll_id=instance.id), many=True).data
+        return data
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -96,6 +97,7 @@ class QuestionSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data['options'] = OptionSerializer(Option.objects.filter(question_id=instance.id), many=True).data
+        return data
 
 
 class OptionSerializer(serializers.ModelSerializer):
@@ -120,6 +122,7 @@ class PollResultSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data['answers'] = PollAnswerSerializer(PollAnswer.objects.filter(result_id=instance.id), many=True).data
+        return data
 
 
 class PollAnswerSerializer(serializers.ModelSerializer):

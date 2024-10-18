@@ -1,16 +1,19 @@
-from rest_framework.viewsets import ViewSet
+from django.db.models import Q
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
-from .repository.get_project_filter import get_projects_filter
-from django.db.models import Q
+from rest_framework.viewsets import ViewSet
+
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
-from .models import Banner, Region, CommissionCategory, CommissionMember, Projects, AppealMember, Appeal, News, Opinion
+from .models import (Banner, Region, CommissionCategory,
+                     CommissionMember, Projects, Post)
+from .repository.get_posts_list import get_post_list
+from .repository.get_project_filter import get_projects_filter
 from .serializers import (
     BannerSerializer, RegionSerializer, CommissionMemberSerializer, ProjectsSerializer, CommissionCategorySerializer,
-    AppealSerializer, AppealMemberSerializer, NewsSerializer, OpinionSerializer, ParamValidateSerializer
+    AppealSerializer, ParamValidateSerializer, PostSerializer, PostFilterSerializer
 )
 
 
@@ -18,11 +21,11 @@ class BannerViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='List Of Banners',
         operation_description='List of banners',
-        responses={200: BannerSerializer()},
+        responses={200: BannerSerializer(many=True)},
         tags=['Banner']
     )
     def banner_list(self, request):
-        banners = Banner.objects.all()
+        banners = Banner.objects.filter(is_published=True)
         serializer = BannerSerializer(banners, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
@@ -31,7 +34,7 @@ class RegionViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='List Of Regions',
         operation_description='List of regions',
-        responses={200: RegionSerializer()},
+        responses={200: RegionSerializer(many=True)},
         tags=['Region']
     )
     def region_list(self, request):
@@ -44,7 +47,7 @@ class CommissionViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='List Of Commission Members',
         operation_description='List of commission members',
-        responses={200: CommissionMemberSerializer()},
+        responses={200: CommissionMemberSerializer(many=True)},
         tags=['Commission']
     )
     def commission_member_list(self, request):
@@ -55,7 +58,7 @@ class CommissionViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='List Of Commission Members By Category ID',
         operation_description='List of commission members by category id',
-        responses={200: CommissionMemberSerializer()},
+        responses={200: CommissionMemberSerializer(many=True)},
         tags=['Commission']
     )
     def commission_members_by_category(self, request, pk):
@@ -79,19 +82,19 @@ class CommissionViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='Commission members by region id',
         operation_description='List of commission members by region id',
-        responses={200: CommissionMemberSerializer()},
+        responses={200: CommissionMemberSerializer(many=True)},
         tags=['Commission']
     )
     def commission_member_by_region(self, request, pk):
         commission_members = CommissionMember.objects.filter(region_id=pk)
         return Response(
             data={'result': CommissionMemberSerializer(commission_members, many=True, context={'request': request}
-                                                       ).data, 'ok': True})
+                                                       ).data, 'ok': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         operation_summary='List Of Commission Categories',
         operation_description='List of commission categories',
-        responses={200: CommissionCategorySerializer()},
+        responses={200: CommissionCategorySerializer(many=True)},
         tags=['Commission']
     )
     def commission_category_list(self, request):
@@ -104,11 +107,11 @@ class ProjectViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='List Of Projects',
         operation_description='List of projects',
-        responses={200: ProjectsSerializer()},
+        responses={200: ProjectsSerializer(many=True)},
         tags=['Project']
     )
     def projects_list(self, request):
-        projects = Projects.objects.all()
+        projects = Projects.objects.filter(is_published=True)
         serializer = ProjectsSerializer(projects, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
@@ -123,7 +126,7 @@ class ProjectViewSet(ViewSet):
         ],
         operation_summary='List of projects by type',
         operation_description='List of projects by type',
-        responses={200: ProjectsSerializer()},
+        responses={200: ProjectsSerializer(many=True)},
         tags=['Project']
     )
     def filter_by_query_param(self, request):
@@ -136,7 +139,7 @@ class ProjectViewSet(ViewSet):
         query = Q()
         if status_:
             query &= Q(status=status_)
-        projects = Projects.objects.filter(query).order_by('id')
+        projects = Projects.objects.filter(query, is_published=True).order_by('id')
         response = get_projects_filter(
             context={'request': request, 'project_param': projects}, page=page, page_size=page_size)
         return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
@@ -154,51 +157,86 @@ class AppealViewSet(ViewSet):
         data = request.data
         serializer = AppealSerializer(data=data, context={'request': request})
         if not serializer.is_valid():
-            raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT, message=serializer.errors)
-        serializer.save()
-        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_201_CREATED)
-
-    @swagger_auto_schema(
-        request_body=AppealMemberSerializer(),
-        operation_summary='Create Appeal Member',
-        operation_description='Create appeal member',
-        responses={201: AppealMemberSerializer()},
-        tags=['Appeal']
-    )
-    def create_appeal_member(self, request):
-        data = request.data
-        serializer = AppealMemberSerializer(data=data, context={'request': request})
-        if not serializer.is_valid():
-            raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT, message=serializer.errors)
+            raise CustomApiException(error_code=ErrorCodes.VALIDATION_FAILED, message=serializer.errors)
         serializer.save()
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_201_CREATED)
 
 
-class NewsViewSet(ViewSet):
+class PostViewSet(ViewSet):
     @swagger_auto_schema(
-        operation_summary='List Of News',
-        operation_description='List of news',
-        responses={200: NewsSerializer()},
-        tags=['News']
+        operation_summary='List Of Posts',
+        operation_description='List of Posts',
+        responses={200: PostSerializer()},
+        tags=['Post']
     )
-    def news_list(self, request):
-        news = News.objects.all()
-        serializer = NewsSerializer(news, many=True, context={'request': request})
+    def post_list(self, request):
+        posts = Post.objects.all()
+        serializer = PostSerializer(posts, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
 
-class OpinionViewSet(ViewSet):
+class ViewsCountViewSet(ViewSet):
     @swagger_auto_schema(
-        request_body=OpinionSerializer(),
-        operation_summary='Create Opinion',
-        operation_description='Create opinion',
-        responses={201: OpinionSerializer()},
-        tags=['Opinion']
+        operation_summary='count posts',
+        operation_description='count posts',
+        tags=['Views count']
     )
-    def create_opinion(self, request):
-        data = request.data
-        serializer = OpinionSerializer(data=data, context={'request': request})
-        if not serializer.is_valid():
-            raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT, message=serializer.errors)
-        serializer.save()
-        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+    def count_views(self, request, pk=None):
+        obj = Post.objects.filter(id=pk).first()
+        user_ip = request.META.get('REMOTE_ADDR')
+        if not obj:
+            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
+
+        viewed_posts = request.COOKIES.get('viewed_posts', '')
+        if viewed_posts:
+            viewed_posts = viewed_posts.split(',')
+        else:
+            viewed_posts = []
+
+        if f"{obj.id}-{user_ip}" not in viewed_posts:
+            obj.views_count += 1
+            obj.save()
+            viewed_posts.append(f"{obj.id}-{user_ip}")
+        serializer = PostSerializer(obj)
+        response = Response(serializer.data)
+        response.set_cookie('viewed_articles', ','.join(viewed_posts), max_age=3600 * 24 * 30)  # 30 days
+
+        return response
+
+
+class FilteringViewSet(ViewSet):
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                name='q', in_=openapi.IN_QUERY, description='Search q', type=openapi.TYPE_STRING),
+            openapi.Parameter(
+                name='page', in_=openapi.IN_QUERY, description='Page', type=openapi.TYPE_INTEGER),
+            openapi.Parameter(
+                name='page_size', in_=openapi.IN_QUERY, description='Page size', type=openapi.TYPE_INTEGER),
+            openapi.Parameter(
+                name='member', in_=openapi.IN_QUERY, description='Page size', type=openapi.TYPE_INTEGER),
+
+        ],
+        operation_summary='Posts filter ',
+        operation_description="Posts filter",
+        responses={200: PostSerializer()},
+        tags=['Post'])
+    def filtering_by_post(self, request):
+        serializer_params = PostFilterSerializer(data=request.query_params.copy(), context={'request': request})
+        if not serializer_params.is_valid():
+            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
+        member = serializer_params.validated_data.get('member', '')
+        q = serializer_params.validated_data.get('q', '')
+        filter_ = Q()
+        if q:
+            filter_ &= (Q(short_description__icontains=q) | Q(description__icontains=q))
+
+        if 'member' in serializer_params.data:
+            filter_ &= Q(commission_member=member)
+
+        posts = Post.objects.filter(filter_).order_by('-created_at')
+        response = get_post_list(context={'request': request, 'query': posts},
+                                 page=serializer_params.data.get('page', 1),
+                                 page_size=serializer_params.data.get('page_size', 10))
+
+        return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)

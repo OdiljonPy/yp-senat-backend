@@ -5,43 +5,50 @@ from .models import FAQ, AboutUs, AdditionalLinks, ContactUs, Poll, Question, Op
 @admin.register(FAQ)
 class FAQAdmin(admin.ModelAdmin):
     list_display = ('id',)
-    list_display_links = ('id',)
-
+    search_fields = ('answer', 'question')
+    list_filter = ('is_visible',)
 
 @admin.register(AboutUs)
 class AboutUsAdmin(admin.ModelAdmin):
     list_display = ('id', 'title')
     list_display_links = ('id', 'title')
+    search_fields = ('title', 'description')
 
 
 @admin.register(AdditionalLinks)
 class AdditionalLinksAdmin(admin.ModelAdmin):
     list_display = ('id',)
-    list_display_links = ('id',)
+    search_fields = ('title',)
+    list_filter = ('is_visible',)
 
 
 @admin.register(ContactUs)
 class ContactUsAdmin(admin.ModelAdmin):
     list_display = ('id', 'phone_number', 'email')
-    list_display_links = ('id',)
+    list_display_links = ('id', 'phone_number')
+    search_fields = ('phone_number', 'email', 'address')
 
 
 @admin.register(Poll)
 class PollAdmin(admin.ModelAdmin):
     list_display = ('id', 'title')
     list_display_links = ('id', 'title')
+    search_fields = ('title', 'description')
 
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'poll', 'text', 'type')
+    list_display = ('id', 'poll', 'type')
     list_display_links = ('id', 'poll')
+    search_fields = ('text',)
+    list_filter = ('type',)
 
 
 @admin.register(Option)
 class OptionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'question', 'text')
+    list_display = ('id', 'question')
     list_display_links = ('id', 'question')
+    search_fields = ('question', 'text')
 
 
 class PollAnswerTabularInline(admin.TabularInline):
@@ -53,4 +60,6 @@ class PollAnswerTabularInline(admin.TabularInline):
 class PollResultAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'poll')
     list_display_links = ('id', 'user')
+    search_fields = ('user',)
+    list_filter = ('poll',)
     inlines = [PollAnswerTabularInline]

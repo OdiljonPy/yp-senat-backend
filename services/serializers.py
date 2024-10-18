@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from config import settings
 from .models import (
-    Banner, Region, CommissionCategory, CommissionMember, Projects, News, AppealMember, Appeal, Opinion, PROJECT_STATUS)
+    Banner, Region, CommissionCategory, CommissionMember, Projects, Post, Appeal, PROJECT_STATUS)
 from exceptions.exception import CustomApiException
 from exceptions.error_messages import ErrorCodes
 
@@ -25,11 +25,11 @@ class BannerSerializer(serializers.ModelSerializer):
         language = 'ru'
         if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
             language = request.META.get('HTTP_ACCEPT_LANGUAGE')
-        self.fields['short_description'] = serializers.CharField(source=f'short_description_{language}')
+        self.fields['title'] = serializers.CharField(source=f'title_{language}')
 
     class Meta:
         model = Banner
-        fields = ['id', 'image', 'short_description', 'created_at', 'is_published']
+        fields = ['id', 'image', 'title', 'created_at', 'is_published']
 
 
 class RegionSerializer(serializers.ModelSerializer):
@@ -96,65 +96,28 @@ class ProjectsSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'short_description', 'description', 'file', 'status', 'created_at', 'is_published']
 
 
-class NewsSerializer(serializers.ModelSerializer):
+class PostSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         request = self.context.get('request')
         language = 'ru'
         if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
             language = request.META.get('HTTP_ACCEPT_LANGUAGE')
+        self.fields['title'] = serializers.CharField(source=f'title_{language}')
         self.fields['short_description'] = serializers.CharField(source=f'short_description_{language}')
         self.fields['description'] = serializers.CharField(source=f'description_{language}')
 
     class Meta:
-        model = News
-        fields = ['id', 'image', 'short_description', 'description', 'telegram_url', 'instagram_url', 'facebook_url',
-                  'created_at', 'is_published']
-
-
-class AppealMemberSerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        request = self.context.get('request')
-        language = 'ru'
-        if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
-            language = request.META.get('HTTP_ACCEPT_LANGUAGE')
-        self.fields['full_name'] = serializers.CharField(source=f'full_name_{language}')
-        self.fields['message'] = serializers.CharField(source=f'message_{language}')
-        self.fields['address'] = serializers.CharField(source=f'address_{language}')
-        self.fields['gender'] = serializers.CharField(source=f'gender_{language}')
-
-    class Meta:
-        model = AppealMember
-        fields = ['id', 'commission_member', 'region', 'full_name', 'message', 'phone_number', 'address', 'email',
-                  'gender', 'birthdate']
+        model = Post
+        fields = ['id', 'image', 'short_description', 'description', 'commission_member', 'telegram_url',
+                  'instagram_url', 'facebook_url', 'created_at', 'is_published']
 
 
 class AppealSerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        request = self.context.get('request')
-        language = 'ru'
-        if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
-            language = request.META.get('HTTP_ACCEPT_LANGUAGE')
-        self.fields['full_name'] = serializers.CharField(source=f'full_name_{language}')
-        self.fields['message'] = serializers.CharField(source=f'message_{language}')
-
     class Meta:
         model = Appeal
         fields = ['id', 'full_name', 'phone_number', 'email', 'message']
 
 
-class OpinionSerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        request = self.context.get('request')
-        language = 'ru'
-        if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
-            language = request.META.get('HTTP_ACCEPT_LANGUAGE')
-        self.fields['full_name'] = serializers.CharField(source=f'full_name_{language}')
-        self.fields['message'] = serializers.CharField(source=f'message_{language}')
-
-    class Meta:
-        model = Opinion
-        fields = ['id', 'full_name', 'phone_number', 'message', 'created_at']
+class PostFilterSerializer(ParamValidateSerializer):
+    q = serializers.CharField(required=False)

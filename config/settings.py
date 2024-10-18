@@ -33,8 +33,7 @@ INSTALLED_APPS = [
     'modeltranslation',
     'corsheaders',
     'drf_yasg',
-    'ckeditor',
-    'ckeditor_uploader',
+    'tinymce',
 
     # apps
     'services',
@@ -153,59 +152,29 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# SWAGGER_SETTINGS = {
-#     'SECURITY_DEFINITIONS': {
-#         'jwt': {
-#             'type': 'apiKey',
-#             'name': 'Authorization',
-#             'in': 'header'
-#         }
-#     },
-#     'SWAGGER_UI_REQUEST_HEADERS': [
-#         {
-#             'name': 'Authorization',
-#             'description': 'JWT Token',
-#             'value': 'Bearer <your_jwt_token_here>'
-#         },
-#     ],
-#     'LOGIN_URL': 'api/v1/auth/login',
-#     "DEFAULT_MODEL_RENDERING": "example"
-# }
-
-customColorPalette = [
-    {
-        'color': 'hsl(4, 90%, 58%)',
-        'label': 'Red'
-    },
-    {
-        'color': 'hsl(340, 82%, 52%)',
-        'label': 'Pink'
-    },
-    {
-        'color': 'hsl(291, 64%, 42%)',
-        'label': 'Purple'
-    },
-    {
-        'color': 'hsl(262, 52%, 47%)',
-        'label': 'Deep Purple'
-    },
-    {
-        'color': 'hsl(231, 48%, 48%)',
-        'label': 'Indigo'
-    },
-    {
-        'color': 'hsl(207, 90%, 54%)',
-        'label': 'Blue'
-    },
-]
-
-CKEDITOR_CONFIGS = {
-    'default': {
-        'toolbar': 'full',
-        'height': 300,
-        'width': 'auto',
-    },
+TINYMCE_DEFAULT_CONFIG = {
+    'height': 500,
+    'width': '100%',
+    'plugins': 'advlist autolink lists link image charmap preview anchor '
+               'searchreplace visualblocks code fullscreen insertdatetime media table paste help',
+    'toolbar': 'undo redo | styleselect | bold italic | link image media | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+    'image_advtab': True,  # Enables advanced image options
+    'file_picker_callback': 'function(callback, value, meta) { \
+        if (meta.filetype === "image") { \
+            var input = document.createElement("input"); \
+            input.setAttribute("type", "file"); \
+            input.setAttribute("accept", "image/*"); \
+            input.onchange = function() { \
+                var file = this.files[0]; \
+                var reader = new FileReader(); \
+                reader.onload = function() { \
+                    callback(reader.result, { alt: file.name }); \
+                }; \
+                reader.readAsDataURL(file); \
+            }; \
+            input.click(); \
+        } \
+    }',
 }
-
-CKEDITOR_UPLOAD_PATH = "ckeditor/"
-
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880
