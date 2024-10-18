@@ -8,9 +8,7 @@ def get_projects_filter(context: dict, page: int, page_size: int):
     projects = context.get('project_param')
     total_projects = projects.aggregate(count=Count('id'))['count']
     paginator = Paginator(projects, page_size)
-    if page > paginator.num_pages:
-        raise CustomApiException(ErrorCodes.NOT_FOUND, message='Page do not exists')
-    page_obj = paginator.page(page)
+    page_obj = paginator.get_page(page)
 
     responses = {
         "totalElements": total_projects,
