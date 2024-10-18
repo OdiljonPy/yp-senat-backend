@@ -5,24 +5,24 @@ from abstract_models.base_model import BaseModel
 from utils.validations import phone_number_validation
 
 GENDER = (
-    (1, 'Male'),
-    (2, 'Female'),
+    (1, 'Мужчина'),
+    (2, 'Женщина'),
 )
 
 PROJECT_STATUS = (
-    (1, "Finished"),
-    (2, "InProces"),
+    (1, "Оконченный"),
+    (2, "В процессе"),
 )
 
 MEMBER_TYPE = (
-    (1, 'Constant'),
-    (2, "Regional"),
+    (1, 'Постоянный'),
+    (2, "Региональный"),
 )
 
 
 class Banner(BaseModel):
     image = models.ImageField(upload_to='banner/', verbose_name='Изображение')
-    short_description = models.CharField(max_length=255, verbose_name='Краткое описание')
+    title = models.CharField(max_length=255, verbose_name='Заголовок')
     is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
 
     def __str__(self):
@@ -73,9 +73,9 @@ class CommissionMember(BaseModel):
     speciality = models.CharField(max_length=150, verbose_name='специальность')
     email = models.EmailField(verbose_name='электронная почта')
 
-    telegram_url = models.URLField(default='telegram.org', )
-    instagram_url = models.URLField(default='instagram.com')
-    facebook_url = models.URLField(default='facebook.com')
+    telegram_url = models.URLField(default='telegram.org', verbose_name="телеграм_url")
+    instagram_url = models.URLField(default='instagram.com', verbose_name="инстаграм_url")
+    facebook_url = models.URLField(default='facebook.com', verbose_name="фэйсбук_url")
 
     def __str__(self):
         return self.full_name

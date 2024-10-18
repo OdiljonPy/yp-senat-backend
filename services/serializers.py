@@ -18,7 +18,6 @@ class ParamValidateSerializer(serializers.Serializer):
         return data
 
 
-
 class BannerSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -26,11 +25,11 @@ class BannerSerializer(serializers.ModelSerializer):
         language = 'ru'
         if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
             language = request.META.get('HTTP_ACCEPT_LANGUAGE')
-        self.fields['short_description'] = serializers.CharField(source=f'short_description_{language}')
+        self.fields['title'] = serializers.CharField(source=f'short_description_{language}')
 
     class Meta:
         model = Banner
-        fields = ['id', 'image', 'short_description', 'created_at', 'is_published']
+        fields = ['id', 'image', 'title', 'created_at', 'is_published']
 
 
 class RegionSerializer(serializers.ModelSerializer):
@@ -104,6 +103,7 @@ class PostSerializer(serializers.ModelSerializer):
         language = 'ru'
         if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
             language = request.META.get('HTTP_ACCEPT_LANGUAGE')
+        self.fields['title'] = serializers.CharField(source=f'title_{language}')
         self.fields['short_description'] = serializers.CharField(source=f'short_description_{language}')
         self.fields['description'] = serializers.CharField(source=f'description_{language}')
 
@@ -113,9 +113,7 @@ class PostSerializer(serializers.ModelSerializer):
                   'instagram_url', 'facebook_url', 'created_at', 'is_published']
 
 
-
 class AppealSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Appeal
         fields = ['id', 'full_name', 'phone_number', 'email', 'message']

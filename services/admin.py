@@ -5,7 +5,7 @@ from .models import Banner, Region, CommissionCategory, CommissionMember, Projec
 @admin.register(Banner)
 class BannerAdmin(admin.ModelAdmin):
     list_display = ('id',)
-    search_fields = ('short_description',)
+    search_fields = ('title',)
     list_filter = ('is_published',)
 
 class CommissionMemberTabularInline(admin.TabularInline):

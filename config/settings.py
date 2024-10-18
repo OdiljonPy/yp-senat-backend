@@ -152,63 +152,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# SWAGGER_SETTINGS = {
-#     'SECURITY_DEFINITIONS': {
-#         'jwt': {
-#             'type': 'apiKey',
-#             'name': 'Authorization',
-#             'in': 'header'
-#         }
-#     },
-#     'SWAGGER_UI_REQUEST_HEADERS': [
-#         {
-#             'name': 'Authorization',
-#             'description': 'JWT Token',
-#             'value': 'Bearer <your_jwt_token_here>'
-#         },
-#     ],
-#     'LOGIN_URL': 'api/v1/auth/login',
-#     "DEFAULT_MODEL_RENDERING": "example"
-# }
-
-customColorPalette = [
-    {
-        'color': 'hsl(4, 90%, 58%)',
-        'label': 'Red'
-    },
-    {
-        'color': 'hsl(340, 82%, 52%)',
-        'label': 'Pink'
-    },
-    {
-        'color': 'hsl(291, 64%, 42%)',
-        'label': 'Purple'
-    },
-    {
-        'color': 'hsl(262, 52%, 47%)',
-        'label': 'Deep Purple'
-    },
-    {
-        'color': 'hsl(231, 48%, 48%)',
-        'label': 'Indigo'
-    },
-    {
-        'color': 'hsl(207, 90%, 54%)',
-        'label': 'Blue'
-    },
-]
-
-# CKEDITOR_CONFIGS = {
-#     'default': {
-#         'toolbar': 'full',
-#         'height': 300,
-#         'width': 'auto',
-#     },
-# }
-#
-# CKEDITOR_UPLOAD_PATH = "ckeditor/"
-#
-
 TINYMCE_DEFAULT_CONFIG = {
     'height': 500,
     'width': '100%',

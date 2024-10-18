@@ -1,10 +1,9 @@
 from modeltranslation.translator import translator, TranslationOptions
-from .models import Banner, Region, CommissionCategory, CommissionMember, Projects, Appeal
+from .models import Banner, Region, CommissionCategory, CommissionMember, Projects, Appeal, Post
 
 
 class BannerTranslationOption(TranslationOptions):
-    fields = ('short_description',)
-
+    fields = ('title',)
 
 class RegionTranslationOption(TranslationOptions):
     fields = ('name',)
@@ -25,9 +24,13 @@ class ProjectsTranslationOption(TranslationOptions):
 class AppealTranslationOption(TranslationOptions):
     fields = ('full_name', 'message')
 
+class PostTranslationOption(TranslationOptions):
+    fields = ('title', 'short_description', 'description')
+
 
 translator.register(Banner, BannerTranslationOption)
 translator.register(Region, RegionTranslationOption)
+translator.register(Post, PostTranslationOption)
 translator.register(CommissionMember, CommissionMemberTranslationOption)
 translator.register(CommissionCategory, CommissionCategoryTranslationOption)
 translator.register(Projects, ProjectsTranslationOption)
