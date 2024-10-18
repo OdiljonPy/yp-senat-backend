@@ -103,28 +103,9 @@ class Projects(BaseModel):
         ordering = ('created_at',)
 
 
-class AppealMember(BaseModel):
-    commission_member = models.ForeignKey(CommissionMember, on_delete=models.CASCADE, verbose_name='член комиссии')
-    region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='регион')
-
-    full_name = models.CharField(max_length=100, verbose_name='полное имя')
-    message = models.TextField(verbose_name='сообщение')
-    phone_number = models.CharField(max_length=14, validators=[phone_number_validation], verbose_name='номер телефона')
-    address = models.CharField(max_length=255, verbose_name='адрес')
-    email = models.EmailField(verbose_name='электронная почта')
-    gender = models.PositiveIntegerField(choices=GENDER, default=1, verbose_name='пол')
-    birthdate = models.DateField(verbose_name='Дата рождения')
-
-    def __str__(self):
-        return self.full_name
-
-    class Meta:
-        verbose_name = 'Запрос член'
-        verbose_name_plural = 'Запросы члена'
-        ordering = ('created_at',)
-
-
 class Appeal(BaseModel):
+    commission_member = models.ForeignKey(CommissionMember, on_delete=models.CASCADE, blank=True, null=True)
+
     full_name = models.CharField(max_length=100, verbose_name='Полное имя')
     phone_number = models.CharField(max_length=14, validators=[phone_number_validation], verbose_name='номер телефона')
     email = models.EmailField(verbose_name='электронная почта')
@@ -139,39 +120,30 @@ class Appeal(BaseModel):
         ordering = ('created_at',)
 
 
-
 class Post(BaseModel):
-    title = models.CharField(max_length=255)
-    image = models.ImageField(upload_to='news/')
-    short_description = models.CharField(max_length=200)
-    description = RichTextField()
-    is_published = models.BooleanField(default=True)
+    title = models.CharField(max_length=255, verbose_name="заголовок")
+    image = models.ImageField(upload_to='news/', verbose_name="изображение")
+    short_description = models.CharField(max_length=200, verbose_name="краткое описание")
+    description = HTMLField(verbose_name="описание")
+    is_published = models.BooleanField(default=True, verbose_name="опубликовано")
 
-    commission_member = models.ForeignKey(CommissionMember, on_delete=models.CASCADE, blank=True, null=True)
+    commission_member = models.ForeignKey(CommissionMember, on_delete=models.CASCADE, blank=True, null=True,
+                                          verbose_name="член комиссии")
 
-    views_count = models.IntegerField(default=0)
+    views_count = models.IntegerField(default=0, verbose_name="количество просмотров")
 
-    telegram_url = models.URLField(default='telegram.org')
-    instagram_url = models.URLField(default='instagram.com')
-    facebook_url = models.URLField(default='facebook.com')
+    telegram_url = models.URLField(default='telegram.org', verbose_name="телеграм_url")
+    instagram_url = models.URLField(default='instagram.com', verbose_name="инстаграм_url")
+    facebook_url = models.URLField(default='facebook.com', verbose_name="фэйсбук_url")
 
     def __str__(self):
         return self.short_description
 
+    class Meta:
+        verbose_name = 'Пост'
+        verbose_name_plural = 'Посты'
+        ordering = ('created_at',)
+
     def counts_view(self):
         self.views_count += 1
         self.save()
-
-
-class Opinion(BaseModel):
-    full_name = models.CharField(max_length=100, verbose_name='Полное имя')
-    phone_number = models.CharField(max_length=14, validators=[phone_number_validation], verbose_name='номер телефона')
-    message = models.TextField(verbose_name='Сообщение')
-
-    def __str__(self):
-        return self.full_name
-
-    class Meta:
-        verbose_name = 'Мнение'
-        verbose_name_plural = 'Мнения'
-        ordering = ('created_at',)
