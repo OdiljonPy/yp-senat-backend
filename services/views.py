@@ -7,9 +7,9 @@ from rest_framework.viewsets import ViewSet
 
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
-from .repository.get_posts_list import get_post_list
 from .models import (Banner, Region, CommissionCategory,
                      CommissionMember, Projects, Post)
+from .repository.get_posts_list import get_post_list
 from .repository.get_project_filter import get_projects_filter
 from .serializers import (
     BannerSerializer, RegionSerializer, CommissionMemberSerializer, ProjectsSerializer, CommissionCategorySerializer,
@@ -184,13 +184,14 @@ class ViewsCountViewSet(ViewSet):
     def count_views(self, request, pk=None):
         obj = Post.objects.filter(id=pk).first()
         user_ip = request.META.get('REMOTE_ADDR')
+        if not obj:
+            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
 
         viewed_posts = request.COOKIES.get('viewed_posts', '')
         if viewed_posts:
             viewed_posts = viewed_posts.split(',')
         else:
             viewed_posts = []
-
 
         if f"{obj.id}-{user_ip}" not in viewed_posts:
             obj.views_count += 1
