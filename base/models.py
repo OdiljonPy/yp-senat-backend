@@ -60,7 +60,9 @@ class AdditionalLinks(BaseModel):
 class ContactUs(BaseModel):
     email = models.EmailField(verbose_name='электронная почта')
     phone_number = models.CharField(max_length=14, validators=[phone_number_validation], verbose_name='номер телефона')
-    address = models.CharField(max_length=300, verbose_name='адрес')
+    address = models.CharField(max_length=255, verbose_name='адрес')
+    latitude = models.FloatField(verbose_name="Широта")
+    longitude = models.FloatField(verbose_name="Долгота")
 
     def __str__(self):
         return str(self.id) or ''
