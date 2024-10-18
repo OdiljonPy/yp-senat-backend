@@ -14,8 +14,7 @@ from .models import Banner, Region, CommissionCategory, CommissionMember, Projec
 from .repository.get_posts_list import get_post_list
 from .serializers import (
     BannerSerializer, RegionSerializer, CommissionMemberSerializer, ProjectsSerializer, CommissionCategorySerializer,
-    AppealSerializer, AppealMemberSerializer, NewsSerializer, OpinionSerializer, ParamValidateSerializer
-    AppealSerializer, AppealMemberSerializer, PostSerializer, OpinionSerializer, FilterSerializer
+    AppealSerializer, ParamValidateSerializer, PostSerializer, FilterSerializer
 )
 
 
@@ -159,25 +158,9 @@ class AppealViewSet(ViewSet):
         data = request.data
         serializer = AppealSerializer(data=data, context={'request': request})
         if not serializer.is_valid():
-            raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT, message=serializer.errors)
+            raise CustomApiException(error_code=ErrorCodes.VALIDATION_FAILED, message=serializer.errors)
         serializer.save()
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_201_CREATED)
-
-    @swagger_auto_schema(
-        request_body=AppealMemberSerializer(),
-        operation_summary='Create Appeal Member',
-        operation_description='Create appeal member',
-        responses={201: AppealMemberSerializer()},
-        tags=['Appeal']
-    )
-    def create_appeal_member(self, request):
-        data = request.data
-        serializer = AppealMemberSerializer(data=data, context={'request': request})
-        if not serializer.is_valid():
-            raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT, message=serializer.errors)
-        serializer.save()
-        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_201_CREATED)
-
 
 class NewsViewSet(ViewSet):
     @swagger_auto_schema(
@@ -191,22 +174,6 @@ class NewsViewSet(ViewSet):
         serializer = PostSerializer(news, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
-
-class OpinionViewSet(ViewSet):
-    @swagger_auto_schema(
-        request_body=OpinionSerializer(),
-        operation_summary='Create Opinion',
-        operation_description='Create opinion',
-        responses={201: OpinionSerializer()},
-        tags=['Opinion']
-    )
-    def create_opinion(self, request):
-        data = request.data
-        serializer = OpinionSerializer(data=data, context={'request': request})
-        if not serializer.is_valid():
-            raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT, message=serializer.errors)
-        serializer.save()
-        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
 
 class ViewsCountViewSet(ViewSet):
