@@ -1,6 +1,6 @@
 from django.db import models
 from tinymce.models import HTMLField
-
+from django.core.exceptions import ValidationError
 from abstract_models.base_model import BaseModel
 from utils.validations import phone_number_validation
 
@@ -8,7 +8,6 @@ POLL_TYPES = (
     (1, 'Единственный выбор'),
     (2, 'Множественный выбор')
 )
-
 
 class FAQ(BaseModel):
     question = models.CharField(max_length=200, verbose_name='вопрос')
@@ -27,13 +26,37 @@ class FAQ(BaseModel):
 class AboutUs(BaseModel):
     title = models.CharField(max_length=200, verbose_name='заголовок')
     description = HTMLField(verbose_name="описание")
+    file = models.FileField(upload_to='about_us/', verbose_name="файл")
+    is_video = models.BooleanField(default=False, verbose_name="видео")
 
     telegram_url = models.URLField(default='telegram.org', verbose_name="телеграм_url")
     instagram_url = models.URLField(default='instagram.com', verbose_name="инстаграм_url")
     facebook_url = models.URLField(default='facebook.com', verbose_name="фэйсбук_url")
+    youtube_url = models.URLField(default='youtube.com', verbose_name="ютубе_url")
 
     def __str__(self):
         return self.title
+
+    def save(
+        self,
+        *args,
+        force_insert=False,
+        force_update=False,
+        using=None,
+        update_fields=None,
+    ):
+        type_ = self.file.url.split('.')[-1]
+        image_type = ['jpg', 'jpeg', 'png', 'gif', 'webp']
+        video_type = ['mp4', 'avi', 'mkv']
+        if type_ in video_type:
+            self.is_video = True
+        elif type_ in image_type:
+            self.is_video = False
+        # else:
+        #     raise ValidationError('Invalid file type')
+
+        return super().save(force_insert, force_update, using, update_fields)
+
 
     class Meta:
         verbose_name = 'О нас'
@@ -62,6 +85,11 @@ class ContactUs(BaseModel):
     address = models.CharField(max_length=255, verbose_name='адрес')
     latitude = models.FloatField(verbose_name="широта")
     longitude = models.FloatField(verbose_name="долгота")
+
+    telegram_url = models.URLField(default='telegram.org', verbose_name="телеграм_url")
+    instagram_url = models.URLField(default='instagram.com', verbose_name="инстаграм_url")
+    facebook_url = models.URLField(default='facebook.com', verbose_name="фэйсбук_url")
+    youtube_url = models.URLField(default='youtube.com', verbose_name="ютубе_url")
 
     def __str__(self):
         return str(self.id) or ''
