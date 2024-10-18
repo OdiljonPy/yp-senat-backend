@@ -1,5 +1,3 @@
-from django.db.models import Q
-from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
@@ -10,11 +8,14 @@ from .repository.get_project_filter import get_projects_filter
 from django.db.models import Q
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
-from .models import Banner, Region, CommissionCategory, CommissionMember, Projects, Post
 from .repository.get_posts_list import get_post_list
+from .models import (Banner, Region, CommissionCategory,
+                     CommissionMember, Projects, Post)
 from .serializers import (
-    BannerSerializer, RegionSerializer, CommissionMemberSerializer, ProjectsSerializer, CommissionCategorySerializer,
-    AppealSerializer, ParamValidateSerializer, PostSerializer, FilterSerializer
+    BannerSerializer, RegionSerializer,
+    CommissionMemberSerializer, ProjectsSerializer,
+    CommissionCategorySerializer, AppealSerializer,
+    ParamValidateSerializer, PostSerializer, FilterSerializer
 )
 
 
@@ -22,11 +23,11 @@ class BannerViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='List Of Banners',
         operation_description='List of banners',
-        responses={200: BannerSerializer()},
+        responses={200: BannerSerializer(many=True)},
         tags=['Banner']
     )
     def banner_list(self, request):
-        banners = Banner.objects.all()
+        banners = Banner.objects.filter(is_published=True)
         serializer = BannerSerializer(banners, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
@@ -35,7 +36,7 @@ class RegionViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='List Of Regions',
         operation_description='List of regions',
-        responses={200: RegionSerializer()},
+        responses={200: RegionSerializer(many=True)},
         tags=['Region']
     )
     def region_list(self, request):
@@ -48,7 +49,7 @@ class CommissionViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='List Of Commission Members',
         operation_description='List of commission members',
-        responses={200: CommissionMemberSerializer()},
+        responses={200: CommissionMemberSerializer(many=True)},
         tags=['Commission']
     )
     def commission_member_list(self, request):
@@ -59,7 +60,7 @@ class CommissionViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='List Of Commission Members By Category ID',
         operation_description='List of commission members by category id',
-        responses={200: CommissionMemberSerializer()},
+        responses={200: CommissionMemberSerializer(many=True)},
         tags=['Commission']
     )
     def commission_members_by_category(self, request, pk):
@@ -83,19 +84,19 @@ class CommissionViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='Commission members by region id',
         operation_description='List of commission members by region id',
-        responses={200: CommissionMemberSerializer()},
+        responses={200: CommissionMemberSerializer(many=True)},
         tags=['Commission']
     )
     def commission_member_by_region(self, request, pk):
         commission_members = CommissionMember.objects.filter(region_id=pk)
         return Response(
             data={'result': CommissionMemberSerializer(commission_members, many=True, context={'request': request}
-                                                       ).data, 'ok': True})
+                                                       ).data, 'ok': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         operation_summary='List Of Commission Categories',
         operation_description='List of commission categories',
-        responses={200: CommissionCategorySerializer()},
+        responses={200: CommissionCategorySerializer(many=True)},
         tags=['Commission']
     )
     def commission_category_list(self, request):
@@ -108,11 +109,11 @@ class ProjectViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='List Of Projects',
         operation_description='List of projects',
-        responses={200: ProjectsSerializer()},
+        responses={200: ProjectsSerializer(many=True)},
         tags=['Project']
     )
     def projects_list(self, request):
-        projects = Projects.objects.all()
+        projects = Projects.objects.filter(is_published=True)
         serializer = ProjectsSerializer(projects, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
@@ -127,7 +128,7 @@ class ProjectViewSet(ViewSet):
         ],
         operation_summary='List of projects by type',
         operation_description='List of projects by type',
-        responses={200: ProjectsSerializer()},
+        responses={200: ProjectsSerializer(many=True)},
         tags=['Project']
     )
     def filter_by_query_param(self, request):
@@ -140,7 +141,7 @@ class ProjectViewSet(ViewSet):
         query = Q()
         if status_:
             query &= Q(status=status_)
-        projects = Projects.objects.filter(query).order_by('id')
+        projects = Projects.objects.filter(query, is_published=True).order_by('id')
         response = get_projects_filter(
             context={'request': request, 'project_param': projects}, page=page, page_size=page_size)
         return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
