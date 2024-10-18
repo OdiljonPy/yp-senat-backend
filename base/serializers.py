@@ -58,7 +58,7 @@ class ContactUsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ContactUs
-        fields = ('id', 'email', 'phone_number', 'address')
+        fields = ('id', 'email', 'phone_number', 'address', 'latitude', 'longitude')
 
 
 class PollSerializer(serializers.ModelSerializer):

@@ -15,11 +15,11 @@ class FAQViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='FAQ',
         operation_description='Frequently Asked Questions',
-        responses={200: FAQSerializer()},
+        responses={200: FAQSerializer(many=True)},
         tags=['FAQ']
     )
     def faq_get(self, request):
-        faqs = FAQ.objects.all()
+        faqs = FAQ.objects.filter(is_visible=True)
         return Response(data={'result': FAQSerializer(faqs, many=True, context={'request': request}).data, 'ok': True},
                         status=status.HTTP_200_OK)
 
@@ -32,9 +32,9 @@ class AboutUsViewSet(ViewSet):
         tags=['About Us']
     )
     def about_us_get(self, request):
-        data = AboutUs.objects.all()
+        data = AboutUs.objects.order_by('-created_at').first()
         return Response(
-            data={'result': AboutUsSerializer(data, many=True, context={'request': request}).data, 'ok': True},
+            data={'result': AboutUsSerializer(data, context={'request': request}).data, 'ok': True},
             status=status.HTTP_200_OK)
 
 
@@ -42,11 +42,11 @@ class AdditionalLinksViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='Additional Links',
         operation_description='Additional Links',
-        responses={200: AdditionalLinksSerializer()},
+        responses={200: AdditionalLinksSerializer(many=True)},
         tags=['Additional Links']
     )
     def additional_links_get(self, request):
-        links = AdditionalLinks.objects.all()
+        links = AdditionalLinks.objects.filter(is_visible=True)
         return Response(
             data={'result': AdditionalLinksSerializer(links, many=True, context={'request': request}).data, 'ok': True},
             status=status.HTTP_200_OK)
@@ -60,9 +60,9 @@ class ContactUsViewSet(ViewSet):
         tags=['Contact Us']
     )
     def contact_us_get(self, request):
-        data = ContactUs.objects.all()
+        data = ContactUs.objects.order_by('-created_at').first()
         return Response(
-            data={'result': ContactUsSerializer(data, many=True, context={'request': request}).data, 'ok': True},
+            data={'result': ContactUsSerializer(data, context={'request': request}).data, 'ok': True},
             status=status.HTTP_200_OK)
 
 
@@ -70,7 +70,7 @@ class PollViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='List of Polls',
         operation_description='List of polls',
-        responses={200: PollSerializer()},
+        responses={200: PollSerializer(many=True)},
         tags=['Poll']
     )
     def get_polls(self, request):
