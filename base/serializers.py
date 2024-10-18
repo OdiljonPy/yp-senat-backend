@@ -128,4 +128,14 @@ class PollResultSerializer(serializers.ModelSerializer):
 class PollAnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = PollAnswer
-        fields = ('id', 'result', 'question', 'option')
+        fields = ('id', 'result', 'question', 'answer')
+
+
+class TakePollAnswerSerializer(serializers.Serializer):
+    question = serializers.IntegerField()
+    answer = serializers.ListField(child=serializers.IntegerField())
+
+
+class TakePollSerializer(serializers.Serializer):
+    poll = serializers.IntegerField()
+    answers = serializers.ListField(child=TakePollAnswerSerializer())

@@ -28,7 +28,7 @@ class ContactUsAdmin(admin.ModelAdmin):
 
 @admin.register(Poll)
 class PollAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title')
+    list_display = ('id', 'title', 'participant_count')
     list_display_links = ('id', 'title')
 
 

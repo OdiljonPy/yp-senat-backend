@@ -55,6 +55,7 @@ class ContactUs(BaseModel):
 class Poll(BaseModel):
     title = models.CharField(max_length=100, verbose_name='заголовок')
     description = RichTextField(verbose_name='описание')
+    participant_count = models.PositiveIntegerField(default=0, verbose_name='количество участники')
 
     def __str__(self):
         return self.title

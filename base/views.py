@@ -1,7 +1,7 @@
 from .models import FAQ, AboutUs, AdditionalLinks, ContactUs, Poll, Question, Option, PollResult, PollAnswer
 from .serializers import (
     FAQSerializer, AdditionalLinksSerializer, AboutUsSerializer, ContactUsSerializer, PollSerializer,
-    QuestionSerializer, OptionSerializer, PollResultSerializer, PollAnswerSerializer
+    QuestionSerializer, OptionSerializer, PollResultSerializer, PollAnswerSerializer, TakePollSerializer
 )
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
@@ -68,7 +68,7 @@ class ContactUsViewSet(ViewSet):
 
 class PollViewSet(ViewSet):
     @swagger_auto_schema(
-        operation_summary='List Of Polls',
+        operation_summary='List of Polls',
         operation_description='List of polls',
         responses={200: PollSerializer()},
         tags=['Poll']
@@ -84,10 +84,102 @@ class PollViewSet(ViewSet):
         responses={200: PollSerializer()},
         tags=['Poll']
     )
-    def get_poll_detail(self, request, pk):
+    def get_poll(self, request, pk):
+        user = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))
         poll = Poll.objects.filter(id=pk).first()
         if not poll:
             raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
 
+        result = PollResult.objects.filter(poll_id=poll.id, user=user).first()
+        if result:
+            serializer = PollResultSerializer(result, context={'request': request})
+            return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+
         serializer = PollSerializer(poll, context={'request': request})
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        request_body=TakePollSerializer(),
+        operation_summary='Take Poll',
+        operation_description='Take poll',
+        responses={200: PollResultSerializer()},
+        tags=['Poll']
+    )
+    def take_poll(self, request):
+        data = request.data
+        user = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))
+
+        serializer = TakePollSerializer(data=data, context={'request': request})
+        if not serializer.is_valid():
+            raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT, message=serializer.errors)
+
+        poll = Poll.objects.filter(id=data.get('poll')).first()
+        if not poll:
+            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
+
+        result = PollResult.objects.filter(poll_id=poll.id, user=user).first()
+        if result:
+            raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT)
+
+        result = PollResult.objects.create(user=user, poll=poll)
+        result.save()
+
+        answers = [{**answer, 'result': result.id} for answer in data['answers']]
+
+        serializer = PollAnswerSerializer(data=answers, many=True, context={'request': request})
+        if not serializer.is_valid():
+            result.delete()
+            raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT, message=serializer.errors)
+
+        serializer.save()
+        poll.participant_count += 1
+        poll.save()
+
+        return Response(data={'result': PollResultSerializer(result, context={'request': request}).data, 'ok': True},
+                        status=status.HTTP_201_CREATED)
+
+
+class QuestionViewSet(ViewSet):
+    @swagger_auto_schema(
+        operation_summary='Get Questions By Poll Id',
+        operation_description='Get questions by poll id',
+        responses={200: QuestionSerializer()},
+        tags=['Question']
+    )
+    def get_questions(self, request):
+        data = request.GET
+        questions = Question.objects.filter(poll_id=data.get('poll'))
+        serializer = QuestionSerializer(questions, many=True, context={'request': request})
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary='Get One Question',
+        operation_description='Get one question',
+        responses={200: QuestionSerializer()},
+        tags=['Question']
+    )
+    def get_question(self, request, pk):
+        question = Question.objects.filter(id=pk).first()
+        if not question:
+            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
+
+        serializer = QuestionSerializer(question, context={'request': request})
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary='Get Next Question',
+        operation_description='Get next question',
+        responses={200: QuestionSerializer()},
+        tags=['Question']
+    )
+    def get_next_question(self, request, pk):
+        question = Question.objects.filter(id=pk).first()
+        if not question:
+            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
+
+        question = Question.objects.filter(id=question.id + 1, poll_id=question.poll_id).first()
+        if not question:
+            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
+
+        serializer = QuestionSerializer(question, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
