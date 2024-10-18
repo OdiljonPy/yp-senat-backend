@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (
-    BannerViewSet, RegionViewSet, CommissionViewSet, ProjectViewSet, AppealViewSet, NewsViewSet, OpinionViewSet,
+    BannerViewSet, RegionViewSet, CommissionViewSet, ProjectViewSet, AppealViewSet, NewsViewSet,
     ViewsCountViewSet, FilteringViewSet
 )
 

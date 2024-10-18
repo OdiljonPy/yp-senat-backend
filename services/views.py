@@ -5,16 +5,14 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
-from drf_yasg import openapi
-from .repository.get_project_filter import get_projects_filter
-from django.db.models import Q
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
 from .models import Banner, Region, CommissionCategory, CommissionMember, Projects, Post
 from .repository.get_posts_list import get_post_list
+from .repository.get_project_filter import get_projects_filter
 from .serializers import (
     BannerSerializer, RegionSerializer, CommissionMemberSerializer, ProjectsSerializer, CommissionCategorySerializer,
-    AppealSerializer, ParamValidateSerializer, PostSerializer, FilterSerializer
+    AppealSerializer, ParamValidateSerializer, PostSerializer, PostFilterSerializer
 )
 
 
@@ -162,6 +160,7 @@ class AppealViewSet(ViewSet):
         serializer.save()
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_201_CREATED)
 
+
 class NewsViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='List Of News',
@@ -173,7 +172,6 @@ class NewsViewSet(ViewSet):
         news = Post.objects.all()
         serializer = PostSerializer(news, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
-
 
 
 class ViewsCountViewSet(ViewSet):
@@ -238,7 +236,7 @@ class FilteringViewSet(ViewSet):
         responses={200: PostSerializer()},
         tags=['News'])
     def filtering_by_news(self, request):
-        serializer_params = FilterSerializer(data=request.query_params.copy(), context={'request': request})
+        serializer_params = PostFilterSerializer(data=request.query_params.copy(), context={'request': request})
         if not serializer_params.is_valid():
             raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
         member = serializer_params.validated_data.get('member', '')
