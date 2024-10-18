@@ -1,4 +1,4 @@
-from ckeditor.fields import RichTextField
+from tinymce.models import HTMLField
 from django.db import models
 
 from abstract_models.base_model import BaseModel
@@ -65,7 +65,7 @@ class CommissionMember(BaseModel):
 
     full_name = models.CharField(max_length=100, verbose_name='полное имя')
     type = models.PositiveIntegerField(choices=MEMBER_TYPE, default=1, verbose_name='тип')
-    description = RichTextField(verbose_name='описание')
+    description = HTMLField(verbose_name='описание')
     position = models.CharField(max_length=80, verbose_name='позиция')
     birthdate = models.DateTimeField(verbose_name='дата рождения')
     nation = models.CharField(max_length=100, verbose_name='нация')
@@ -89,7 +89,7 @@ class CommissionMember(BaseModel):
 class Projects(BaseModel):
     name = models.CharField(max_length=100, verbose_name='навзание')
     short_description = models.CharField(max_length=200, verbose_name='Краткое описание')
-    description = RichTextField(verbose_name='описание')
+    description = HTMLField(verbose_name='описание')
     file = models.FileField(upload_to="project/", verbose_name='файл')
     status = models.PositiveIntegerField(choices=PROJECT_STATUS, default=2, verbose_name='статус')
     is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
@@ -142,7 +142,7 @@ class Appeal(BaseModel):
 class News(BaseModel):
     image = models.ImageField(upload_to='news/', verbose_name='Изображение')
     short_description = models.CharField(max_length=200, verbose_name='краткое описания')
-    description = RichTextField(verbose_name='Описание')
+    description = HTMLField(verbose_name='Описание')
     is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
 
     telegram_url = models.URLField(default='telegram.org')

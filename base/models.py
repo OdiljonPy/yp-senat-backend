@@ -1,6 +1,6 @@
-from ckeditor.fields import RichTextField
+
 from django.db import models
-from numpy.f2py.crackfortran import verbose
+from tinymce.models import HTMLField
 
 from abstract_models.base_model import BaseModel
 from utils.validations import phone_number_validation
@@ -27,7 +27,7 @@ class FAQ(BaseModel):
 
 class AboutUs(BaseModel):
     title = models.CharField(max_length=200, verbose_name='заголовок')
-    description = RichTextField()
+    description = HTMLField()
 
     telegram_url = models.URLField(default='telegram.org')
     instagram_url = models.URLField(default='instagram.com')
@@ -73,7 +73,7 @@ class ContactUs(BaseModel):
 
 class Poll(BaseModel):
     title = models.CharField(max_length=100, verbose_name='заголовок')
-    description = RichTextField(verbose_name='описание')
+    description = HTMLField(verbose_name='описание')
 
     def __str__(self):
         return self.title
@@ -86,7 +86,7 @@ class Poll(BaseModel):
 
 class Question(BaseModel):
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE, verbose_name='опрос')
-    text = RichTextField(verbose_name='текст')
+    text = HTMLField(verbose_name='текст')
     type = models.PositiveIntegerField(choices=POLL_TYPES, default=1, verbose_name='тип')
 
     def __str__(self):
