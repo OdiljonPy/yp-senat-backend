@@ -240,3 +240,5 @@ class FilteringViewSet(ViewSet):
                                  page_size=serializer_params.data.get('page_size', 10))
 
         return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
+
+

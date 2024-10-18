@@ -1,5 +1,5 @@
-from tinymce.models import HTMLField
 from django.db import models
+from tinymce.models import HTMLField
 
 from abstract_models.base_model import BaseModel
 from utils.validations import phone_number_validation
@@ -120,6 +120,13 @@ class Appeal(BaseModel):
         ordering = ('created_at',)
 
 
+class IpAddress(BaseModel):
+    ip = models.CharField()
+
+    def __str__(self):
+        return self.ip
+
+
 class Post(BaseModel):
     title = models.CharField(max_length=255, verbose_name="заголовок")
     image = models.ImageField(upload_to='news/', verbose_name="изображение")
@@ -130,7 +137,7 @@ class Post(BaseModel):
     commission_member = models.ForeignKey(CommissionMember, on_delete=models.CASCADE, blank=True, null=True,
                                           verbose_name="член комиссии")
 
-    views_count = models.IntegerField(default=0, verbose_name="количество просмотров")
+    views_count = models.ManyToManyField(IpAddress, blank=True, verbose_name="количество просмотров")
 
     telegram_url = models.URLField(default='telegram.org', verbose_name="телеграм_url")
     instagram_url = models.URLField(default='instagram.com', verbose_name="инстаграм_url")
