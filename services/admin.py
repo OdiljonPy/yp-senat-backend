@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Banner, Region, CommissionCategory, CommissionMember, Projects, Appeal, Post, Opinion
+from .models import Banner, Region, CommissionCategory, CommissionMember, Projects, Appeal, Post
 
 
 @admin.register(Banner)
