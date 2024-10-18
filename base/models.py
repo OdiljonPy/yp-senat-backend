@@ -1,4 +1,3 @@
-
 from django.db import models
 from tinymce.models import HTMLField
 
@@ -27,11 +26,11 @@ class FAQ(BaseModel):
 
 class AboutUs(BaseModel):
     title = models.CharField(max_length=200, verbose_name='заголовок')
-    description = HTMLField()
+    description = HTMLField(verbose_name="описание")
 
-    telegram_url = models.URLField(default='telegram.org')
-    instagram_url = models.URLField(default='instagram.com')
-    facebook_url = models.URLField(default='facebook.com')
+    telegram_url = models.URLField(default='telegram.org', verbose_name="телеграм_url")
+    instagram_url = models.URLField(default='instagram.com', verbose_name="инстаграм_url")
+    facebook_url = models.URLField(default='facebook.com', verbose_name="фэйсбук_url")
 
     def __str__(self):
         return self.title
@@ -45,7 +44,7 @@ class AboutUs(BaseModel):
 class AdditionalLinks(BaseModel):
     title = models.CharField(max_length=250, verbose_name='заголовок')
     link = models.URLField(verbose_name='ссылка')
-    image = models.ImageField(upload_to='additional_links/', verbose_name='')
+    image = models.ImageField(upload_to='additional_links/', verbose_name='изображение')
     is_visible = models.BooleanField(default=True, verbose_name='изображение')
 
     def __str__(self):
@@ -61,8 +60,8 @@ class ContactUs(BaseModel):
     email = models.EmailField(verbose_name='электронная почта')
     phone_number = models.CharField(max_length=14, validators=[phone_number_validation], verbose_name='номер телефона')
     address = models.CharField(max_length=255, verbose_name='адрес')
-    latitude = models.FloatField(verbose_name="Широта")
-    longitude = models.FloatField(verbose_name="Долгота")
+    latitude = models.FloatField(verbose_name="широта")
+    longitude = models.FloatField(verbose_name="долгота")
 
     def __str__(self):
         return str(self.id) or ''
