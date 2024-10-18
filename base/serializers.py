@@ -30,7 +30,7 @@ class AboutUsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AboutUs
-        fields = ('id', 'title', 'description')
+        fields = ('id', 'title', 'description', 'telegram_url', 'instagram_url', 'facebook_url', 'youtube_url', 'is_video', 'file')
 
 
 class AdditionalLinksSerializer(serializers.ModelSerializer):
@@ -58,7 +58,8 @@ class ContactUsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ContactUs
-        fields = ('id', 'email', 'phone_number', 'address', 'latitude', 'longitude')
+        fields = ('id', 'email', 'phone_number', 'address', 'latitude', 'longitude', 'telegram_url',
+                  'instagram_url', 'facebook_url', 'youtube_url')
 
 
 class PollSerializer(serializers.ModelSerializer):
