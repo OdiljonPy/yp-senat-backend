@@ -161,16 +161,16 @@ class AppealViewSet(ViewSet):
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_201_CREATED)
 
 
-class NewsViewSet(ViewSet):
+class PostViewSet(ViewSet):
     @swagger_auto_schema(
-        operation_summary='List Of News',
-        operation_description='List of news',
+        operation_summary='List Of Posts',
+        operation_description='List of Posts',
         responses={200: PostSerializer()},
-        tags=['News']
+        tags=['Post']
     )
-    def news_list(self, request):
-        news = Post.objects.all()
-        serializer = PostSerializer(news, many=True, context={'request': request})
+    def post_list(self, request):
+        posts = Post.objects.all()
+        serializer = PostSerializer(posts, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
 
@@ -189,8 +189,8 @@ class ViewsCountViewSet(ViewSet):
     #     raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
 
     @swagger_auto_schema(
-        operation_summary='count news',
-        operation_description='count news',
+        operation_summary='count posts',
+        operation_description='count posts',
         tags=['Views count']
     )
     def count_views(self, request, pk=None):
@@ -198,22 +198,22 @@ class ViewsCountViewSet(ViewSet):
         user_ip = request.META.get('REMOTE_ADDR')
         print(request.COOKIES)
 
-        viewed_news = request.COOKIES.get('viewed_news', '')
-        print('first', viewed_news)
-        if viewed_news:
-            viewed_news = viewed_news.split(',')
+        viewed_posts = request.COOKIES.get('viewed_posts', '')
+        print('first', viewed_posts)
+        if viewed_posts:
+            viewed_posts = viewed_posts.split(',')
         else:
-            viewed_news = []
+            viewed_posts = []
 
-        print(viewed_news)
+        print(viewed_posts)
 
-        if f"{obj.id}-{user_ip}" not in viewed_news:
+        if f"{obj.id}-{user_ip}" not in viewed_posts:
             obj.views_count += 1
             obj.save()
-            viewed_news.append(f"{obj.id}-{user_ip}")
+            viewed_posts.append(f"{obj.id}-{user_ip}")
         serializer = PostSerializer(obj)
         response = Response(serializer.data)
-        response.set_cookie('viewed_articles', ','.join(viewed_news), max_age=3600 * 24 * 30)  # 30 days
+        response.set_cookie('viewed_articles', ','.join(viewed_posts), max_age=3600 * 24 * 30)  # 30 days
 
         return response
 
@@ -231,11 +231,11 @@ class FilteringViewSet(ViewSet):
                 name='member', in_=openapi.IN_QUERY, description='Page size', type=openapi.TYPE_INTEGER),
 
         ],
-        operation_summary='News filter ',
-        operation_description="News filter",
+        operation_summary='Posts filter ',
+        operation_description="Posts filter",
         responses={200: PostSerializer()},
-        tags=['News'])
-    def filtering_by_news(self, request):
+        tags=['Post'])
+    def filtering_by_post(self, request):
         serializer_params = PostFilterSerializer(data=request.query_params.copy(), context={'request': request})
         if not serializer_params.is_valid():
             raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
