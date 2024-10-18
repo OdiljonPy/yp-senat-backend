@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import (
-    BannerViewSet, RegionViewSet, CommissionViewSet, ProjectViewSet, AppealViewSet, NewsViewSet, OpinionViewSet
+    BannerViewSet, RegionViewSet, CommissionViewSet, ProjectViewSet, AppealViewSet, NewsViewSet, OpinionViewSet,
+    ViewsCountViewSet, FilteringViewSet
 )
 
 urlpatterns = [
@@ -23,4 +24,6 @@ urlpatterns = [
 
     path('appeal/', AppealViewSet.as_view({'post': 'create_appeal'}), name='appeal'),
     path('appeal/member/', AppealViewSet.as_view({'post': 'create_appeal_member'}), name='appeal_member'),
+    path('view/<int:pk>/', ViewsCountViewSet.as_view({'get': 'count_views'}), name='count_views'),
+    path('filtering/', FilteringViewSet.as_view({'get': 'filtering_by_news'}), name='filtering_by_news')
 ]

@@ -139,11 +139,17 @@ class Appeal(BaseModel):
         ordering = ('created_at',)
 
 
-class News(BaseModel):
-    image = models.ImageField(upload_to='news/', verbose_name='Изображение')
-    short_description = models.CharField(max_length=200, verbose_name='краткое описания')
-    description = HTMLField(verbose_name='Описание')
-    is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
+
+class Post(BaseModel):
+    title = models.CharField(max_length=255)
+    image = models.ImageField(upload_to='news/')
+    short_description = models.CharField(max_length=200)
+    description = RichTextField()
+    is_published = models.BooleanField(default=True)
+
+    commission_member = models.ForeignKey(CommissionMember, on_delete=models.CASCADE, blank=True, null=True)
+
+    views_count = models.IntegerField(default=0)
 
     telegram_url = models.URLField(default='telegram.org')
     instagram_url = models.URLField(default='instagram.com')
@@ -152,10 +158,9 @@ class News(BaseModel):
     def __str__(self):
         return self.short_description
 
-    class Meta:
-        verbose_name = 'Новост'
-        verbose_name_plural = 'Новости'
-        ordering = ('created_at',)
+    def counts_view(self):
+        self.views_count += 1
+        self.save()
 
 
 class Opinion(BaseModel):
