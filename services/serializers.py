@@ -25,7 +25,7 @@ class BannerSerializer(serializers.ModelSerializer):
         language = 'ru'
         if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
             language = request.META.get('HTTP_ACCEPT_LANGUAGE')
-        self.fields['title'] = serializers.CharField(source=f'short_description_{language}')
+        self.fields['title'] = serializers.CharField(source=f'title_{language}')
 
     class Meta:
         model = Banner

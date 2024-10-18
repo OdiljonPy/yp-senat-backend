@@ -7,9 +7,9 @@ from rest_framework.viewsets import ViewSet
 
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
-from .repository.get_posts_list import get_post_list
 from .models import (Banner, Region, CommissionCategory,
                      CommissionMember, Projects, Post)
+from .repository.get_posts_list import get_post_list
 from .repository.get_project_filter import get_projects_filter
 from .serializers import (
     BannerSerializer, RegionSerializer, CommissionMemberSerializer, ProjectsSerializer, CommissionCategorySerializer,
@@ -176,19 +176,6 @@ class PostViewSet(ViewSet):
 
 
 class ViewsCountViewSet(ViewSet):
-    # @swagger_auto_schema(
-    #     operation_summary='count news',
-    #     operation_description='count news',
-    #     tags=['Commission']
-    # )
-    # def count_views(self, request, pk=None):
-    #     obj = News.objects.filter(id=pk).first()
-    #     if obj:
-    #         obj.counts_view()
-    #         serializer = NewsSerializer(obj)
-    #         return Response(data={'data': serializer.data, 'ok': False}, status=status.HTTP_200_OK)
-    #     raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
-
     @swagger_auto_schema(
         operation_summary='count posts',
         operation_description='count posts',
@@ -197,16 +184,14 @@ class ViewsCountViewSet(ViewSet):
     def count_views(self, request, pk=None):
         obj = Post.objects.filter(id=pk).first()
         user_ip = request.META.get('REMOTE_ADDR')
-        print(request.COOKIES)
+        if not obj:
+            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
 
         viewed_posts = request.COOKIES.get('viewed_posts', '')
-        print('first', viewed_posts)
         if viewed_posts:
             viewed_posts = viewed_posts.split(',')
         else:
             viewed_posts = []
-
-        print(viewed_posts)
 
         if f"{obj.id}-{user_ip}" not in viewed_posts:
             obj.views_count += 1
@@ -254,4 +239,4 @@ class FilteringViewSet(ViewSet):
                                  page=serializer_params.data.get('page', 1),
                                  page_size=serializer_params.data.get('page_size', 10))
 
-        return Response(data={'result': response.data, 'ok': True}, status=status.HTTP_200_OK)
+        return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
