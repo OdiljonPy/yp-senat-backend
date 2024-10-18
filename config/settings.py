@@ -33,8 +33,7 @@ INSTALLED_APPS = [
     'modeltranslation',
     'corsheaders',
     'drf_yasg',
-    'ckeditor',
-    'ckeditor_uploader',
+    'tinymce',
 
     # apps
     'services',
@@ -199,13 +198,40 @@ customColorPalette = [
     },
 ]
 
-CKEDITOR_CONFIGS = {
-    'default': {
-        'toolbar': 'full',
-        'height': 300,
-        'width': 'auto',
-    },
+# CKEDITOR_CONFIGS = {
+#     'default': {
+#         'toolbar': 'full',
+#         'height': 300,
+#         'width': 'auto',
+#     },
+# }
+#
+# CKEDITOR_UPLOAD_PATH = "ckeditor/"
+#
+
+TINYMCE_DEFAULT_CONFIG = {
+    'height': 500,
+    'width': '100%',
+    'plugins': 'advlist autolink lists link image charmap preview anchor '
+               'searchreplace visualblocks code fullscreen insertdatetime media table paste help',
+    'toolbar': 'undo redo | styleselect | bold italic | link image media | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+    'image_advtab': True,  # Enables advanced image options
+    'file_picker_callback': 'function(callback, value, meta) { \
+        if (meta.filetype === "image") { \
+            var input = document.createElement("input"); \
+            input.setAttribute("type", "file"); \
+            input.setAttribute("accept", "image/*"); \
+            input.onchange = function() { \
+                var file = this.files[0]; \
+                var reader = new FileReader(); \
+                reader.onload = function() { \
+                    callback(reader.result, { alt: file.name }); \
+                }; \
+                reader.readAsDataURL(file); \
+            }; \
+            input.click(); \
+        } \
+    }',
 }
-
-CKEDITOR_UPLOAD_PATH = "ckeditor/"
-
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880
