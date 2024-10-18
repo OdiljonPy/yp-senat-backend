@@ -224,7 +224,7 @@ class FilteringViewSet(ViewSet):
     def filtering_by_post(self, request):
         serializer_params = PostFilterSerializer(data=request.query_params.copy(), context={'request': request})
         if not serializer_params.is_valid():
-            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
+            raise CustomApiException(error_code=ErrorCodes.VALIDATION_FAILED, message=serializer_params.errors)
         member = serializer_params.validated_data.get('member', '')
         q = serializer_params.validated_data.get('q', '')
         filter_ = Q()

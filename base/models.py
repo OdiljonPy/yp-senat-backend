@@ -21,7 +21,7 @@ class FAQ(BaseModel):
     class Meta:
         verbose_name = 'Часто задаваемые вопросы'
         verbose_name_plural = 'Часто задаваемые вопросы'
-        ordering = ['question']
+        ordering = ['created_at']
 
 
 class AboutUs(BaseModel):
@@ -38,7 +38,7 @@ class AboutUs(BaseModel):
     class Meta:
         verbose_name = 'О нас'
         verbose_name_plural = 'О нас'
-        ordering = ['title']
+        ordering = ['created_at']
 
 
 class AdditionalLinks(BaseModel):
@@ -53,7 +53,7 @@ class AdditionalLinks(BaseModel):
     class Meta:
         verbose_name = 'Дополнительные ссылка'
         verbose_name_plural = 'Дополнительные ссылки'
-        ordering = ['title']
+        ordering = ['created_at']
 
 
 class ContactUs(BaseModel):
@@ -69,7 +69,7 @@ class ContactUs(BaseModel):
     class Meta:
         verbose_name = 'Связаться с нами'
         verbose_name_plural = 'Связаться с нами'
-        ordering = ['phone_number']
+        ordering = ['created_at']
 
 
 class Poll(BaseModel):
