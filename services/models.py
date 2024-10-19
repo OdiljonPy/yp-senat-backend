@@ -63,6 +63,7 @@ class CommissionMember(BaseModel):
                                             verbose_name='Категория комиссии')
     region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=True, null=True, verbose_name='регион')
 
+    image = models.ImageField(upload_to='commission_member/')
     full_name = models.CharField(max_length=100, verbose_name='полное имя')
     type = models.PositiveIntegerField(choices=MEMBER_TYPE, default=1, verbose_name='тип')
     description = HTMLField(verbose_name='описание')
