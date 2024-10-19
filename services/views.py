@@ -175,6 +175,20 @@ class PostViewSet(ViewSet):
         serializer = PostSerializer(posts, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        operation_summary="Post detail",
+        operation_description="Post detail",
+        responses={200: PostSerializer()},
+        tags=['Post']
+    )
+    def post_detail(self, request, pk):
+        post = Post.objects.filter(id=pk).first()
+        if not post:
+            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
+
+        serializer = PostSerializer(post, context={'request': request})
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+
 
 class ViewsCountViewSet(ViewSet):
     @swagger_auto_schema(

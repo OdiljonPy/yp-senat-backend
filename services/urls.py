@@ -11,6 +11,7 @@ urlpatterns = [
     path('project/', ProjectViewSet.as_view({'get': 'projects_list'}), name='project'),
     path('projects/', ProjectViewSet.as_view({'get': 'filter_by_query_param'}), name='projects'),
     path('post/', PostViewSet.as_view({'get': 'post_list'}), name='news'),
+    path('post/<int:pk>/', PostViewSet.as_view({'get': "post_detail"}), name='post_detail'),
 
     path('commission/', CommissionViewSet.as_view({'get': 'commission_member_list'}), name='commission_list'),
     path('commission/<int:pk>/', CommissionViewSet.as_view({'get': 'commission_member_detail'}),
