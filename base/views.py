@@ -1,7 +1,9 @@
-from .models import FAQ, AboutUs, AdditionalLinks, ContactUs, Poll, Question, Option, PollResult, PollAnswer
+from datetime import timedelta, datetime, date
+from django.utils import timezone
+from .models import FAQ, AboutUs, AdditionalLinks, ContactUs, Poll, Question, Option, PollResult, PollAnswer, VisitorActivity
 from .serializers import (
     FAQSerializer, AdditionalLinksSerializer, AboutUsSerializer, ContactUsSerializer, PollSerializer,
-    QuestionSerializer, OptionSerializer, PollResultSerializer, PollAnswerSerializer
+    QuestionSerializer, OptionSerializer, PollResultSerializer, PollAnswerSerializer, VisitorActivitySerializer
 )
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
@@ -91,3 +93,22 @@ class PollViewSet(ViewSet):
 
         serializer = PollSerializer(poll, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+
+class VisitorActivityViewSet(ViewSet):
+    @swagger_auto_schema(
+        operation_summary='Visitor Activity',
+        operation_description='Visitor Activity',
+        responses={200: VisitorActivitySerializer()},
+        tags = ['Visitors']
+    )
+    def get_visitor_activity(self, request):
+        start_date = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
+        start_date_aware = timezone.make_aware(start_date)
+
+        monthly_visitors = VisitorActivity.objects.filter(
+            created_at__gte=start_date_aware,
+            created_at__lt=timezone.now()
+        )
+        return Response(
+            data={'result': VisitorActivitySerializer(monthly_visitors, many=True).data, 'visitors_count':monthly_visitors.count(), 'ok': True}, status=status.HTTP_200_OK
+        )

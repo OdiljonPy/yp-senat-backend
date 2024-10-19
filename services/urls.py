@@ -2,7 +2,7 @@ from django.urls import path
 
 from .views import (
     BannerViewSet, RegionViewSet, CommissionViewSet, ProjectViewSet, AppealViewSet, PostViewSet,
-    ViewsCountViewSet, FilteringViewSet
+    FilteringViewSet
 )
 
 urlpatterns = [
@@ -24,6 +24,6 @@ urlpatterns = [
          name='commission_category'),
 
     path('appeal/', AppealViewSet.as_view({'post': 'create_appeal'}), name='appeal'),
-    path('view/<int:pk>/', ViewsCountViewSet.as_view({'get': 'count_views'}), name='count_views'),
+    # path('view/<int:pk>/', ViewsCountViewSet.as_view({'get': 'count_views'}), name='count_views'),
     path('filtering/', FilteringViewSet.as_view({'get': 'filtering_by_post'}), name='filtering_by_news')
 ]

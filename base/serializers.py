@@ -1,6 +1,8 @@
+from ipaddress import ip_address
+
 from rest_framework import serializers
 from config import settings
-from .models import FAQ, AboutUs, AdditionalLinks, ContactUs, Poll, Question, Option, PollResult, PollAnswer
+from .models import FAQ, AboutUs, AdditionalLinks, ContactUs, Poll, Question, Option, PollResult, PollAnswer, VisitorActivity
 
 
 class FAQSerializer(serializers.ModelSerializer):
@@ -130,3 +132,9 @@ class PollAnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = PollAnswer
         fields = ('id', 'result', 'question', 'option')
+
+
+class VisitorActivitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VisitorActivity
+        fields = ['id', 'ip_address', 'post']

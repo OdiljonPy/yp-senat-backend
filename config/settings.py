@@ -49,6 +49,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # base app middlewares
+    'base.middlewares.VisitorTrackingMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'

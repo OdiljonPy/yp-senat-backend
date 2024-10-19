@@ -77,7 +77,7 @@ class CommissionMemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CommissionMember
-        fields = ['id', 'full_name', 'commission_category', 'region', 'type', 'description', 'position', 'birthdate',
+        fields = ['id', 'full_name', 'commission_category', 'image', 'region', 'type', 'description', 'position', 'birthdate',
                   'nation', 'education_degree', 'speciality', 'email', 'telegram_url', 'facebook_url', 'instagram_url']
 
 
@@ -98,6 +98,8 @@ class ProjectsSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
+    view_count = serializers.SerializerMethodField()
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         request = self.context.get('request')
@@ -108,14 +110,15 @@ class PostSerializer(serializers.ModelSerializer):
         self.fields['short_description'] = serializers.CharField(source=f'short_description_{language}')
         self.fields['description'] = serializers.CharField(source=f'description_{language}')
 
+
     class Meta:
         model = Post
         fields = ['id', 'image', 'short_description', 'description', 'commission_member', 'telegram_url',
-                  'instagram_url', 'facebook_url', 'created_at', 'is_published', 'views_count']
+                  'instagram_url', 'facebook_url', 'view_count', 'created_at', 'is_published']
 
-    def get_views(self, obj):
-        count = obj.views_count.count()
-        return count
+
+    def get_view_count(self, obj):
+        return obj.visitor_activity.count()
 
 
 class AppealSerializer(serializers.ModelSerializer):

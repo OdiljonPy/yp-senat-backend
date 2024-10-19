@@ -121,11 +121,11 @@ class Appeal(BaseModel):
         ordering = ('created_at',)
 
 
-class IpAddress(BaseModel):
-    ip = models.CharField(max_length=225)
-
-    def __str__(self):
-        return self.ip
+# class IpAddress(BaseModel):
+#     ip = models.CharField()
+#
+#     def __str__(self):
+#         return self.ip
 
 
 class Post(BaseModel):
@@ -138,7 +138,7 @@ class Post(BaseModel):
     commission_member = models.ForeignKey(CommissionMember, on_delete=models.CASCADE, blank=True, null=True,
                                           verbose_name="член комиссии")
 
-    views_count = models.ManyToManyField(IpAddress, blank=True, verbose_name="количество просмотров")
+    # views_count = models.ManyToManyField(IpAddress, blank=True, verbose_name="количество просмотров")
 
     telegram_url = models.URLField(default='telegram.org', verbose_name="телеграм_url")
     instagram_url = models.URLField(default='instagram.com', verbose_name="инстаграм_url")

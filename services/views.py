@@ -8,14 +8,15 @@ from rest_framework.viewsets import ViewSet
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
 from .models import (Banner, Region, CommissionCategory,
-                     CommissionMember, Projects, Post, IpAddress)
+                     CommissionMember, Projects, Post)
 from .repository.get_posts_list import get_post_list
 from .repository.get_project_filter import get_projects_filter
 from .serializers import (
     BannerSerializer, RegionSerializer, CommissionMemberSerializer, ProjectsSerializer, CommissionCategorySerializer,
     AppealSerializer, ParamValidateSerializer, PostSerializer, PostFilterSerializer
 )
-from .utils import get_ip
+from django.db.models import Count
+# from .utils import get_ip
 
 
 class BannerViewSet(ViewSet):
@@ -171,7 +172,7 @@ class PostViewSet(ViewSet):
         tags=['Post']
     )
     def post_list(self, request):
-        posts = Post.objects.all()
+        posts = Post.objects.all().annotate(view_count=Count('visitor_activity'))
         serializer = PostSerializer(posts, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
@@ -182,7 +183,7 @@ class PostViewSet(ViewSet):
         tags=['Post']
     )
     def post_detail(self, request, pk):
-        post = Post.objects.filter(id=pk).first()
+        post = Post.objects.annotate(view_count=Count('visitor_activity')).filter(id=pk).first()
         if not post:
             raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
 
@@ -190,26 +191,33 @@ class PostViewSet(ViewSet):
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
 
-class ViewsCountViewSet(ViewSet):
-    @swagger_auto_schema(
-        operation_summary='count posts',
-        operation_description='count posts',
-        tags=['Views count']
-    )
-    def count_views(self, request, pk=None):
-        obj = Post.objects.filter(id=pk, is_published=True).first()
-
-        if not obj:
-            raise CustomApiException(ErrorCodes.NOT_FOUND, ErrorCodes.NOT_FOUND)
-        ip = get_ip(request)
-        if IpAddress.objects.filter(ip=ip).exists():
-            obj.views_count.add(IpAddress.objects.filter(ip=ip).first())
-        else:
-            IpAddress.objects.create(ip=ip)
-            obj.views_count.add(IpAddress.objects.filter(ip=ip).first())
-
-        serializer = PostSerializer(obj)
-        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+# class ViewsCountViewSet(ViewSet):
+#     @swagger_auto_schema(
+#         operation_summary='count posts',
+#         operation_description='count posts',
+#         tags=['Views count']
+#     )
+#     def count_views(self, request, pk=None):
+#         obj = Post.objects.filter(id=pk).first()
+#         user_ip = request.META.get('REMOTE_ADDR')
+#         if not obj:
+#             raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
+#
+#         viewed_posts = request.COOKIES.get('viewed_posts', '')
+#         if viewed_posts:
+#             viewed_posts = viewed_posts.split(',')
+#         else:
+#             viewed_posts = []
+#
+#         if f"{obj.id}-{user_ip}" not in viewed_posts:
+#             obj.views_count += 1
+#             obj.save()
+#             viewed_posts.append(f"{obj.id}-{user_ip}")
+#         serializer = PostSerializer(obj)
+#         response = Response(serializer.data)
+#         response.set_cookie('viewed_articles', ','.join(viewed_posts), max_age=3600 * 24 * 30)  # 30 days
+#
+#         return response
 
 
 class FilteringViewSet(ViewSet):
@@ -248,3 +256,5 @@ class FilteringViewSet(ViewSet):
                                  page_size=serializer_params.data.get('page_size', 10))
 
         return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
+
+
