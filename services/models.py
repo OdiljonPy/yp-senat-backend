@@ -121,7 +121,7 @@ class Appeal(BaseModel):
 
 
 class IpAddress(BaseModel):
-    ip = models.CharField()
+    ip = models.CharField(max_length=225)
 
     def __str__(self):
         return self.ip

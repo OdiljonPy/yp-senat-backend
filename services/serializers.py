@@ -1,9 +1,10 @@
 from rest_framework import serializers
+
 from config import settings
+from exceptions.error_messages import ErrorCodes
+from exceptions.exception import CustomApiException
 from .models import (
     Banner, Region, CommissionCategory, CommissionMember, Projects, Post, Appeal, PROJECT_STATUS)
-from exceptions.exception import CustomApiException
-from exceptions.error_messages import ErrorCodes
 
 
 class ParamValidateSerializer(serializers.Serializer):
@@ -110,7 +111,11 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'image', 'short_description', 'description', 'commission_member', 'telegram_url',
-                  'instagram_url', 'facebook_url', 'created_at', 'is_published']
+                  'instagram_url', 'facebook_url', 'created_at', 'is_published', 'views_count']
+
+    def get_views(self, obj):
+        count = obj.views_count.count()
+        return count
 
 
 class AppealSerializer(serializers.ModelSerializer):
