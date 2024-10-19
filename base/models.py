@@ -37,14 +37,7 @@ class AboutUs(BaseModel):
     def __str__(self):
         return self.title
 
-    def save(
-        self,
-        *args,
-        force_insert=False,
-        force_update=False,
-        using=None,
-        update_fields=None,
-    ):
+    def clean(self):
         type_ = self.file.url.split('.')[-1]
         image_type = ['jpg', 'jpeg', 'png', 'gif', 'webp']
         video_type = ['mp4', 'avi', 'mkv']
@@ -52,11 +45,8 @@ class AboutUs(BaseModel):
             self.is_video = True
         elif type_ in image_type:
             self.is_video = False
-        # else:
-        #     raise ValidationError('Invalid file type')
-
-        return super().save(force_insert, force_update, using, update_fields)
-
+        else:
+            raise ValidationError('Invalid file type')
 
     class Meta:
         verbose_name = 'О нас'
