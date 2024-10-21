@@ -111,11 +111,12 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'image', 'short_description', 'description', 'commission_member', 'telegram_url',
-                  'instagram_url', 'facebook_url', 'created_at', 'is_published', 'views_count']
+                  'instagram_url', 'facebook_url', 'created_at', 'is_published']
 
-    def get_views(self, obj):
-        count = obj.views_count.count()
-        return count
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['counting'] = instance.views_count.count()
+        return data
 
 
 class AppealSerializer(serializers.ModelSerializer):

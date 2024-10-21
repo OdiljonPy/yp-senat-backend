@@ -2,7 +2,7 @@ from django.urls import path
 
 from .views import (
     BannerViewSet, RegionViewSet, CommissionViewSet, ProjectViewSet, AppealViewSet, PostViewSet,
-    ViewsCountViewSet, FilteringViewSet
+    ViewsCountViewSet, SearchingViewSet
 )
 
 urlpatterns = [
@@ -25,5 +25,5 @@ urlpatterns = [
 
     path('appeal/', AppealViewSet.as_view({'post': 'create_appeal'}), name='appeal'),
     path('view/<int:pk>/', ViewsCountViewSet.as_view({'get': 'count_views'}), name='count_views'),
-    path('filtering/', FilteringViewSet.as_view({'get': 'filtering_by_post'}), name='filtering_by_news')
+    path('filtering/', SearchingViewSet.as_view({'get': 'search_by_post'}), name='search_by_post')
 ]
