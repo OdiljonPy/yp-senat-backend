@@ -1,3 +1,5 @@
+from tarfile import TruncatedHeaderError
+
 from django.db.models import Q
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -167,11 +169,22 @@ class PostViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='List Of Posts',
         operation_description='List of Posts',
-        responses={200: PostSerializer()},
+        responses={200: PostSerializer(many=True)},
         tags=['Post']
     )
     def post_list(self, request):
-        posts = Post.objects.all()
+        posts = Post.objects.filter(commission_member__is_null=True)
+        serializer = PostSerializer(posts, many=True, context={'request': request})
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary='List of posts by commission members',
+        operation_description="List of posts by commission members",
+        responses={200: PostSerializer(many=True)},
+        tags=['Post']
+    )
+    def post_list_by_members(self, request):
+        posts = Post.objects.filter(commission_member__is_null=False)
         serializer = PostSerializer(posts, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
@@ -222,7 +235,7 @@ class FilteringViewSet(ViewSet):
             openapi.Parameter(
                 name='page_size', in_=openapi.IN_QUERY, description='Page size', type=openapi.TYPE_INTEGER),
             openapi.Parameter(
-                name='member', in_=openapi.IN_QUERY, description='Page size', type=openapi.TYPE_INTEGER),
+                name='member', in_=openapi.IN_QUERY, description='Member', type=openapi.TYPE_STRING),
 
         ],
         operation_summary='Posts filter ',
@@ -239,7 +252,7 @@ class FilteringViewSet(ViewSet):
         if q:
             filter_ &= (Q(short_description__icontains=q) | Q(description__icontains=q))
 
-        if 'member' in serializer_params.data:
+        if 'member' in serializer_params.validated_data:
             filter_ &= Q(commission_member=member)
 
         posts = Post.objects.filter(filter_).order_by('-created_at')

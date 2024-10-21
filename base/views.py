@@ -1,3 +1,4 @@
+from services.utils import get_ip
 from .models import FAQ, AboutUs, AdditionalLinks, ContactUs, Poll, Question, Option, PollResult, PollAnswer
 from .serializers import (
     FAQSerializer, AdditionalLinksSerializer, AboutUsSerializer, ContactUsSerializer, PollSerializer,
@@ -85,7 +86,7 @@ class PollViewSet(ViewSet):
         tags=['Poll']
     )
     def get_poll(self, request, pk):
-        user = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))
+        user = get_ip(request)
         poll = Poll.objects.filter(id=pk).first()
         if not poll:
             raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
@@ -107,11 +108,11 @@ class PollViewSet(ViewSet):
     )
     def take_poll(self, request):
         data = request.data
-        user = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))
+        user = get_ip(request)
 
         serializer = TakePollSerializer(data=data, context={'request': request})
         if not serializer.is_valid():
-            raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT, message=serializer.errors)
+            raise CustomApiException(error_code=ErrorCodes.VALIDATION_FAILED, message=serializer.errors)
 
         poll = Poll.objects.filter(id=data.get('poll')).first()
         if not poll:
@@ -122,6 +123,8 @@ class PollViewSet(ViewSet):
             raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT)
 
         result = PollResult.objects.create(user=user, poll=poll)
+        # poll_serializer = PollResultSerializer(data={'user': user, "poll": poll}, context={'request': request})
+        # poll_serializer.save()
         result.save()
 
         answers = [{**answer, 'result': result.id} for answer in data['answers']]
@@ -143,7 +146,7 @@ class QuestionViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='Get Questions By Poll Id',
         operation_description='Get questions by poll id',
-        responses={200: QuestionSerializer()},
+        responses={200: QuestionSerializer(many=True)},
         tags=['Question']
     )
     def get_questions(self, request):

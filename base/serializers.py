@@ -93,7 +93,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        fields = ('id', 'text', 'type')
+        fields = ('id', 'text', 'type')  #'poll',
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
