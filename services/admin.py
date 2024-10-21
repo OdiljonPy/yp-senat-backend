@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Banner, Region, CommissionCategory, CommissionMember, Projects, Appeal, Post
+
+from .models import Banner, Region, CommissionCategory, CommissionMember, Projects, Appeal, Post, IpAddress
 
 
 @admin.register(Banner)
@@ -8,9 +9,11 @@ class BannerAdmin(admin.ModelAdmin):
     search_fields = ('title',)
     list_filter = ('is_published',)
 
+
 class CommissionMemberTabularInline(admin.TabularInline):
     model = CommissionMember
     extra = 0
+
 
 @admin.register(Region)
 class RegionAdmin(admin.ModelAdmin):
@@ -50,7 +53,6 @@ class AppealAdmin(admin.ModelAdmin):
     search_fields = ('full_name', 'phone_number', 'email')
 
 
-
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     list_display = ('id', 'title')
@@ -58,3 +60,8 @@ class PostAdmin(admin.ModelAdmin):
     search_fields = ('title', 'description', 'short_description')
     list_filter = ('is_published',)
 
+
+@admin.register(IpAddress)
+class IpAddressAdmin(admin.ModelAdmin):
+    list_display = ('id', 'ip', 'created_at')
+    list_display_links = ('id', 'ip')

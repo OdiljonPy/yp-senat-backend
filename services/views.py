@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.db.models import Q
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -184,21 +186,25 @@ class ViewsCountViewSet(ViewSet):
     )
     def count_views(self, request, pk=None):
         obj = Post.objects.filter(id=pk, is_published=True).first()
+        current_time = date.today()
 
         if not obj:
-            raise CustomApiException(ErrorCodes.NOT_FOUND, ErrorCodes.NOT_FOUND)
+            raise CustomApiException(ErrorCodes.NOT_FOUND)
         ip = get_ip(request)
-        if IpAddress.objects.filter(ip=ip).exists():
+        if IpAddress.objects.filter(ip=ip, created_at__day=current_time.day, created_at__month=current_time.month,
+                                    created_at__year=current_time.year).exists():
             obj.views_count.add(IpAddress.objects.filter(ip=ip).first())
         else:
             IpAddress.objects.create(ip=ip)
-            obj.views_count.add(IpAddress.objects.filter(ip=ip).first())
+            obj.views_count.add(
+                IpAddress.objects.filter(ip=ip, created_at__day=current_time.day, created_at__month=current_time.month,
+                                         created_at__year=current_time.year).first())
 
-        serializer = PostSerializer(obj)
+        serializer = PostSerializer(obj, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
 
-class FilteringViewSet(ViewSet):
+class SearchingViewSet(ViewSet):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
@@ -207,26 +213,19 @@ class FilteringViewSet(ViewSet):
                 name='page', in_=openapi.IN_QUERY, description='Page', type=openapi.TYPE_INTEGER),
             openapi.Parameter(
                 name='page_size', in_=openapi.IN_QUERY, description='Page size', type=openapi.TYPE_INTEGER),
-            openapi.Parameter(
-                name='member', in_=openapi.IN_QUERY, description='Page size', type=openapi.TYPE_INTEGER),
-
         ],
         operation_summary='Posts filter ',
         operation_description="Posts filter",
         responses={200: PostSerializer()},
         tags=['Post'])
-    def filtering_by_post(self, request):
+    def search_by_post(self, request):
         serializer_params = PostFilterSerializer(data=request.query_params.copy(), context={'request': request})
         if not serializer_params.is_valid():
             raise CustomApiException(error_code=ErrorCodes.VALIDATION_FAILED, message=serializer_params.errors)
-        member = serializer_params.validated_data.get('member', '')
         q = serializer_params.validated_data.get('q', '')
         filter_ = Q()
         if q:
             filter_ &= (Q(short_description__icontains=q) | Q(description__icontains=q))
-
-        if 'member' in serializer_params.data:
-            filter_ &= Q(commission_member=member)
 
         posts = Post.objects.filter(filter_).order_by('-created_at')
         response = get_post_list(context={'request': request, 'query': posts},
