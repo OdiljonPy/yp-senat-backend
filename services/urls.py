@@ -1,8 +1,9 @@
 from django.urls import path
 
+from .serializers import PostSerializer
 from .views import (
     BannerViewSet, RegionViewSet, CommissionViewSet, ProjectViewSet, AppealViewSet, PostViewSet,
-    ViewsCountViewSet, SearchingViewSet
+    SearchingViewSet
 )
 
 urlpatterns = [
@@ -10,7 +11,8 @@ urlpatterns = [
     path('region/', RegionViewSet.as_view({'get': 'region_list'}), name='region'),
     path('project/', ProjectViewSet.as_view({'get': 'projects_list'}), name='project'),
     path('projects/', ProjectViewSet.as_view({'get': 'filter_by_query_param'}), name='projects'),
-    path('post/', PostViewSet.as_view({'get': 'post_list'}), name='news'),
+    path('post/', PostViewSet.as_view({'get': 'post_list'}), name='post'),
+    path('post/member/', PostViewSet.as_view({'get': 'post_list_by_members'}), name='post_by_member'),
     path('post/<int:pk>/', PostViewSet.as_view({'get': "post_detail"}), name='post_detail'),
 
     path('commission/', CommissionViewSet.as_view({'get': 'commission_member_list'}), name='commission_list'),
@@ -24,6 +26,5 @@ urlpatterns = [
          name='commission_category'),
 
     path('appeal/', AppealViewSet.as_view({'post': 'create_appeal'}), name='appeal'),
-    path('view/<int:pk>/', ViewsCountViewSet.as_view({'get': 'count_views'}), name='count_views'),
     path('filtering/', SearchingViewSet.as_view({'get': 'search_by_post'}), name='search_by_post')
 ]

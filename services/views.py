@@ -1,4 +1,3 @@
-
 from datetime import date
 
 from django.db.models import Q
@@ -190,27 +189,11 @@ class PostViewSet(ViewSet):
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
-        operation_summary="Post detail",
-        operation_description="Post detail",
-        responses={200: PostSerializer()},
+        operation_summary='Post detail',
+        operation_description='Post detail',
         tags=['Post']
     )
-    def post_detail(self, request, pk):
-        post = Post.objects.filter(id=pk).first()
-        if not post:
-            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
-
-        serializer = PostSerializer(post, context={'request': request})
-        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
-
-
-class ViewsCountViewSet(ViewSet):
-    @swagger_auto_schema(
-        operation_summary='count posts',
-        operation_description='count posts',
-        tags=['Views count']
-    )
-    def count_views(self, request, pk=None):
+    def post_detail(self, request, pk=None):
         obj = Post.objects.filter(id=pk, is_published=True).first()
         current_time = date.today()
 
