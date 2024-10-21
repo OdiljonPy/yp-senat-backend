@@ -1,3 +1,4 @@
+
 from datetime import date
 
 from django.db.models import Q
@@ -169,12 +170,37 @@ class PostViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='List Of Posts',
         operation_description='List of Posts',
-        responses={200: PostSerializer()},
+        responses={200: PostSerializer(many=True)},
         tags=['Post']
     )
     def post_list(self, request):
-        posts = Post.objects.all()
+        posts = Post.objects.filter(commission_member__is_null=True)
         serializer = PostSerializer(posts, many=True, context={'request': request})
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary='List of posts by commission members',
+        operation_description="List of posts by commission members",
+        responses={200: PostSerializer(many=True)},
+        tags=['Post']
+    )
+    def post_list_by_members(self, request):
+        posts = Post.objects.filter(commission_member__is_null=False)
+        serializer = PostSerializer(posts, many=True, context={'request': request})
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary="Post detail",
+        operation_description="Post detail",
+        responses={200: PostSerializer()},
+        tags=['Post']
+    )
+    def post_detail(self, request, pk):
+        post = Post.objects.filter(id=pk).first()
+        if not post:
+            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
+
+        serializer = PostSerializer(post, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
 

@@ -17,3 +17,4 @@ PyYAML==6.0.2
 setuptools==75.2.0
 sqlparse==0.5.1
 uritemplate==4.1.1
+django-debug-toolbar

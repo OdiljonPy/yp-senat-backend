@@ -30,7 +30,7 @@ class AboutUsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AboutUs
-        fields = ('id', 'title', 'description')
+        fields = ('id', 'title', 'description', 'telegram_url', 'instagram_url', 'facebook_url', 'youtube_url', 'is_video', 'file')
 
 
 class AdditionalLinksSerializer(serializers.ModelSerializer):
@@ -58,7 +58,8 @@ class ContactUsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ContactUs
-        fields = ('id', 'email', 'phone_number', 'address', 'latitude', 'longitude')
+        fields = ('id', 'email', 'phone_number', 'address', 'latitude', 'longitude', 'telegram_url',
+                  'instagram_url', 'facebook_url', 'youtube_url')
 
 
 class PollSerializer(serializers.ModelSerializer):
@@ -92,7 +93,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        fields = ('id', 'text', 'type')
+        fields = ('id', 'text', 'type')  #'poll',
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -128,4 +129,14 @@ class PollResultSerializer(serializers.ModelSerializer):
 class PollAnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = PollAnswer
-        fields = ('id', 'result', 'question', 'option')
+        fields = ('id', 'result', 'question', 'answer')
+
+
+class TakePollAnswerSerializer(serializers.Serializer):
+    question = serializers.IntegerField()
+    answer = serializers.ListField(child=serializers.IntegerField())
+
+
+class TakePollSerializer(serializers.Serializer):
+    poll = serializers.IntegerField()
+    answers = serializers.ListField(child=TakePollAnswerSerializer())
