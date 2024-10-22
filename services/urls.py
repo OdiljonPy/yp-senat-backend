@@ -1,9 +1,8 @@
 from django.urls import path
 
-from .serializers import PostSerializer
 from .views import (
     BannerViewSet, RegionViewSet, CommissionViewSet, ProjectViewSet, AppealViewSet, PostViewSet,
-    SearchingViewSet
+    SearchingViewSet, VisitorsViewSet
 )
 
 urlpatterns = [
@@ -26,5 +25,6 @@ urlpatterns = [
          name='commission_category'),
 
     path('appeal/', AppealViewSet.as_view({'post': 'create_appeal'}), name='appeal'),
-    path('filtering/', SearchingViewSet.as_view({'get': 'search_by_post'}), name='search_by_post')
+    path('filtering/', SearchingViewSet.as_view({'get': 'search_by_post'}), name='search_by_post'),
+    path('visitors/', VisitorsViewSet.as_view({'get': 'get'}), name='visitors'),
 ]
