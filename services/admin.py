@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Banner, Region, CommissionCategory, CommissionMember, Projects, Appeal, Post, IpAddress
+from .models import Banner, Region, CommissionCategory, CommissionMember, Projects, Appeal, Post, Visitors
 
 
 @admin.register(Banner)
@@ -61,7 +61,7 @@ class PostAdmin(admin.ModelAdmin):
     list_filter = ('is_published',)
 
 
-@admin.register(IpAddress)
-class IpAddressAdmin(admin.ModelAdmin):
-    list_display = ('id', 'ip', 'created_at')
-    list_display_links = ('id', 'ip')
+@admin.register(Visitors)
+class VisitorsAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'ip', 'created_at')
+    list_display_links = ('id', 'ip', 'name')

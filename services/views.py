@@ -10,7 +10,7 @@ from rest_framework.viewsets import ViewSet
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
 from .models import (Banner, Region, CommissionCategory,
-                     CommissionMember, Projects, Post, IpAddress)
+                     CommissionMember, Projects, Post, Visitors)
 from .repository.get_posts_list import get_post_list
 from .repository.get_project_filter import get_projects_filter
 from .serializers import (
@@ -30,6 +30,7 @@ class BannerViewSet(ViewSet):
     def banner_list(self, request):
         banners = Banner.objects.filter(is_published=True)
         serializer = BannerSerializer(banners, many=True, context={'request': request})
+
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
 
@@ -200,14 +201,16 @@ class PostViewSet(ViewSet):
         if not obj:
             raise CustomApiException(ErrorCodes.NOT_FOUND)
         ip = get_ip(request)
-        if IpAddress.objects.filter(ip=ip, created_at__day=current_time.day, created_at__month=current_time.month,
-                                    created_at__year=current_time.year).exists():
-            obj.views_count.add(IpAddress.objects.filter(ip=ip).first())
+        name = request.META.get('HTTP_USER_AGENT', '')
+
+        if Visitors.objects.filter(ip=ip, created_at__day=current_time.day, created_at__month=current_time.month,
+                                   created_at__year=current_time.year).exists():
+            obj.views.add(Visitors.objects.filter(ip=ip).first())
         else:
-            IpAddress.objects.create(ip=ip)
-            obj.views_count.add(
-                IpAddress.objects.filter(ip=ip, created_at__day=current_time.day, created_at__month=current_time.month,
-                                         created_at__year=current_time.year).first())
+            Visitors.objects.create(ip=ip, name=name)
+            obj.views.add(
+                Visitors.objects.filter(ip=ip, created_at__day=current_time.day, created_at__month=current_time.month,
+                                        created_at__year=current_time.year).first())
 
         serializer = PostSerializer(obj, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
@@ -242,3 +245,12 @@ class SearchingViewSet(ViewSet):
                                  page_size=serializer_params.data.get('page_size', 10))
 
         return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
+
+
+class VisitorsViewSet(ViewSet):
+    @swagger_auto_schema(
+        operation_summary='Visitors',
+        operation_description='Visitors',
+        tags=['Visitors'])
+    def get(self, request):
+        return Response(data={'result': Visitors.objects.all().count()}, status=status.HTTP_200_OK)
