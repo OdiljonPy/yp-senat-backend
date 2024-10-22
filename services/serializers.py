@@ -115,7 +115,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['counting'] = instance.views_count.count()
+        data['counting'] = instance.views.count()
         return data
 
 

@@ -205,10 +205,10 @@ class PostViewSet(ViewSet):
 
         if Visitors.objects.filter(ip=ip, created_at__day=current_time.day, created_at__month=current_time.month,
                                    created_at__year=current_time.year).exists():
-            obj.views_count.add(Visitors.objects.filter(ip=ip).first())
+            obj.views.add(Visitors.objects.filter(ip=ip).first())
         else:
             Visitors.objects.create(ip=ip, name=name)
-            obj.views_count.add(
+            obj.views.add(
                 Visitors.objects.filter(ip=ip, created_at__day=current_time.day, created_at__month=current_time.month,
                                         created_at__year=current_time.year).first())
 
