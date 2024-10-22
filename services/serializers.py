@@ -80,6 +80,11 @@ class CommissionMemberSerializer(serializers.ModelSerializer):
         fields = ['id', 'full_name', 'commission_category', 'region', 'type', 'description', 'position', 'birthdate',
                   'nation', 'education_degree', 'speciality', 'email', 'telegram_url', 'facebook_url', 'instagram_url']
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['posts'] = PostSerializer(instance.member_post.filter(is_published=True), many=True).data
+        return data
+
 
 class ProjectsSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
@@ -110,7 +115,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'image', 'short_description', 'description', 'commission_member', 'telegram_url',
+        fields = ['id', 'title', 'image', 'short_description', 'description', 'commission_member', 'telegram_url',
                   'instagram_url', 'facebook_url', 'created_at', 'is_published']
 
     def to_representation(self, instance):

@@ -136,7 +136,7 @@ class Visitors(BaseModel):
 
 class Post(BaseModel):
     title = models.CharField(max_length=255, verbose_name="заголовок")
-    image = models.ImageField(upload_to='news/', verbose_name="изображение")
+    image = models.ImageField(upload_to='post/', verbose_name="изображение")
     short_description = models.CharField(max_length=200, verbose_name="краткое описание")
     description = HTMLField(verbose_name="описание")
     is_published = models.BooleanField(default=True, verbose_name="опубликовано")
