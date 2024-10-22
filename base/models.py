@@ -9,6 +9,7 @@ POLL_TYPES = (
     (2, 'Множественный выбор')
 )
 
+
 class FAQ(BaseModel):
     question = models.CharField(max_length=200, verbose_name='вопрос')
     answer = models.CharField(max_length=200, verbose_name='ответ')

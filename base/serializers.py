@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from config import settings
 from .models import FAQ, AboutUs, AdditionalLinks, ContactUs, Poll, Question, Option, PollResult, PollAnswer
+from django.db.models import Count
 
 
 class FAQSerializer(serializers.ModelSerializer):
@@ -30,7 +31,9 @@ class AboutUsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AboutUs
-        fields = ('id', 'title', 'description', 'telegram_url', 'instagram_url', 'facebook_url', 'youtube_url', 'is_video', 'file')
+        fields = (
+            'id', 'title', 'description', 'telegram_url', 'instagram_url', 'facebook_url', 'youtube_url', 'is_video',
+            'file')
 
 
 class AdditionalLinksSerializer(serializers.ModelSerializer):
@@ -93,7 +96,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        fields = ('id', 'text', 'type')  #'poll',
+        fields = ('id', 'text', 'type')  # 'poll',
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -114,6 +117,13 @@ class OptionSerializer(serializers.ModelSerializer):
         model = Option
         fields = ('id', 'question', 'text')
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        option_count = PollAnswer.objects.filter(answer__in=[instance.id], question_id=instance.question.id).count()
+        total_count = PollAnswer.objects.filter(question_id=instance.question.id).aggregate(num_answers=Count('answer'))
+        data['percentage_option'] = option_count * 100 / total_count['num_answers']
+        return data
+
 
 class PollResultSerializer(serializers.ModelSerializer):
     class Meta:
@@ -122,6 +132,7 @@ class PollResultSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
+        data['poll'] = PollSerializer(instance.poll).data
         data['answers'] = PollAnswerSerializer(PollAnswer.objects.filter(result_id=instance.id), many=True).data
         return data
 
