@@ -24,6 +24,7 @@ class ContactUsTestCase(APITestCase):
         contact_us_view_set = ContactUsViewSet.as_view({'get': 'contact_us_get'})
         response = contact_us_view_set(request)
         last_contact_us_data = ContactUs.objects.order_by('-created_at').first()
-        excepted_data = {'result': ContactUsSerializer(last_contact_us_data, context={'request': request}).data, 'ok': True}
+        excepted_data = {'result': ContactUsSerializer(last_contact_us_data, context={'request': request}).data,
+                         'ok': True}
         self.assertEqual(response.data, excepted_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

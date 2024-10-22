@@ -8,11 +8,11 @@ from rest_framework import status
 class PollTestCase(APITestCase):
     def setUp(self):
         self.poll1 = Poll.objects.create(title='Python', description='Question and answers about Python programming.',
-                                    participant_count=50)
+                                         participant_count=50)
         self.poll2 = Poll.objects.create(title='Django', description='Question and answers about Django programming.',
-                                    participant_count=20)
+                                         participant_count=20)
         self.poll3 = Poll.objects.create(title='Election', description='Question and answers about election 2024.',
-                                    participant_count=10)
+                                         participant_count=10)
 
         self.factory = APIRequestFactory()
 
@@ -32,5 +32,3 @@ class PollTestCase(APITestCase):
         expected_data = {'result': PollSerializer(self.poll1, context={'request': request}).data, 'ok': True}
         self.assertEqual(response.data, expected_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-
