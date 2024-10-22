@@ -62,6 +62,6 @@ class PostAdmin(admin.ModelAdmin):
 
 
 @admin.register(Visitors)
-class IpAddressAdmin(admin.ModelAdmin):
+class VisitorsAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'ip', 'created_at')
     list_display_links = ('id', 'ip', 'name')
