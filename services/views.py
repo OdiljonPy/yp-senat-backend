@@ -53,8 +53,8 @@ class CommissionViewSet(ViewSet):
         responses={200: CommissionMemberSerializer(many=True)},
         tags=['Commission']
     )
-    def commission_member_list(self, request):
-        members = CommissionMember.objects.all()
+    def commission_member_constant(self, request):
+        members = CommissionMember.objects.filter(type=1)
         serializer = CommissionMemberSerializer(members, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
