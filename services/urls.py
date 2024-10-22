@@ -14,7 +14,7 @@ urlpatterns = [
     path('post/member/', PostViewSet.as_view({'get': 'post_list_by_members'}), name='post_by_member'),
     path('post/<int:pk>/', PostViewSet.as_view({'get': "post_detail"}), name='post_detail'),
 
-    path('commission/', CommissionViewSet.as_view({'get': 'commission_member_list'}), name='commission_list'),
+    path('commission/', CommissionViewSet.as_view({'get': 'commission_member_constant'}), name='commission_constant'),
     path('commission/<int:pk>/', CommissionViewSet.as_view({'get': 'commission_member_detail'}),
          name='commission_detail'),
     path('region/commissions/<int:pk>/', CommissionViewSet.as_view({'get': 'commission_member_by_region'}),

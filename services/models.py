@@ -128,6 +128,11 @@ class Visitors(BaseModel):
     def __str__(self):
         return self.ip
 
+    class Meta:
+        verbose_name = 'Ip адрес'
+        verbose_name_plural = 'Ip адресы'
+        ordering = ('created_at',)
+
 
 class Post(BaseModel):
     title = models.CharField(max_length=255, verbose_name="заголовок")
@@ -137,6 +142,7 @@ class Post(BaseModel):
     is_published = models.BooleanField(default=True, verbose_name="опубликовано")
 
     commission_member = models.ForeignKey(CommissionMember, on_delete=models.CASCADE, blank=True, null=True,
+                                          related_name='member_post',
                                           verbose_name="член комиссии")
 
     views = models.ManyToManyField(Visitors, blank=True, verbose_name="количество просмотров")
