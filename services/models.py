@@ -139,3 +139,7 @@ class Post(BaseModel):
         verbose_name = 'Пост'
         verbose_name_plural = 'Посты'
         ordering = ('-created_at',)
+
+    @property
+    def counting(self):
+        return self.views.count()

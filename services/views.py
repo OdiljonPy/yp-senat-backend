@@ -181,8 +181,6 @@ class PostViewSet(ViewSet):
         if post_member is False:
             filter_ &= (Q(commission_member__isnull=False, is_published=True))
 
-
-
         posts = Post.objects.filter(filter_).order_by('-created_at')
         response = get_post_list(context={'request': request, 'query': posts},
                                  page=serializer_params.data.get('page', 1),
@@ -202,16 +200,10 @@ class PostViewSet(ViewSet):
         if not obj:
             raise CustomApiException(ErrorCodes.NOT_FOUND)
         ip = get_ip(request)
-        name = request.META.get('HTTP_USER_AGENT', '')
 
         if Visitors.objects.filter(ip=ip, created_at__day=current_time.day, created_at__month=current_time.month,
                                    created_at__year=current_time.year).exists():
             obj.views.add(Visitors.objects.filter(ip=ip).first())
-        else:
-            Visitors.objects.create(ip=ip, name=name)
-            obj.views.add(
-                Visitors.objects.filter(ip=ip, created_at__day=current_time.day, created_at__month=current_time.month,
-                                        created_at__year=current_time.year).first())
 
         serializer = PostSerializer(obj, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
@@ -223,4 +215,4 @@ class VisitorsViewSet(ViewSet):
         operation_description='Visitors',
         tags=['Visitors'])
     def get(self, request):
-        return Response(data={'result': Visitors.objects.all().count()}, status=status.HTTP_200_OK)
+        return Response(data={'result': Visitors.objects.all().count(), 'ok': True}, status=status.HTTP_200_OK)
