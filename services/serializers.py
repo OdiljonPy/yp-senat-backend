@@ -1,5 +1,3 @@
-from random import choice
-
 from rest_framework import serializers
 
 from config import settings
@@ -73,7 +71,8 @@ class CommissionMemberSerializer(serializers.ModelSerializer):
         data['category_name'] = CommissionCategorySerializer(instance.commission_category,
                                                              context=self.context).data
         data['region'] = RegionSerializer(instance.region, context=self.context).data
-        data['posts'] = PostSerializer(instance.member_post.filter(is_published=True).order_by('-created_at')[:6], many=True,
+        data['posts'] = PostSerializer(instance.member_post.filter(is_published=True).order_by('-created_at')[:6],
+                                       many=True,
                                        context=self.context).data  # here cannot be used select_related because it's cannot refer to the model through related_name.
         return data
 
@@ -108,12 +107,7 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'title', 'image', 'short_description', 'description', 'commission_member', 'created_at',
-                  'is_published']
-
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data['counting'] = instance.views.count()
-        return data
+                  'is_published', 'counting']
 
 
 class AppealSerializer(serializers.ModelSerializer):
