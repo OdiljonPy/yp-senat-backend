@@ -1,34 +1,42 @@
-from rest_framework.test import APITestCase, APIRequestFactory
-from base.views import PollViewSet
-from base.serializers import PollSerializer, TakePollSerializer
-from base.models import Poll, PollResult
+from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
+from base.models import Poll, PollResult
+from django.urls import reverse
 
 
-class PollTestCase(APITestCase):
+class PollViewSetTest(APITestCase):
     def setUp(self):
-        self.poll1 = Poll.objects.create(title='Python', description='Question and answers about Python programming.',
-                                         participant_count=50)
-        self.poll2 = Poll.objects.create(title='Django', description='Question and answers about Django programming.',
-                                         participant_count=20)
-        self.poll3 = Poll.objects.create(title='Election', description='Question and answers about election 2024.',
-                                         participant_count=10)
+        self.client = APIClient()
+        self.poll = Poll.objects.create(title='Poll 1', description='Sample poll', participant_count=5)
+        self.poll_result = PollResult.objects.create(poll=self.poll, user='127.0.0.1')
 
-        self.factory = APIRequestFactory()
+    def test_get_polls_positive(self):
+        url = reverse('polls')
+        response = self.client.get(url)
 
-    def test_get_polls(self):
-        request = self.factory.get('/polls/')
-        polls_view_set = PollViewSet.as_view({'get': 'get_polls'})
-        response = polls_view_set(request)
-        polls = Poll.objects.all()
-        expected_data = {'result': PollSerializer(polls, many=True, context={'request': request}).data, 'ok': True}
-        self.assertEqual(response.data, expected_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['result']), 1)
+        self.assertEqual(response.data['result'][0]['title'], 'Poll 1')
 
-    def test_get_poll_without_result(self):
-        request = self.factory.get('/polls/{self.poll1.id}/')
-        poll_view_set = PollViewSet.as_view({'get': 'get_poll'})
-        response = poll_view_set(request, pk=self.poll1.id)
-        expected_data = {'result': PollSerializer(self.poll1, context={'request': request}).data, 'ok': True}
-        self.assertEqual(response.data, expected_data)
+    def test_get_polls_negative(self):
+        Poll.objects.all().delete()
+        url = reverse('polls')
+        response = self.client.get(url)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['result']), 0)
+
+    def test_get_poll_positive(self):
+        self.poll = Poll.objects.create(title='Poll one', description='Sample poll', participant_count=5)
+        url = reverse('poll', kwargs={'pk': self.poll.id})
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['result']['title'], 'Poll one')
+
+    def test_get_poll_negative(self):
+        self.poll.delete()
+        url = reverse('poll', kwargs={'pk': 1})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(len(response.data['result']), 0)

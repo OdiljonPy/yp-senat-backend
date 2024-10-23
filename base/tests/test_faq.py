@@ -1,24 +1,24 @@
-from rest_framework.test import APIRequestFactory, APITestCase
-from base.models import FAQ
-from base.serializers import FAQSerializer
-from base.views import FAQViewSet
+from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
+from base.models import FAQ
+from django.urls import reverse
 
 
-class FAQTestCase(APITestCase):
+class FAQViewSetTest(APITestCase):
     def setUp(self):
-        FAQ.objects.create(question='The most popular programming language is ?',
-                                  answer='It is absolutely python', is_visible=True)
-        FAQ.objects.create(question='Which database do you use ?', answer='SQL', is_visible=True)
-        FAQ.objects.create(question='Which language do you use ?', answer='Python', is_visible=False)
+        self.client = APIClient()
+        self.url = reverse('faq')
+        self.faq1 = FAQ.objects.create(question='What is X?', answer='X is answer of Y', is_visible=True)
+        self.faq2 = FAQ.objects.create(question='What is Y?', answer='Y is answer of Z', is_visible=False)
 
-        self.factory = APIRequestFactory()
-
-    def test_get_visible_faq(self):
-        request = self.factory.get('/faq/')
-        faq_view_set = FAQViewSet.as_view({'get': 'faq_get'})
-        response = faq_view_set(request)
-        visible_faq = FAQ.objects.filter(is_visible=True)
-        excepted_data = {'result': FAQSerializer(visible_faq, many=True, context={'request': request}).data, 'ok': True}
-        self.assertEqual(response.data, excepted_data)
+    def test_faq_get_positive(self):
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['result']), 1)
+        self.assertEqual(response.data['result'][0]['question'], 'What is X?')
+
+    def test_faq_get_negative(self):
+        FAQ.objects.all().delete()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['result']), 0)
