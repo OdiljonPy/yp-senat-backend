@@ -2,6 +2,7 @@ from django.db import models
 from tinymce.models import HTMLField
 from django.core.exceptions import ValidationError
 from abstract_models.base_model import BaseModel
+from services.models import Visitors
 from utils.validations import phone_number_validation
 
 POLL_TYPES = (
@@ -106,7 +107,7 @@ class Poll(BaseModel):
 
 
 class Question(BaseModel):
-    poll = models.ForeignKey(Poll, on_delete=models.CASCADE, verbose_name='опрос')
+    poll = models.ForeignKey(Poll, on_delete=models.CASCADE, verbose_name='опрос', related_name='questions')
     text = HTMLField(verbose_name='текст')
     type = models.PositiveIntegerField(choices=POLL_TYPES, default=1, verbose_name='тип')
 
@@ -120,7 +121,7 @@ class Question(BaseModel):
 
 
 class Option(BaseModel):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, verbose_name='вопрос')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, verbose_name='вопрос', related_name='options')
     text = models.CharField(max_length=100, verbose_name='текст')
 
     def __str__(self):
@@ -133,11 +134,11 @@ class Option(BaseModel):
 
 
 class PollResult(BaseModel):
-    user = models.CharField(max_length=15, verbose_name='пользователь')
+    user = models.ForeignKey(Visitors, on_delete=models.CASCADE, verbose_name='пользователь')
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE, verbose_name='опрос')
 
     def __str__(self):
-        return self.user
+        return self.user.ip
 
     class Meta:
         verbose_name = 'Результат опроса'
@@ -151,7 +152,7 @@ class PollAnswer(BaseModel):
     answer = models.ManyToManyField(Option, verbose_name='вариант')
 
     def __str__(self):
-        return self.result.user
+        return self.result.user.ip
 
     class Meta:
         verbose_name = 'Ответ на опрос'
