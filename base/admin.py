@@ -1,6 +1,11 @@
 from django.contrib import admin
-from .models import FAQ, AboutUs, AdditionalLinks, ContactUs, Poll, Question, Option, PollResult, PollAnswer
+from .models import FAQ, AboutUs, AdditionalLinks, BaseInfo, Banner, Poll, Question, Option, PollResult, PollAnswer
 
+@admin.register(Banner)
+class BannerAdmin(admin.ModelAdmin):
+    list_display = ('id',)
+    search_fields = ('title',)
+    list_filter = ('is_published',)
 
 @admin.register(FAQ)
 class FAQAdmin(admin.ModelAdmin):
@@ -10,8 +15,7 @@ class FAQAdmin(admin.ModelAdmin):
 
 @admin.register(AboutUs)
 class AboutUsAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title')
-    list_display_links = ('id', 'title')
+    list_display = ('id',)
     search_fields = ('title', 'description')
 
 
@@ -22,8 +26,8 @@ class AdditionalLinksAdmin(admin.ModelAdmin):
     list_filter = ('is_visible',)
 
 
-@admin.register(ContactUs)
-class ContactUsAdmin(admin.ModelAdmin):
+@admin.register(BaseInfo)
+class BaseInfoAdmin(admin.ModelAdmin):
     list_display = ('id', 'phone_number', 'email')
     list_display_links = ('id', 'phone_number')
     search_fields = ('phone_number', 'email', 'address')
