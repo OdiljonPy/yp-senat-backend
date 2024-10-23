@@ -1,6 +1,20 @@
 from rest_framework import serializers
 from config import settings
-from .models import FAQ, AboutUs, AdditionalLinks, ContactUs, Poll, Question, Option, PollResult, PollAnswer
+from .models import FAQ, AboutUs, AdditionalLinks, Poll, Question, Option, PollResult, PollAnswer, BaseInfo, Banner
+
+
+class BannerSerializer(serializers.ModelSerializer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get('request')
+        language = 'ru'
+        if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
+            language = request.META.get('HTTP_ACCEPT_LANGUAGE')
+        self.fields['title'] = serializers.CharField(source=f'title_{language}')
+
+    class Meta:
+        model = Banner
+        fields = ['id', 'image', 'title', 'created_at', 'is_published']
 
 
 class FAQSerializer(serializers.ModelSerializer):
@@ -25,12 +39,11 @@ class AboutUsSerializer(serializers.ModelSerializer):
         language = 'ru'
         if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
             language = request.META.get('HTTP_ACCEPT_LANGUAGE')
-        self.fields['title'] = serializers.CharField(source=f'title_{language}')
         self.fields['description'] = serializers.CharField(source=f'description_{language}')
 
     class Meta:
         model = AboutUs
-        fields = ('id', 'title', 'description', 'telegram_url', 'instagram_url', 'facebook_url', 'youtube_url', 'is_video', 'file')
+        fields = ('id', 'description')
 
 
 class AdditionalLinksSerializer(serializers.ModelSerializer):
@@ -47,7 +60,7 @@ class AdditionalLinksSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'link', 'is_visible')
 
 
-class ContactUsSerializer(serializers.ModelSerializer):
+class BaseInfoSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         request = self.context.get('request')
@@ -57,7 +70,7 @@ class ContactUsSerializer(serializers.ModelSerializer):
         self.fields['address'] = serializers.CharField(source=f'address_{language}')
 
     class Meta:
-        model = ContactUs
+        model = BaseInfo
         fields = ('id', 'email', 'phone_number', 'address', 'latitude', 'longitude', 'telegram_url',
                   'instagram_url', 'facebook_url', 'youtube_url')
 
@@ -78,7 +91,8 @@ class PollSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['questions'] = QuestionSerializer(Question.objects.filter(poll_id=instance.id), many=True).data
+        data['questions'] = QuestionSerializer(Question.objects.filter(poll_id=instance.id), many=True,
+                                               context=self.context).data
         return data
 
 
@@ -93,11 +107,12 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        fields = ('id', 'text', 'type')  #'poll',
+        fields = ('id', 'text', 'type')  # 'poll',
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['options'] = OptionSerializer(Option.objects.filter(question_id=instance.id), many=True).data
+        data['options'] = OptionSerializer(Option.objects.filter(question_id=instance.id), many=True,
+                                           context=self.context).data
         return data
 
 
@@ -122,7 +137,7 @@ class PollResultSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['answers'] = PollAnswerSerializer(PollAnswer.objects.filter(result_id=instance.id), many=True).data
+        data['answers'] = PollAnswerSerializer(PollAnswer.objects.filter(result_id=instance.id), many=True, context=self.context).data
         return data
 
 

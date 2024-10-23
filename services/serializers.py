@@ -1,10 +1,12 @@
+from random import choice
+
 from rest_framework import serializers
 
 from config import settings
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
 from .models import (
-    Banner, Region, CommissionCategory, CommissionMember, Projects, Post, Appeal, PROJECT_STATUS)
+    Region, CommissionCategory, CommissionMember, Projects, Post, Appeal, PROJECT_STATUS)
 
 
 class ParamValidateSerializer(serializers.Serializer):
@@ -17,20 +19,6 @@ class ParamValidateSerializer(serializers.Serializer):
             raise CustomApiException(ErrorCodes.VALIDATION_FAILED,
                                      message='page and page_size must be positive integer')
         return data
-
-
-class BannerSerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        request = self.context.get('request')
-        language = 'ru'
-        if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
-            language = request.META.get('HTTP_ACCEPT_LANGUAGE')
-        self.fields['title'] = serializers.CharField(source=f'title_{language}')
-
-    class Meta:
-        model = Banner
-        fields = ['id', 'image', 'title', 'created_at', 'is_published']
 
 
 class RegionSerializer(serializers.ModelSerializer):
@@ -82,7 +70,11 @@ class CommissionMemberSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['posts'] = PostSerializer(instance.member_post.filter(is_published=True), many=True).data
+        data['category_name'] = CommissionCategorySerializer(instance.commission_category,
+                                                             context=self.context).data
+        data['region'] = RegionSerializer(instance.region, context=self.context).data
+        data['posts'] = PostSerializer(instance.member_post.filter(is_published=True).order_by('-created_at')[:6], many=True,
+                                       context=self.context).data  # here cannot be used select_related because it's cannot refer to the model through related_name.
         return data
 
 
@@ -115,8 +107,8 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'image', 'short_description', 'description', 'commission_member', 'telegram_url',
-                  'instagram_url', 'facebook_url', 'created_at', 'is_published']
+        fields = ['id', 'title', 'image', 'short_description', 'description', 'commission_member', 'created_at',
+                  'is_published']
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -127,8 +119,9 @@ class PostSerializer(serializers.ModelSerializer):
 class AppealSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appeal
-        fields = ['id', 'full_name', 'phone_number', 'email', 'message']
+        fields = ['id', 'commission_member', 'full_name', 'phone_number', 'email', 'message']
 
 
 class PostFilterSerializer(ParamValidateSerializer):
     q = serializers.CharField(required=False)
+    post_member_exist = serializers.BooleanField(required=False)

@@ -1,9 +1,12 @@
 from modeltranslation.translator import translator, TranslationOptions
-from .models import AboutUs, AdditionalLinks, FAQ, ContactUs, Poll, Question, Option
+from .models import AboutUs, AdditionalLinks, FAQ, Poll, Question, Option, BaseInfo, Banner
 
+
+class BannerTranslationOption(TranslationOptions):
+    fields = ('title',)
 
 class AboutUsTranslationOption(TranslationOptions):
-    fields = ('title', 'description',)
+    fields = ('description',)
 
 
 class AdditionalLinksTranslationOptions(TranslationOptions):
@@ -14,7 +17,7 @@ class FAQTranslationOption(TranslationOptions):
     fields = ('question', 'answer')
 
 
-class ContactUsTranslationOption(TranslationOptions):
+class BaseInfoTranslationOption(TranslationOptions):
     fields = ('address',)
 
 
@@ -33,7 +36,7 @@ class OptionTranslationOption(TranslationOptions):
 translator.register(AboutUs, AboutUsTranslationOption)
 translator.register(AdditionalLinks, AdditionalLinksTranslationOptions)
 translator.register(FAQ, FAQTranslationOption)
-translator.register(ContactUs, ContactUsTranslationOption)
+translator.register(BaseInfo, BaseInfoTranslationOption)
 translator.register(Poll, PollTranslationOption)
 translator.register(Question, QuestionTranslationOption)
 translator.register(Option, OptionTranslationOption)

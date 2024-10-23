@@ -1,13 +1,6 @@
 from django.contrib import admin
 
-from .models import Banner, Region, CommissionCategory, CommissionMember, Projects, Appeal, Post, Visitors
-
-
-@admin.register(Banner)
-class BannerAdmin(admin.ModelAdmin):
-    list_display = ('id',)
-    search_fields = ('title',)
-    list_filter = ('is_published',)
+from .models import Region, CommissionCategory, CommissionMember, Projects, Appeal, Post, Visitors
 
 
 class CommissionMemberTabularInline(admin.TabularInline):

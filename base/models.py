@@ -9,10 +9,24 @@ POLL_TYPES = (
     (2, 'Множественный выбор')
 )
 
+
+class Banner(BaseModel):
+    image = models.ImageField(upload_to='banner/', verbose_name='Изображение')
+    title = models.CharField(max_length=255, verbose_name='текст')
+    is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
+
+    def __str__(self):
+        return str(self.id) or ''
+
+    class Meta:
+        verbose_name = 'Баннер'
+        verbose_name_plural = 'Баннеры'
+        ordering = ('-created_at',)
+
 class FAQ(BaseModel):
-    question = models.CharField(max_length=200, verbose_name='вопрос')
-    answer = models.CharField(max_length=200, verbose_name='ответ')
-    is_visible = models.BooleanField(default=True, verbose_name='видимый')
+    question = models.TextField(max_length=700, verbose_name='вопрос')
+    answer = models.TextField(max_length=1000, verbose_name='ответ')
+    is_visible = models.BooleanField(default=True, verbose_name='опубликован')
 
     def __str__(self):
         return self.question
@@ -20,45 +34,26 @@ class FAQ(BaseModel):
     class Meta:
         verbose_name = 'Часто задаваемые вопросы'
         verbose_name_plural = 'Часто задаваемые вопросы'
-        ordering = ['created_at']
+        ordering = ('-created_at',)
 
 
 class AboutUs(BaseModel):
-    title = models.CharField(max_length=200, verbose_name='заголовок')
     description = HTMLField(verbose_name="описание")
-    file = models.FileField(upload_to='about_us/', verbose_name="файл")
-    is_video = models.BooleanField(default=False, verbose_name="видео")
-
-    telegram_url = models.URLField(default='telegram.org', verbose_name="телеграм_url")
-    instagram_url = models.URLField(default='instagram.com', verbose_name="инстаграм_url")
-    facebook_url = models.URLField(default='facebook.com', verbose_name="фэйсбук_url")
-    youtube_url = models.URLField(default='youtube.com', verbose_name="ютубе_url")
 
     def __str__(self):
-        return self.title
-
-    def clean(self):
-        type_ = self.file.url.split('.')[-1]
-        image_type = ['jpg', 'jpeg', 'png', 'gif', 'webp']
-        video_type = ['mp4', 'avi', 'mkv']
-        if type_ in video_type:
-            self.is_video = True
-        elif type_ in image_type:
-            self.is_video = False
-        else:
-            raise ValidationError('Invalid file type')
+        return str(self.id) or ''
 
     class Meta:
         verbose_name = 'О нас'
         verbose_name_plural = 'О нас'
-        ordering = ['created_at']
+        ordering = ('-created_at',)
 
 
 class AdditionalLinks(BaseModel):
-    title = models.CharField(max_length=250, verbose_name='заголовок')
+    title = models.CharField(max_length=250, verbose_name='название')
     link = models.URLField(verbose_name='ссылка')
     image = models.ImageField(upload_to='additional_links/', verbose_name='изображение')
-    is_visible = models.BooleanField(default=True, verbose_name='изображение')
+    is_visible = models.BooleanField(default=True, verbose_name='опубликован')
 
     def __str__(self):
         return str(self.id) or ''
@@ -66,13 +61,13 @@ class AdditionalLinks(BaseModel):
     class Meta:
         verbose_name = 'Дополнительные ссылка'
         verbose_name_plural = 'Дополнительные ссылки'
-        ordering = ['created_at']
+        ordering = ('-created_at',)
 
 
-class ContactUs(BaseModel):
+class BaseInfo(BaseModel):
     email = models.EmailField(verbose_name='электронная почта')
     phone_number = models.CharField(max_length=14, validators=[phone_number_validation], verbose_name='номер телефона')
-    address = models.CharField(max_length=255, verbose_name='адрес')
+    address = models.CharField(max_length=255, verbose_name='название адреса')
     latitude = models.FloatField(verbose_name="широта")
     longitude = models.FloatField(verbose_name="долгота")
 
@@ -87,7 +82,7 @@ class ContactUs(BaseModel):
     class Meta:
         verbose_name = 'Связаться с нами'
         verbose_name_plural = 'Связаться с нами'
-        ordering = ['created_at']
+        ordering = ('-created_at',)
 
 
 class Poll(BaseModel):
@@ -101,7 +96,7 @@ class Poll(BaseModel):
     class Meta:
         verbose_name = 'Опрос'
         verbose_name_plural = "Опросы"
-        ordering = ('created_at',)
+        ordering = ('-created_at',)
 
 
 class Question(BaseModel):
@@ -115,7 +110,7 @@ class Question(BaseModel):
     class Meta:
         verbose_name = 'Вопрос'
         verbose_name_plural = "Вопросы"
-        ordering = ('created_at',)
+        ordering = ('-created_at',)
 
 
 class Option(BaseModel):
@@ -128,7 +123,7 @@ class Option(BaseModel):
     class Meta:
         verbose_name = 'Вариант'
         verbose_name_plural = "Варианты"
-        ordering = ('created_at',)
+        ordering = ('-created_at',)
 
 
 class PollResult(BaseModel):
@@ -141,7 +136,7 @@ class PollResult(BaseModel):
     class Meta:
         verbose_name = 'Результат опроса'
         verbose_name_plural = "Результаты опроса"
-        ordering = ('created_at',)
+        ordering = ('-created_at',)
 
 
 class PollAnswer(BaseModel):
@@ -155,4 +150,4 @@ class PollAnswer(BaseModel):
     class Meta:
         verbose_name = 'Ответ на опрос'
         verbose_name_plural = "Ответы на опросы"
-        ordering = ('created_at',)
+        ordering = ('-created_at',)

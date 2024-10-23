@@ -1,8 +1,8 @@
 from services.utils import get_ip
-from .models import FAQ, AboutUs, AdditionalLinks, ContactUs, Poll, Question, Option, PollResult, PollAnswer
+from .models import FAQ, AboutUs, AdditionalLinks, BaseInfo, Poll, Question, PollResult, Banner
 from .serializers import (
-    FAQSerializer, AdditionalLinksSerializer, AboutUsSerializer, ContactUsSerializer, PollSerializer,
-    QuestionSerializer, OptionSerializer, PollResultSerializer, PollAnswerSerializer, TakePollSerializer
+    FAQSerializer, AdditionalLinksSerializer, AboutUsSerializer, BaseInfoSerializer, PollSerializer,
+    QuestionSerializer, PollResultSerializer, PollAnswerSerializer, TakePollSerializer, BannerSerializer
 )
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
@@ -11,6 +11,19 @@ from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
 from drf_yasg.utils import swagger_auto_schema
 
+
+class BannerViewSet(ViewSet):
+    @swagger_auto_schema(
+        operation_summary='List Of Banners',
+        operation_description='List of banners',
+        responses={200: BannerSerializer(many=True)},
+        tags=['Banner']
+    )
+    def banner_list(self, request):
+        banners = Banner.objects.filter(is_published=True).order_by('-created_at')[:3]
+        serializer = BannerSerializer(banners, many=True, context={'request': request})
+
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
 class FAQViewSet(ViewSet):
     @swagger_auto_schema(
@@ -53,17 +66,17 @@ class AdditionalLinksViewSet(ViewSet):
             status=status.HTTP_200_OK)
 
 
-class ContactUsViewSet(ViewSet):
+class BaseInfoViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='Contact Us',
         operation_description='Contact Us',
-        responses={200: ContactUsSerializer()},
+        responses={200: BaseInfoSerializer()},
         tags=['Contact Us']
     )
-    def contact_us_get(self, request):
-        data = ContactUs.objects.order_by('-created_at').first()
+    def base_info_get(self, request):
+        data = BaseInfo.objects.order_by('-created_at').first()
         return Response(
-            data={'result': ContactUsSerializer(data, context={'request': request}).data, 'ok': True},
+            data={'result': BaseInfoSerializer(data, context={'request': request}).data, 'ok': True},
             status=status.HTTP_200_OK)
 
 
@@ -123,8 +136,6 @@ class PollViewSet(ViewSet):
             raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT)
 
         result = PollResult.objects.create(user=user, poll=poll)
-        # poll_serializer = PollResultSerializer(data={'user': user, "poll": poll}, context={'request': request})
-        # poll_serializer.save()
         result.save()
 
         answers = [{**answer, 'result': result.id} for answer in data['answers']]
