@@ -1,3 +1,4 @@
+from services.models import Visitors
 from services.utils import get_ip
 from .models import FAQ, AboutUs, AdditionalLinks, BaseInfo, Poll, Question, PollResult, Banner
 from .serializers import (
@@ -24,6 +25,7 @@ class BannerViewSet(ViewSet):
         serializer = BannerSerializer(banners, many=True, context={'request': request})
 
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+
 
 class FAQViewSet(ViewSet):
     @swagger_auto_schema(
@@ -99,12 +101,12 @@ class PollViewSet(ViewSet):
         tags=['Poll']
     )
     def get_poll(self, request, pk):
-        user = get_ip(request)
-        poll = Poll.objects.filter(id=pk).first()
+        user = Visitors.objects.filter(ip=get_ip(request)).first()
+        poll = Poll.objects.filter(id=pk).prefetch_related('questions', 'questions__options').first()
         if not poll:
             raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
 
-        result = PollResult.objects.filter(poll_id=poll.id, user=user).first()
+        result = PollResult.objects.filter(poll_id=poll.id, user=user).prefetch_related('answers').first()
         if result:
             serializer = PollResultSerializer(result, context={'request': request})
             return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
@@ -121,7 +123,7 @@ class PollViewSet(ViewSet):
     )
     def take_poll(self, request):
         data = request.data
-        user = get_ip(request)
+        user = Visitors.objects.filter(ip=get_ip(request)).first()
 
         serializer = TakePollSerializer(data=data, context={'request': request})
         if not serializer.is_valid():
@@ -138,12 +140,11 @@ class PollViewSet(ViewSet):
         result = PollResult.objects.create(user=user, poll=poll)
         result.save()
 
-        answers = [{**answer, 'result': result.id} for answer in data['answers']]
-
-        serializer = PollAnswerSerializer(data=answers, many=True, context={'request': request})
+        serializer = PollAnswerSerializer(data=data['answers'], many=True,
+                                          context={'request': request, 'result': result})
         if not serializer.is_valid():
             result.delete()
-            raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT, message=serializer.errors)
+            raise CustomApiException(error_code=ErrorCodes.VALIDATION_FAILED, message=serializer.errors)
 
         serializer.save()
         poll.participant_count += 1
@@ -155,43 +156,18 @@ class PollViewSet(ViewSet):
 
 class QuestionViewSet(ViewSet):
     @swagger_auto_schema(
-        operation_summary='Get Questions By Poll Id',
-        operation_description='Get questions by poll id',
-        responses={200: QuestionSerializer(many=True)},
-        tags=['Question']
-    )
-    def get_questions(self, request):
-        data = request.GET
-        questions = Question.objects.filter(poll_id=data.get('poll'))
-        serializer = QuestionSerializer(questions, many=True, context={'request': request})
-        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
-
-    @swagger_auto_schema(
-        operation_summary='Get One Question',
-        operation_description='Get one question',
-        responses={200: QuestionSerializer()},
-        tags=['Question']
-    )
-    def get_question(self, request, pk):
-        question = Question.objects.filter(id=pk).first()
-        if not question:
-            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
-
-        serializer = QuestionSerializer(question, context={'request': request})
-        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
-
-    @swagger_auto_schema(
         operation_summary='Get Next Question',
         operation_description='Get next question',
         responses={200: QuestionSerializer()},
         tags=['Question']
     )
     def get_next_question(self, request, pk):
-        question = Question.objects.filter(id=pk).first()
+        question = Question.objects.filter(id=pk).prefetch_related('options').first()
         if not question:
             raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
 
-        question = Question.objects.filter(id=question.id + 1, poll_id=question.poll_id).first()
+        question = Question.objects.filter(id__gt=question.id, poll_id=question.poll_id).prefetch_related(
+            'options').first()
         if not question:
             raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
 

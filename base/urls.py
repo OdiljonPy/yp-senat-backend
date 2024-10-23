@@ -13,7 +13,5 @@ urlpatterns = [
     path('polls/', PollViewSet.as_view({'get': 'get_polls'}), name='polls'),
     path('polls/<int:pk>/', PollViewSet.as_view({'get': 'get_poll'}), name='poll'),
     path('polls/take/', PollViewSet.as_view({'post': 'take_poll'}), name='take_poll'),
-    path('polls/question/', QuestionViewSet.as_view({'get': 'get_questions'}), name='questions'),
-    path('polls/question/<int:pk>/', QuestionViewSet.as_view({'get': 'get_question'}), name='question'),
     path('polls/question/next/<int:pk>/', QuestionViewSet.as_view({'get': 'get_next_question'}), name='next_question'),
 ]
