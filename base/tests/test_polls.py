@@ -1,14 +1,15 @@
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
-from base.models import Poll, PollResult
+from base.models import Poll, PollResult, Visitors
 from django.urls import reverse
 
 
 class PollViewSetTest(APITestCase):
     def setUp(self):
         self.client = APIClient()
+        self.visitor = Visitors.objects.create(name='mozilla', ip='127.0.0.1')
         self.poll = Poll.objects.create(title='Poll 1', description='Sample poll', participant_count=5)
-        self.poll_result = PollResult.objects.create(poll=self.poll, user='127.0.0.1')
+        self.poll_result = PollResult.objects.create(poll=self.poll, user=self.visitor)
 
     def test_get_polls_positive(self):
         url = reverse('polls')
