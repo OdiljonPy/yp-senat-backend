@@ -1,27 +1,26 @@
-from rest_framework.test import APIRequestFactory, APITestCase
-from base.models import AdditionalLinks
-from base.serializers import AdditionalLinksSerializer
+from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
-from base.views import AdditionalLinksViewSet
+from django.urls import reverse
+from base.models import AdditionalLinks
 
-
-class AdditionalLinksTestCase(APITestCase):
+class AdditionalLinksViewSetTest(APITestCase):
     def setUp(self):
-        AdditionalLinks.objects.create(title='telegram_url', link='telegram.org', image='add_links/image1.jpg',
-                                       is_visible=True)
-        AdditionalLinks.objects.create(title='instagram_url', link='instagram.com', image='add_links/image2.png',
-                                       is_visible=True)
-        AdditionalLinks.objects.create(title='youtube_url', link='youtube.com', image='add_links/image3.jpeg',
-                                       is_visible=False)
+        self.client = APIClient()
+        self.url = reverse('additional_links')
 
-        self.factory = APIRequestFactory()
+        self.link1 = AdditionalLinks.objects.create(title="Link 1", link="http://link1.com", image='additional_links/image1.jpg', is_visible=True)
+        self.link2 = AdditionalLinks.objects.create(title="Link 2", link="http://link2.com", image='additional_links/image2.png', is_visible=True)
+        self.link3 = AdditionalLinks.objects.create(title="Link 3", link="http://link3.com", image='additional_links/image3.jpeg', is_visible=False)
 
-    def test_additional_links(self):
-        request = self.factory.get('/additional/')
-        additional_links_view_set = AdditionalLinksViewSet.as_view({'get': 'additional_links_get'})
-        response = additional_links_view_set(request)
-        visible_data = AdditionalLinks.objects.filter(is_visible=True)
-        excepted_data = {
-            'result': AdditionalLinksSerializer(visible_data, many=True, context={'request': request}).data, 'ok': True}
-        self.assertEqual(response.data, excepted_data)
+    def test_additional_links_get_positive(self):
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['result']), 2)
+        self.assertEqual(response.data['result'][0]['title'], "Link 2")
+        self.assertEqual(response.data['result'][1]['title'], "Link 1")
+
+    def test_additional_links_get_negative_no_visible_links(self):
+        AdditionalLinks.objects.filter(is_visible=True).delete()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['result']), 0)
