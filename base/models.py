@@ -24,6 +24,7 @@ class Banner(BaseModel):
         verbose_name_plural = 'Баннеры'
         ordering = ('-created_at',)
 
+
 class FAQ(BaseModel):
     question = models.TextField(max_length=700, verbose_name='вопрос')
     answer = models.TextField(max_length=1000, verbose_name='ответ')
@@ -111,7 +112,7 @@ class Question(BaseModel):
     class Meta:
         verbose_name = 'Вопрос'
         verbose_name_plural = "Вопросы"
-        ordering = ('-created_at',)
+        ordering = ('created_at',)
 
 
 class Option(BaseModel):
@@ -124,7 +125,7 @@ class Option(BaseModel):
     class Meta:
         verbose_name = 'Вариант'
         verbose_name_plural = "Варианты"
-        ordering = ('-created_at',)
+        ordering = ('created_at',)
 
 
 class PollResult(BaseModel):
@@ -141,7 +142,7 @@ class PollResult(BaseModel):
 
 
 class PollAnswer(BaseModel):
-    result = models.ForeignKey(PollResult, on_delete=models.CASCADE, verbose_name='результат')
+    result = models.ForeignKey(PollResult, on_delete=models.CASCADE, verbose_name='результат', related_name='answers')
     question = models.ForeignKey(Question, on_delete=models.CASCADE, verbose_name='вопрос')
     answer = models.ManyToManyField(Option, verbose_name='вариант')
 

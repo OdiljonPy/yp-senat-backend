@@ -26,6 +26,7 @@ class BannerViewSet(ViewSet):
 
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
+
 class FAQViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='FAQ',
@@ -105,7 +106,7 @@ class PollViewSet(ViewSet):
         if not poll:
             raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
 
-        result = PollResult.objects.filter(poll_id=poll.id, user=user).first()
+        result = PollResult.objects.filter(poll_id=poll.id, user=user).prefetch_related('answers').first()
         if result:
             serializer = PollResultSerializer(result, context={'request': request})
             return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
@@ -143,7 +144,7 @@ class PollViewSet(ViewSet):
                                           context={'request': request, 'result': result})
         if not serializer.is_valid():
             result.delete()
-            raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT, message=serializer.errors)
+            raise CustomApiException(error_code=ErrorCodes.VALIDATION_FAILED, message=serializer.errors)
 
         serializer.save()
         poll.participant_count += 1

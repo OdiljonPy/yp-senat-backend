@@ -92,8 +92,7 @@ class PollSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['questions'] = QuestionSerializer(Question.objects.filter(poll_id=instance.id), many=True,
-                                               context=self.context).data
+        data['questions'] = QuestionSerializer(instance.questions, many=True, context=self.context).data
         return data
 
 
@@ -112,8 +111,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['options'] = OptionSerializer(Option.objects.filter(question_id=instance.id), many=True,
-                                           context=self.context).data
+        data['options'] = OptionSerializer(instance.options, many=True, context=self.context).data
         return data
 
 
@@ -145,8 +143,8 @@ class PollResultSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['poll'] = PollSerializer(instance.poll).data
-        data['answers'] = PollAnswerSerializer(PollAnswer.objects.filter(result_id=instance.id), many=True, context=self.context).data
+        data['poll'] = PollSerializer(instance.poll, context=self.context).data
+        data['answers'] = PollAnswerSerializer(instance.answers, many=True, context=self.context).data
         return data
 
 
