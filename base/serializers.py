@@ -132,7 +132,10 @@ class OptionSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         option_count = PollAnswer.objects.filter(answer__in=[instance.id], question_id=instance.question.id).count()
         total_count = PollAnswer.objects.filter(question_id=instance.question.id).aggregate(num_answers=Count('answer'))
-        data['percentage_option'] = option_count * 100 / total_count['num_answers']
+        percentage = 0.0
+        if total_count['num_answers'] != 0:
+            percentage = option_count * 100 / total_count['num_answers']
+        data['percentage_option'] = percentage
         return data
 
 
