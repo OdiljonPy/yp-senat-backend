@@ -1,3 +1,5 @@
+from turtle import Turtle
+
 from django.db import models
 from tinymce.models import HTMLField
 
@@ -97,6 +99,7 @@ class Appeal(BaseModel):
     phone_number = models.CharField(max_length=14, validators=[phone_number_validation], verbose_name='номер телефона')
     email = models.EmailField(verbose_name='электронная почта')
     message = models.TextField(verbose_name='сообщение')
+    is_resolved = models.BooleanField(default=False, verbose_name="решено")
 
     def __str__(self):
         return self.full_name

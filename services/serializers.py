@@ -113,7 +113,7 @@ class PostSerializer(serializers.ModelSerializer):
 class AppealSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appeal
-        fields = ['id', 'commission_member', 'full_name', 'phone_number', 'email', 'message']
+        fields = ['id', 'commission_member', 'full_name', 'phone_number', 'email', 'message', 'is_resolved']
 
 
 class PostFilterSerializer(ParamValidateSerializer):
