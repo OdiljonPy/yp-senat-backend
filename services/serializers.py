@@ -90,7 +90,7 @@ class ProjectsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Projects
-        fields = ['id', 'name', 'short_description', 'description', 'file', 'status', 'created_at', 'is_published']
+        fields = ['id', 'name', 'short_description', 'image', 'description', 'file', 'status', 'created_at', 'is_published']
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -107,7 +107,7 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'title', 'image', 'short_description', 'description', 'commission_member', 'created_at',
-                  'is_published', 'counting']
+                  'is_published', 'counting', 'published_date']
 
 
 class AppealSerializer(serializers.ModelSerializer):

@@ -79,6 +79,7 @@ class Projects(BaseModel):
     name = models.CharField(max_length=100, verbose_name='навзание')
     short_description = models.CharField(max_length=200, verbose_name='Краткое описание')
     description = HTMLField(verbose_name='описание')
+    image = models.ImageField(upload_to='project/', verbose_name='изображение')
     file = models.FileField(upload_to="project/", verbose_name='файл')
     status = models.PositiveIntegerField(choices=PROJECT_STATUS, default=2, verbose_name='статус')
     is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
@@ -133,6 +134,7 @@ class Post(BaseModel):
     image = models.ImageField(upload_to='post/', verbose_name="изображение")
     short_description = models.CharField(max_length=200, verbose_name="краткое описание")
     description = HTMLField(verbose_name="описание")
+    published_date = models.DateField()
     is_published = models.BooleanField(default=True, verbose_name="опубликовано")
 
     def __str__(self):
