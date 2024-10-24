@@ -107,7 +107,7 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'title', 'image', 'short_description', 'description', 'commission_member', 'created_at',
-                  'is_published', 'counting']
+                  'is_published']
 
 
 class AppealSerializer(serializers.ModelSerializer):
