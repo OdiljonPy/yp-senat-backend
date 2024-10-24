@@ -41,9 +41,10 @@ class ProjectsAdmin(admin.ModelAdmin):
 
 @admin.register(Appeal)
 class AppealAdmin(admin.ModelAdmin):
-    list_display = ('id', 'full_name', 'commission_member', 'phone_number')
+    list_display = ('id', 'full_name', 'commission_member', 'phone_number', 'is_resolved')
     list_display_links = ('id', 'full_name')
     search_fields = ('full_name', 'phone_number', 'email')
+    list_filter = ('is_resolved',)
 
 
 @admin.register(Post)
