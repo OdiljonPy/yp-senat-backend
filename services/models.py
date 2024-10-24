@@ -1,5 +1,3 @@
-from turtle import Turtle
-
 from django.db import models
 from tinymce.models import HTMLField
 
