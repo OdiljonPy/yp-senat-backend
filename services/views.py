@@ -205,6 +205,10 @@ class PostViewSet(ViewSet):
                                    created_at__year=current_time.year).exists():
             obj.views.add(Visitors.objects.filter(ip=ip).first())
 
+        else:
+            ocj_create = Visitors.objects.create(ip=ip, name=request.META.get('HTTP_USER_AGENT', ''))
+            obj.views.add(ocj_create)
+
         serializer = PostSerializer(obj, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
