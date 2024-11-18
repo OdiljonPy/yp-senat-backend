@@ -64,12 +64,12 @@ class CommissionViewSet(ViewSet):
             if not str(param).isdigit():
                 raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT, message='region id must be integer')
 
-            commission_members = CommissionMember.objects.filter(region_id=param)
+            commission_members = CommissionMember.objects.filter(region_id=param, type=2)
             return Response(
                 data={'result': CommissionMemberSerializer(commission_members, many=True, context={'request': request}
                                                            ).data, 'ok': True}, status=status.HTTP_200_OK)
 
-        commission_members = CommissionMember.objects.filter(type=1)
+        commission_members = CommissionMember.objects.filter(type=2)
         serializer = CommissionMemberSerializer(commission_members, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
