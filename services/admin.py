@@ -49,10 +49,14 @@ class AppealAdmin(admin.ModelAdmin):
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title')
+    list_display = ('id', 'title', 'view_count')
     list_display_links = ('id', 'title')
     search_fields = ('title', 'description', 'short_description')
     list_filter = ('is_published',)
+
+    def view_count(self, obj):
+        return obj.views.count()
+    view_count.short_description = 'Количество просмотров'
 
 
 @admin.register(Visitors)
