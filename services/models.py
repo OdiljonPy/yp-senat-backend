@@ -143,3 +143,12 @@ class Post(BaseModel):
         verbose_name_plural = 'Посты'
         ordering = ('-created_at',)
 
+
+class AppealStat(BaseModel):
+    incoming_appeals = models.PositiveIntegerField()
+    resolver_appeals = models.PositiveIntegerField()
+    explained_appeals = models.PositiveIntegerField()
+    rejected_appeals = models.PositiveIntegerField()
+
+    def __str__(self):
+        return self.incoming_appeals
