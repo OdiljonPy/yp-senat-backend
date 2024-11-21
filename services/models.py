@@ -145,10 +145,10 @@ class Post(BaseModel):
 
 
 class AppealStat(BaseModel):
-    incoming_appeals = models.PositiveIntegerField()
-    resolver_appeals = models.PositiveIntegerField()
-    explained_appeals = models.PositiveIntegerField()
-    rejected_appeals = models.PositiveIntegerField()
+    incoming_appeals = models.PositiveIntegerField(default=0)
+    resolver_appeals = models.PositiveIntegerField(default=0)
+    explained_appeals = models.PositiveIntegerField(default=0)
+    rejected_appeals = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.incoming_appeals
