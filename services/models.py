@@ -143,3 +143,17 @@ class Post(BaseModel):
         verbose_name_plural = 'Посты'
         ordering = ('-created_at',)
 
+
+class AppealStat(BaseModel):
+    incoming_appeals = models.PositiveIntegerField(default=0, verbose_name='полученные обращения')
+    resolved_appeals = models.PositiveIntegerField(default=0, verbose_name='решенные обращения')
+    explained_appeals = models.PositiveIntegerField(default=0, verbose_name='объясненные обрашения')
+    rejected_appeals = models.PositiveIntegerField(default=0, verbose_name='отклоненные обрашения')
+
+    def __str__(self):
+        return self.incoming_appeals
+
+    class Meta:
+        verbose_name = 'Статистика обрашения'
+        verbose_name_plural = 'Статистики обрашений'
+        ordering = ('-created_at',)

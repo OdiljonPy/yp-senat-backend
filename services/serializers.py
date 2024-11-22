@@ -90,7 +90,8 @@ class ProjectsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Projects
-        fields = ['id', 'name', 'short_description', 'image', 'description', 'file', 'status', 'created_at', 'is_published']
+        fields = ['id', 'name', 'short_description', 'image', 'description', 'file', 'status', 'created_at',
+                  'is_published']
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -104,16 +105,19 @@ class PostSerializer(serializers.ModelSerializer):
         self.fields['short_description'] = serializers.CharField(source=f'short_description_{language}')
         self.fields['description'] = serializers.CharField(source=f'description_{language}')
 
+    views_count = serializers.IntegerField(source='views.count', read_only=True)
+
     class Meta:
         model = Post
-        fields = ['id', 'title', 'image', 'short_description', 'description', 'commission_member', 'created_at',
+        fields = ['id', 'title', 'views_count', 'image', 'short_description', 'description', 'commission_member',
+                  'created_at',
                   'is_published']
 
 
 class AppealSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appeal
-        fields = ['id', 'commission_member', 'full_name', 'phone_number', 'email', 'message', 'is_resolved']
+        fields = ['id', 'commission_member', 'full_name', 'phone_number', 'email', 'message']
 
 
 class PostFilterSerializer(ParamValidateSerializer):
