@@ -145,10 +145,15 @@ class Post(BaseModel):
 
 
 class AppealStat(BaseModel):
-    incoming_appeals = models.PositiveIntegerField(default=0)
-    resolver_appeals = models.PositiveIntegerField(default=0)
-    explained_appeals = models.PositiveIntegerField(default=0)
-    rejected_appeals = models.PositiveIntegerField(default=0)
+    incoming_appeals = models.PositiveIntegerField(default=0, verbose_name='полученное обращение')
+    resolved_appeals = models.PositiveIntegerField(default=0, verbose_name='решенная обращение')
+    explained_appeals = models.PositiveIntegerField(default=0, verbose_name='объясненная обрашениe')
+    rejected_appeals = models.PositiveIntegerField(default=0, verbose_name='отклоненная обрашениe')
 
     def __str__(self):
         return self.incoming_appeals
+
+    class Meta:
+        verbose_name = 'Статистика обрашениe'
+        verbose_name_plural = 'Статистики обрашениe'
+        ordering = ('-created_at',)
