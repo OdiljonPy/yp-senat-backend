@@ -1,9 +1,11 @@
+from tkinter.font import names
+
 from django.urls import path
 
 from .views import (
     RegionViewSet, CommissionViewSet,
     ProjectViewSet, AppealViewSet,
-    PostViewSet, VisitorsViewSet,
+    PostViewSet, VisitorsViewSet, AppealStatViewSet,
 )
 
 urlpatterns = [
@@ -21,4 +23,5 @@ urlpatterns = [
 
     path('appeal/', AppealViewSet.as_view({'post': 'create_appeal'}), name='appeal'),
     path('visitors/', VisitorsViewSet.as_view({'get': 'get'}), name='visitors'),
+    path('statistics/', AppealStatViewSet.as_view({'get': 'stats'}), name='appeal_stat')
 ]
