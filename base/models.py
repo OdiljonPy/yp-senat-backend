@@ -100,7 +100,7 @@ class Poll(BaseModel):
 
     result = HTMLField(verbose_name='Результат')
 
-    link_to_poll = models.TextField(verbose_name='Ссылка на опрос')
+    link_to_poll = models.URLField(verbose_name='Ссылка на опрос')
 
 
     def __str__(self):
