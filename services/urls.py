@@ -1,6 +1,5 @@
 from django.urls import path
 
-from base.views import PollViewSet
 from .views import (
     RegionViewSet, CommissionViewSet, ProjectViewSet, AppealViewSet,
     PostViewSet, VisitorsViewSet, AppealStatViewSet,MandatCategoryViewSet
