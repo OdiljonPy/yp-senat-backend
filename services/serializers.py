@@ -123,3 +123,7 @@ class AppealSerializer(serializers.ModelSerializer):
 class PostFilterSerializer(ParamValidateSerializer):
     q = serializers.CharField(required=False)
     post_member_exist = serializers.BooleanField(required=False)
+
+
+class MandatCategorySerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=250)

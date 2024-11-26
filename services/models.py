@@ -44,6 +44,18 @@ class CommissionCategory(BaseModel):
         ordering = ('-created_at',)
 
 
+class MandatCategory(BaseModel):
+    name = models.CharField(max_length=250, verbose_name='Назавние')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Категория мандата'
+        verbose_name_plural = 'Категория мандатов'
+        ordering = ('-created_at',)
+
+
 class CommissionMember(BaseModel):
     commission_category = models.ForeignKey(CommissionCategory, on_delete=models.CASCADE,
                                             verbose_name='Категория комиссии')

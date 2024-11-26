@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Region, CommissionCategory, CommissionMember, Projects, Appeal, Post, Visitors
+from .models import Region, CommissionCategory, CommissionMember, Projects, Appeal, Post, Visitors, MandatCategory
 
 
 class CommissionMemberTabularInline(admin.TabularInline):
@@ -56,6 +56,7 @@ class PostAdmin(admin.ModelAdmin):
 
     def view_count(self, obj):
         return obj.views.count()
+
     view_count.short_description = 'Количество просмотров'
 
 
@@ -63,3 +64,10 @@ class PostAdmin(admin.ModelAdmin):
 class VisitorsAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'ip', 'created_at')
     list_display_links = ('id', 'ip', 'name')
+
+
+@admin.register(MandatCategory)
+class MandatCategoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+    list_display_links = ('id', 'name')
+    list_filter = ('name',)
