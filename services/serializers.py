@@ -4,7 +4,9 @@ from config import settings
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
 from .models import (
-    Region, CommissionCategory, CommissionMember, Projects, Post, Appeal, PROJECT_STATUS)
+    Region, CommissionCategory,
+    CommissionMember, Projects,
+    Post, Appeal, PROJECT_STATUS)
 
 
 class ParamValidateSerializer(serializers.Serializer):
@@ -124,11 +126,9 @@ class PostFilterSerializer(ParamValidateSerializer):
     post_member_exist = serializers.BooleanField(required=False)
 
 
-
 class MandatCategorySerializer(serializers.Serializer):
     name = serializers.CharField(max_length=250)
     mandats = CommissionMemberSerializer(many=True)
-
 
 
 class AppealStatSerializer(serializers.Serializer):

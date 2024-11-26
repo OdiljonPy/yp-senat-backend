@@ -1,6 +1,7 @@
 from django.urls import path
-from .views import FAQViewSet, AboutUsViewSet, AdditionalLinksViewSet, BaseInfoViewSet,  \
-    BannerViewSet, PollViewSet
+from .views import (FAQViewSet, AboutUsViewSet,
+                    AdditionalLinksViewSet, BaseInfoViewSet,
+                    BannerViewSet, PollViewSet)
 
 urlpatterns = [
     path('banner/', BannerViewSet.as_view({'get': 'banner_list'}), name='banner'),

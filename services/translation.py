@@ -1,5 +1,7 @@
 from modeltranslation.translator import translator, TranslationOptions
-from .models import Region, CommissionCategory, CommissionMember, Projects, Appeal, Post
+from .models import (Region, CommissionCategory,
+                     CommissionMember, Projects,
+                     Appeal, Post)
 
 
 class RegionTranslationOption(TranslationOptions):
@@ -21,8 +23,10 @@ class ProjectsTranslationOption(TranslationOptions):
 class AppealTranslationOption(TranslationOptions):
     fields = ('full_name', 'message')
 
+
 class PostTranslationOption(TranslationOptions):
     fields = ('title', 'short_description', 'description')
+
 
 translator.register(Region, RegionTranslationOption)
 translator.register(Post, PostTranslationOption)

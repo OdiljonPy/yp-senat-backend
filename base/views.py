@@ -7,7 +7,9 @@ from rest_framework.viewsets import ViewSet
 
 from .models import FAQ, AboutUs, AdditionalLinks, BaseInfo, Banner, Poll
 from .serializers import (
-    FAQSerializer, AdditionalLinksSerializer, AboutUsSerializer, BaseInfoSerializer, BannerSerializer, PollSerializer
+    FAQSerializer, AdditionalLinksSerializer,
+    AboutUsSerializer, BaseInfoSerializer,
+    BannerSerializer, PollSerializer
 )
 
 
@@ -107,6 +109,4 @@ class PollViewSet(ViewSet):
 
         poll = Poll.objects.filter(filter_).order_by('-created_at')
 
-        return Response(data={'result': PollSerializer(poll, many=True).data, 'ok': True},)
-
-
+        return Response(data={'result': PollSerializer(poll, many=True).data, 'ok': True}, )
