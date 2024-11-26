@@ -1,5 +1,3 @@
-from urllib.request import CacheFTPHandler
-
 from django.db import models
 from tinymce.models import HTMLField
 
