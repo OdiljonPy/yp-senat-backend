@@ -1,11 +1,13 @@
+from django.db.models import Q
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
-from .models import FAQ, AboutUs, AdditionalLinks, BaseInfo, Banner
+from .models import FAQ, AboutUs, AdditionalLinks, BaseInfo, Banner, Poll
 from .serializers import (
-    FAQSerializer, AdditionalLinksSerializer, AboutUsSerializer, BaseInfoSerializer, BannerSerializer
+    FAQSerializer, AdditionalLinksSerializer, AboutUsSerializer, BaseInfoSerializer, BannerSerializer, PollSerializer
 )
 
 
@@ -76,3 +78,35 @@ class BaseInfoViewSet(ViewSet):
         return Response(
             data={'result': BaseInfoSerializer(data, context={'request': request}).data, 'ok': True},
             status=status.HTTP_200_OK)
+
+
+class PollViewSet(ViewSet):
+    @swagger_auto_schema(
+        operation_summary='Poll',
+        operation_description='Poll',
+        manual_parameters=[
+            openapi.Parameter(name='poll_name', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING,
+                              description='Poll Name'),
+            openapi.Parameter(name='poll_status', in_=openapi.IN_QUERY, type=openapi.TYPE_BOOLEAN,
+                              description='Poll Status'),
+        ],
+        responses={200: PollSerializer()},
+        tags=['Poll']
+    )
+    def poll(self, request):
+        param = request.query_params.get('poll_name', None)
+        status = request.query_params.get('poll_status', None)
+
+        filter_ = Q()
+        if param:
+            filter_ &= Q(name__icontains=param)
+        if status == 'true':
+            filter_ &= Q(status=1)
+        if status == 'false':
+            filter_ &= Q(status=2)
+
+        poll = Poll.objects.filter(filter_).order_by('-created_at')
+
+        return Response(data={'result': PollSerializer(poll, many=True).data, 'ok': True},)
+
+
