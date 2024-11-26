@@ -61,7 +61,7 @@ class CommissionMember(BaseModel):
                                             verbose_name='Категория комиссии')
     region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=True, null=True, verbose_name='регион')
 
-    mandat = models.ManyToManyField(MandatCategory, verbose_name='Мандат')
+    mandat = models.ManyToManyField(MandatCategory, verbose_name='Мандат', related_name='mandats')
 
     image = models.ImageField(upload_to='commission_member/')
     full_name = models.CharField(max_length=100, verbose_name='полное имя')
