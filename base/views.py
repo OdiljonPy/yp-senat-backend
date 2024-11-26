@@ -91,6 +91,7 @@ class PollViewSet(ViewSet):
                               description='Poll Status'),
         ],
         responses={200: PollSerializer()},
+        tags=['Poll']
     )
     def poll(self, request):
         param = request.query_params.get('poll_name', None)
