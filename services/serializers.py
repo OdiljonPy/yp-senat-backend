@@ -125,5 +125,12 @@ class PostFilterSerializer(ParamValidateSerializer):
     post_member_exist = serializers.BooleanField(required=False)
 
 
+
 class MandatCategorySerializer(serializers.Serializer):
     name = serializers.CharField(max_length=250)
+
+class AppealStatSerializer(serializers.Serializer):
+    incoming_appeals = serializers.IntegerField(required=False, default=0)
+    resolved_appeals = serializers.IntegerField(required=False, default=0)
+    explained_appeals = serializers.IntegerField(required=False, default=0)
+    rejected_appeals = serializers.IntegerField(required=False, default=0)

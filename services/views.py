@@ -11,14 +11,14 @@ from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
 from .models import (Region, CommissionCategory,
                      CommissionMember, Projects,
-                     Post, Visitors)
+                     Post, Visitors, AppealStat)
 from .repository.get_posts_list import get_post_list
 from .repository.get_project_filter import get_projects_filter
 from .serializers import (
     RegionSerializer, CommissionMemberSerializer,
     ProjectsSerializer, CommissionCategorySerializer,
     AppealSerializer, ParamValidateSerializer,
-    PostSerializer, PostFilterSerializer,
+    PostSerializer, PostFilterSerializer, AppealStatSerializer
 )
 from .utils import get_ip
 
@@ -191,6 +191,7 @@ class PostViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='Post detail',
         operation_description='Post detail',
+        responses={200: PostSerializer()},
         tags=['Post']
     )
     def post_detail(self, request, pk=None):
@@ -220,3 +221,29 @@ class VisitorsViewSet(ViewSet):
         tags=['Visitors'])
     def get(self, request):
         return Response(data={'result': Visitors.objects.all().count(), 'ok': True}, status=status.HTTP_200_OK)
+
+
+class MandatCategoryViewSet(ViewSet):
+    @swagger_auto_schema(
+        operation_summary='Mandat Category',
+        operation_description='Mandat Category',
+        manual_parameters=[
+            openapi.Parameter(name='Mandat_id', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, description='Mandat id')
+        ],
+        tags=['Mandat'])
+    def get(self, request):
+        pass
+
+
+
+class AppealStatViewSet(ViewSet):
+    @swagger_auto_schema(
+        operation_summary='Get statistics of appeals',
+        operation_description='Get statistics of appeals',
+        responses={200: AppealStatSerializer()},
+        tags=['AppealStat']
+    )
+    def stats(self, request):
+        stats = AppealStat.objects.order_by('-created_at').first()
+        return Response(data={'result': AppealStatSerializer(stats, context={'request': request}).data, 'ok': True},
+                        status=status.HTTP_200_OK)

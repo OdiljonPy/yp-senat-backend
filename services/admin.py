@@ -1,6 +1,8 @@
 from django.contrib import admin
 
-from .models import Region, CommissionCategory, CommissionMember, Projects, Appeal, Post, Visitors, MandatCategory
+
+from .models import Region, CommissionCategory, CommissionMember, Projects, Appeal, Post, Visitors, MandatCategory, AppealStat
+
 
 
 class CommissionMemberTabularInline(admin.TabularInline):
@@ -71,3 +73,8 @@ class MandatCategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     list_display_links = ('id', 'name')
     list_filter = ('name',)
+
+@admin.register(AppealStat)
+class AppealStatAdmin(admin.ModelAdmin):
+    list_display = ('id', 'incoming_appeals', 'resolved_appeals', 'explained_appeals', 'rejected_appeals')
+
