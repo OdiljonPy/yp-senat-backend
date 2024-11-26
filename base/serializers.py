@@ -1,7 +1,7 @@
 from rest_framework import serializers
+
 from config import settings
 from .models import FAQ, AboutUs, AdditionalLinks, Poll, BaseInfo, Banner
-from django.db.models import Count
 
 
 class BannerSerializer(serializers.ModelSerializer):
@@ -83,11 +83,9 @@ class PollSerializer(serializers.ModelSerializer):
         language = 'ru'
         if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
             language = request.META.get('HTTP_ACCEPT_LANGUAGE')
-        self.fields['name'] = serializers.CharField(source=f'title_{language}')
-        self.fields['result'] = serializers.CharField(source=f'description_{language}')
+        self.fields['name'] = serializers.CharField(source=f'name_{language}')
+        self.fields['result'] = serializers.CharField(source=f'result_{language}')
 
     class Meta:
         model = Poll
-        fields = ('id', 'name', 'result')
-
-
+        fields = ('id', 'name', 'status', 'started_at', 'ended_at', 'result', 'link_to_poll')
