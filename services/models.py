@@ -44,10 +44,24 @@ class CommissionCategory(BaseModel):
         ordering = ('-created_at',)
 
 
+class MandatCategory(BaseModel):
+    name = models.CharField(max_length=250, verbose_name='Назавние')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Категория мандата'
+        verbose_name_plural = 'Категория мандатов'
+        ordering = ('-created_at',)
+
+
 class CommissionMember(BaseModel):
     commission_category = models.ForeignKey(CommissionCategory, on_delete=models.CASCADE,
                                             verbose_name='Категория комиссии')
     region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=True, null=True, verbose_name='регион')
+
+    mandat = models.ManyToManyField(MandatCategory, verbose_name='Мандат')
 
     image = models.ImageField(upload_to='commission_member/')
     full_name = models.CharField(max_length=100, verbose_name='полное имя')
@@ -55,6 +69,7 @@ class CommissionMember(BaseModel):
     description = HTMLField(verbose_name='описание')
     position = models.CharField(max_length=80, verbose_name='позиция')
     birthdate = models.DateField(verbose_name='дата рождения')
+
     nation = models.CharField(max_length=100, verbose_name='нация')
     education_degree = models.CharField(max_length=100, verbose_name='степень образования')
     speciality = models.CharField(max_length=150, verbose_name='специальность')
