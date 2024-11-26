@@ -1,13 +1,16 @@
 from django.db import models
 from tinymce.models import HTMLField
-from django.core.exceptions import ValidationError
 from abstract_models.base_model import BaseModel
-from services.models import Visitors
 from utils.validations import phone_number_validation
 
 POLL_TYPES = (
     (1, 'Единственный выбор'),
     (2, 'Множественный выбор')
+)
+
+STATUS_POLL = (
+    (1, 'Активный'),
+    (2, 'Завершено')
 )
 
 
@@ -88,68 +91,22 @@ class BaseInfo(BaseModel):
 
 
 class Poll(BaseModel):
-    title = models.CharField(max_length=100, verbose_name='заголовок')
-    description = HTMLField(verbose_name='описание')
-    participant_count = models.PositiveIntegerField(default=0, verbose_name='количество участники')
+    name = models.CharField(max_length=150, verbose_name='название')
+
+    started_at = models.DateField(verbose_name='дата начала')
+    ended_at = models.DateField(verbose_name='дата окончания')
+
+    status = models.PositiveIntegerField(choices=STATUS_POLL, default=1, verbose_name='Состояние')
+
+    result = HTMLField(verbose_name='Результат')
+
+    link_to_poll = models.URLField(verbose_name='Ссылка на опрос')
+
 
     def __str__(self):
-        return self.title
+        return self.name
 
     class Meta:
         verbose_name = 'Опрос'
         verbose_name_plural = "Опросы"
-        ordering = ('-created_at',)
-
-
-class Question(BaseModel):
-    poll = models.ForeignKey(Poll, on_delete=models.CASCADE, verbose_name='опрос', related_name='questions')
-    text = HTMLField(verbose_name='текст')
-    type = models.PositiveIntegerField(choices=POLL_TYPES, default=1, verbose_name='тип')
-
-    def __str__(self):
-        return self.text
-
-    class Meta:
-        verbose_name = 'Вопрос'
-        verbose_name_plural = "Вопросы"
-        ordering = ('created_at',)
-
-
-class Option(BaseModel):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, verbose_name='вопрос', related_name='options')
-    text = models.CharField(max_length=100, verbose_name='текст')
-
-    def __str__(self):
-        return self.text
-
-    class Meta:
-        verbose_name = 'Вариант'
-        verbose_name_plural = "Варианты"
-        ordering = ('created_at',)
-
-
-class PollResult(BaseModel):
-    user = models.ForeignKey(Visitors, on_delete=models.CASCADE, verbose_name='пользователь')
-    poll = models.ForeignKey(Poll, on_delete=models.CASCADE, verbose_name='опрос')
-
-    def __str__(self):
-        return self.user.ip
-
-    class Meta:
-        verbose_name = 'Результат опроса'
-        verbose_name_plural = "Результаты опроса"
-        ordering = ('-created_at',)
-
-
-class PollAnswer(BaseModel):
-    result = models.ForeignKey(PollResult, on_delete=models.CASCADE, verbose_name='результат', related_name='answers')
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, verbose_name='вопрос')
-    answer = models.ManyToManyField(Option, verbose_name='вариант')
-
-    def __str__(self):
-        return self.result.user.ip
-
-    class Meta:
-        verbose_name = 'Ответ на опрос'
-        verbose_name_plural = "Ответы на опросы"
         ordering = ('-created_at',)

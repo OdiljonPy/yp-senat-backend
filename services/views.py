@@ -9,16 +9,15 @@ from rest_framework.viewsets import ViewSet
 
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
-from .models import (Region, CommissionCategory,
-                     CommissionMember, Projects,
-                     Post, Visitors, AppealStat)
+from .models import (Region, CommissionCategory, CommissionMember, Projects,
+                     Post, Visitors, AppealStat, MandatCategory)
 from .repository.get_posts_list import get_post_list
 from .repository.get_project_filter import get_projects_filter
 from .serializers import (
     RegionSerializer, CommissionMemberSerializer,
     ProjectsSerializer, CommissionCategorySerializer,
     AppealSerializer, ParamValidateSerializer,
-    PostSerializer, PostFilterSerializer, AppealStatSerializer
+    PostSerializer, PostFilterSerializer, AppealStatSerializer, MandatCategorySerializer
 )
 from .utils import get_ip
 
@@ -228,12 +227,20 @@ class MandatCategoryViewSet(ViewSet):
         operation_summary='Mandat Category',
         operation_description='Mandat Category',
         manual_parameters=[
-            openapi.Parameter(name='Mandat_id', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, description='Mandat id')
+            openapi.Parameter(name='mandat_id', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, description='Mandat id')
         ],
         tags=['Mandat'])
     def get(self, request):
-        pass
+        param = request.query_params.get('mandat_id', None)
 
+        filter_ = Q()
+
+        if param and param.isdigit():
+            filter_ &= Q(id=param)
+
+        members = MandatCategory.objects.filter(filter_).order_by('created_at')
+        serializer = MandatCategorySerializer(members, many=True, context={'request': request})
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
 
 class AppealStatViewSet(ViewSet):

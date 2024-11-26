@@ -128,6 +128,9 @@ class PostFilterSerializer(ParamValidateSerializer):
 
 class MandatCategorySerializer(serializers.Serializer):
     name = serializers.CharField(max_length=250)
+    mandats = CommissionMemberSerializer(many=True)
+
+
 
 class AppealStatSerializer(serializers.Serializer):
     incoming_appeals = serializers.IntegerField(required=False, default=0)

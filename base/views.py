@@ -1,16 +1,12 @@
-from services.models import Visitors
-from services.utils import get_ip
-from .models import FAQ, AboutUs, AdditionalLinks, BaseInfo, Poll, Question, PollResult, Banner
-from .serializers import (
-    FAQSerializer, AdditionalLinksSerializer, AboutUsSerializer, BaseInfoSerializer, PollSerializer,
-    QuestionSerializer, PollResultSerializer, PollAnswerSerializer, TakePollSerializer, BannerSerializer
-)
-from rest_framework.viewsets import ViewSet
-from rest_framework.response import Response
-from rest_framework import status
-from exceptions.error_messages import ErrorCodes
-from exceptions.exception import CustomApiException
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.viewsets import ViewSet
+
+from .models import FAQ, AboutUs, AdditionalLinks, BaseInfo, Banner
+from .serializers import (
+    FAQSerializer, AdditionalLinksSerializer, AboutUsSerializer, BaseInfoSerializer, BannerSerializer
+)
 
 
 class BannerViewSet(ViewSet):
@@ -80,96 +76,3 @@ class BaseInfoViewSet(ViewSet):
         return Response(
             data={'result': BaseInfoSerializer(data, context={'request': request}).data, 'ok': True},
             status=status.HTTP_200_OK)
-
-
-class PollViewSet(ViewSet):
-    @swagger_auto_schema(
-        operation_summary='List of Polls',
-        operation_description='List of polls',
-        responses={200: PollSerializer(many=True)},
-        tags=['Poll']
-    )
-    def get_polls(self, request):
-        polls = Poll.objects.all()
-        serializer = PollSerializer(polls, many=True, context={'request': request})
-        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
-
-    @swagger_auto_schema(
-        operation_summary='Detail Poll',
-        operation_description='Detail poll',
-        responses={200: PollSerializer()},
-        tags=['Poll']
-    )
-    def get_poll(self, request, pk):
-        user = Visitors.objects.filter(ip=get_ip(request)).first()
-        poll = Poll.objects.filter(id=pk).prefetch_related('questions', 'questions__options').first()
-        if not poll:
-            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
-
-        result = PollResult.objects.filter(poll_id=poll.id, user=user).prefetch_related('answers').first()
-        if result:
-            serializer = PollResultSerializer(result, context={'request': request})
-            return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
-
-        serializer = PollSerializer(poll, context={'request': request})
-        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
-
-    @swagger_auto_schema(
-        request_body=TakePollSerializer(),
-        operation_summary='Take Poll',
-        operation_description='Take poll',
-        responses={200: PollResultSerializer()},
-        tags=['Poll']
-    )
-    def take_poll(self, request):
-        data = request.data
-        user = Visitors.objects.filter(ip=get_ip(request)).first()
-
-        serializer = TakePollSerializer(data=data, context={'request': request})
-        if not serializer.is_valid():
-            raise CustomApiException(error_code=ErrorCodes.VALIDATION_FAILED, message=serializer.errors)
-
-        poll = Poll.objects.filter(id=data.get('poll')).first()
-        if not poll:
-            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
-
-        result = PollResult.objects.filter(poll_id=poll.id, user=user).first()
-        if result:
-            raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT)
-
-        result = PollResult.objects.create(user=user, poll=poll)
-        result.save()
-
-        serializer = PollAnswerSerializer(data=data['answers'], many=True,
-                                          context={'request': request, 'result': result})
-        if not serializer.is_valid():
-            result.delete()
-            raise CustomApiException(error_code=ErrorCodes.VALIDATION_FAILED, message=serializer.errors)
-
-        serializer.save()
-        poll.participant_count += 1
-        poll.save()
-
-        return Response(data={'result': PollResultSerializer(result, context={'request': request}).data, 'ok': True},
-                        status=status.HTTP_201_CREATED)
-
-
-class QuestionViewSet(ViewSet):
-    @swagger_auto_schema(
-        operation_summary='Get Next Question',
-        operation_description='Get next question',
-        responses={200: QuestionSerializer()},
-        tags=['Question']
-    )
-    def get_next_question(self, request, pk):
-        question = Question.objects.filter(id=pk).prefetch_related('options').first()
-        if not question:
-            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
-
-        question = Question.objects.filter(id__gt=question.id, poll_id=question.poll_id).prefetch_related(
-            'options').first()
-        if not question:
-            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
-
-        serializer = QuestionSerializer(question, context={'request': request})
-        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
