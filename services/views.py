@@ -223,6 +223,19 @@ class VisitorsViewSet(ViewSet):
         return Response(data={'result': Visitors.objects.all().count(), 'ok': True}, status=status.HTTP_200_OK)
 
 
+class MandatCategoryViewSet(ViewSet):
+    @swagger_auto_schema(
+        operation_summary='Mandat Category',
+        operation_description='Mandat Category',
+        manual_parameters=[
+            openapi.Parameter(name='Mandat_id', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, description='Mandat id')
+        ],
+        tags=['Mandat'])
+    def get(self, request):
+        pass
+
+
+
 class AppealStatViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='Get statistics of appeals',
@@ -231,6 +244,6 @@ class AppealStatViewSet(ViewSet):
         tags=['AppealStat']
     )
     def stats(self, request):
-        stats = AppealStat.objects.all().order_by('-created_at').first()
+        stats = AppealStat.objects.order_by('-created_at').first()
         return Response(data={'result': AppealStatSerializer(stats, context={'request': request}).data, 'ok': True},
                         status=status.HTTP_200_OK)

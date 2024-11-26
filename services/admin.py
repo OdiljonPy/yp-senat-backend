@@ -69,5 +69,4 @@ class VisitorsAdmin(admin.ModelAdmin):
 @admin.register(AppealStat)
 class AppealStatAdmin(admin.ModelAdmin):
     list_display = ('id', 'incoming_appeals', 'resolved_appeals', 'explained_appeals', 'rejected_appeals')
-    list_display_links = ('id', 'incoming_appeals', 'resolved_appeals', 'explained_appeals', 'rejected_appeals')
 
