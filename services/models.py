@@ -168,7 +168,7 @@ class AppealStat(BaseModel):
     rejected_appeals = models.PositiveIntegerField(default=0, verbose_name='отклоненные обрашения')
 
     def __str__(self):
-        return self.incoming_appeals
+        return str(self.incoming_appeals)
 
     class Meta:
         verbose_name = 'Статистика обрашения'
