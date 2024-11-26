@@ -22,7 +22,7 @@ class BaseInfoTranslationOption(TranslationOptions):
 
 
 class PollTranslationOption(TranslationOptions):
-    fields = ('name',)
+    fields = ('name', 'result')
 
 
 class QuestionTranslationOption(TranslationOptions):

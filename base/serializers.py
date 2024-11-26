@@ -83,11 +83,11 @@ class PollSerializer(serializers.ModelSerializer):
         language = 'ru'
         if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
             language = request.META.get('HTTP_ACCEPT_LANGUAGE')
-        self.fields['title'] = serializers.CharField(source=f'title_{language}')
-        self.fields['description'] = serializers.CharField(source=f'description_{language}')
+        self.fields['name'] = serializers.CharField(source=f'title_{language}')
+        self.fields['result'] = serializers.CharField(source=f'description_{language}')
 
     class Meta:
         model = Poll
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'result')
 
 
