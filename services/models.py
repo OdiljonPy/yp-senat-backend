@@ -1,3 +1,5 @@
+from urllib.request import CacheFTPHandler
+
 from django.db import models
 from tinymce.models import HTMLField
 
@@ -61,12 +63,15 @@ class CommissionMember(BaseModel):
                                             verbose_name='Категория комиссии')
     region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=True, null=True, verbose_name='регион')
 
+    mandat = models.ManyToManyField(MandatCategory, verbose_name='Мандат')
+
     image = models.ImageField(upload_to='commission_member/')
     full_name = models.CharField(max_length=100, verbose_name='полное имя')
     type = models.PositiveIntegerField(choices=MEMBER_TYPE, default=1, verbose_name='тип')
     description = HTMLField(verbose_name='описание')
     position = models.CharField(max_length=80, verbose_name='позиция')
     birthdate = models.DateField(verbose_name='дата рождения')
+
     nation = models.CharField(max_length=100, verbose_name='нация')
     education_degree = models.CharField(max_length=100, verbose_name='степень образования')
     speciality = models.CharField(max_length=150, verbose_name='специальность')
