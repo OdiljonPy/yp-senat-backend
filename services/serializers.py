@@ -12,10 +12,9 @@ from .models import (
 class ParamValidateSerializer(serializers.Serializer):
     page = serializers.IntegerField(required=False, default=1)
     page_size = serializers.IntegerField(required=False, default=10)
-    status = serializers.ChoiceField(PROJECT_STATUS, required=False)
 
     def validate(self, data):
-        if (data.get('page_size') and data.get('page_size') < 1) or (data.get('page') and data.get('page') < 1):
+        if data.get('page_size', 0) < 1 or (data.get('page') and data.get('page') < 1):
             raise CustomApiException(ErrorCodes.VALIDATION_FAILED,
                                      message='page and page_size must be positive integer')
         return data
@@ -47,6 +46,25 @@ class CommissionCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = CommissionCategory
         fields = ['id', 'name']
+
+
+class PostSerializer(serializers.ModelSerializer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get('request')
+        language = 'ru'
+        if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
+            language = request.META.get('HTTP_ACCEPT_LANGUAGE')
+        self.fields['title'] = serializers.CharField(source=f'title_{language}')
+        self.fields['short_description'] = serializers.CharField(source=f'short_description_{language}')
+        self.fields['description'] = serializers.CharField(source=f'description_{language}')
+
+    views_count = serializers.IntegerField(source='views.count', read_only=True)
+
+    class Meta:
+        model = Post
+        fields = ['id', 'title', 'views_count', 'image', 'short_description', 'description', 'commission_member',
+                  'created_at', 'is_published', 'published_date']
 
 
 class CommissionMemberSerializer(serializers.ModelSerializer):
@@ -96,25 +114,6 @@ class ProjectsSerializer(serializers.ModelSerializer):
                   'is_published']
 
 
-class PostSerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        request = self.context.get('request')
-        language = 'ru'
-        if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
-            language = request.META.get('HTTP_ACCEPT_LANGUAGE')
-        self.fields['title'] = serializers.CharField(source=f'title_{language}')
-        self.fields['short_description'] = serializers.CharField(source=f'short_description_{language}')
-        self.fields['description'] = serializers.CharField(source=f'description_{language}')
-
-    views_count = serializers.IntegerField(source='views.count', read_only=True)
-
-    class Meta:
-        model = Post
-        fields = ['id', 'title', 'views_count', 'image', 'short_description', 'description', 'commission_member',
-                  'created_at', 'is_published', 'published_date']
-
-
 class AppealSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appeal
@@ -124,6 +123,11 @@ class AppealSerializer(serializers.ModelSerializer):
 class PostFilterSerializer(ParamValidateSerializer):
     q = serializers.CharField(required=False)
     post_member_exist = serializers.BooleanField(required=False)
+    status = serializers.ChoiceField(PROJECT_STATUS, required=False)
+
+
+class MandatFilterSerializer(ParamValidateSerializer):
+    id = serializers.IntegerField(required=False)
 
 
 class MandatCategorySerializer(serializers.Serializer):

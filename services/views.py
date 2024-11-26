@@ -9,7 +9,7 @@ from .utils import get_ip
 
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
-from .repository.get_posts_list import get_post_list
+from .repository.pagination import get_post_list, get_mandat_filter
 from .repository.get_project_filter import get_projects_filter
 from .models import (Region, CommissionCategory,
                      CommissionMember, Projects,
@@ -20,7 +20,7 @@ from .serializers import (
     ProjectsSerializer, CommissionCategorySerializer,
     AppealSerializer, ParamValidateSerializer,
     PostSerializer, PostFilterSerializer,
-    AppealStatSerializer, MandatCategorySerializer
+    AppealStatSerializer, MandatFilterSerializer
 )
 
 
@@ -229,20 +229,35 @@ class MandatCategoryViewSet(ViewSet):
         operation_summary='Mandat Category',
         operation_description='Mandat Category',
         manual_parameters=[
-            openapi.Parameter(name='mandat_id', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, description='Mandat id')
+            openapi.Parameter(
+                name='mandat_id', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, description='Mandat id'),
+            openapi.Parameter(
+                name='page', in_=openapi.IN_QUERY, description='Page', type=openapi.TYPE_INTEGER),
+            openapi.Parameter(
+                name='page_size', in_=openapi.IN_QUERY, description='Page size', type=openapi.TYPE_INTEGER),
+
         ],
         tags=['Mandat'])
     def get(self, request):
-        param = request.query_params.get('mandat_id', None)
+        param = request.query_params
+        serializer_params = MandatFilterSerializer(data=param, context={'request': request})
+        if not serializer_params.is_valid():
+            raise CustomApiException(error_code=ErrorCodes.VALIDATION_FAILED, message=serializer_params.errors)
+
+        mandat_id = serializer_params.validated_data.get('mandat_id')
 
         filter_ = Q()
 
-        if param and param.isdigit():
+        if mandat_id and mandat_id.isdigit():
             filter_ &= Q(id=param)
 
         members = MandatCategory.objects.filter(filter_).order_by('created_at')
-        serializer = MandatCategorySerializer(members, many=True, context={'request': request})
-        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+
+        response = get_mandat_filter(context={'request': request, 'query': members},
+                                     page=serializer_params.data.get('page', 1),
+                                     page_size=serializer_params.data.get('page_size', 10))
+
+        return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
 
 
 class AppealStatViewSet(ViewSet):
