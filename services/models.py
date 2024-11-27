@@ -137,11 +137,20 @@ class Visitors(BaseModel):
         ordering = ('-created_at',)
 
 
+class PostCategory(BaseModel):
+    name = models.CharField(max_length=225)
+
+    def __str__(self):
+        return self.name
+
+
 class Post(BaseModel):
     commission_member = models.ForeignKey(CommissionMember, on_delete=models.SET_NULL, blank=True, null=True,
                                           related_name='member_post',
                                           verbose_name="член комиссии")
     views = models.ManyToManyField(Visitors, blank=True, verbose_name="количество просмотров")
+
+    category = models.ForeignKey(PostCategory, on_delete=models.SET_NULL, blank=True, null=True)
 
     title = models.CharField(max_length=255, verbose_name="заголовок")
     image = models.ImageField(upload_to='post/', verbose_name="изображение")
