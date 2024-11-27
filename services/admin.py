@@ -92,3 +92,4 @@ class AppealStatAdmin(admin.ModelAdmin):
 class PostCategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     list_display_links = ('id', 'name')
+    search_fields = ('name',)
