@@ -1,3 +1,5 @@
+from datetime import timezone, datetime
+
 from django.db.models import Q
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -96,8 +98,9 @@ class PollViewSet(ViewSet):
         tags=['Poll']
     )
     def poll(self, request):
+
         param = request.query_params.get('poll_name', None)
-        status = request.query_params.get('poll_status', None)
+        status = request.query_params.get('poll_status', '')
 
         filter_ = Q()
         if param:
@@ -107,6 +110,10 @@ class PollViewSet(ViewSet):
         if status.lower() == 'false':
             filter_ &= Q(status=2)
 
-        poll = Poll.objects.filter(filter_).order_by('-created_at')
+        
 
-        return Response(data={'result': PollSerializer(poll, many=True).data, 'ok': True}, )
+        polls = Poll.objects.filter(filter_).order_by('-created_at')
+
+        Poll.objects.filter(ended_at__lt=datetime.now().date()).update(status=2)
+
+        return Response(data={'result': PollSerializer(polls, many=True).data, 'ok': True}, )
