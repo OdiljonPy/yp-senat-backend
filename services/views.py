@@ -224,8 +224,8 @@ class PostViewSet(ViewSet):
 
         posts = Post.objects.filter(filter_).order_by('-created_at')
         response = get_post_list(context={'request': request}, request_data=posts,
-                                 page=serializer_params.data.get('page', 1),
-                                 page_size=serializer_params.data.get('page_size', 10))
+                                 page=serializer_params.validated_data.get('page', 1),
+                                 page_size=serializer_params.validated_data.get('page_size', 10))
 
         return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
 
@@ -281,8 +281,8 @@ class PostViewSet(ViewSet):
             filter_ &= Q(category_id=category_id)
         posts = Post.objects.filter(filter_, is_published=True).order_by('-created_at')
         response = get_post_list(request_data=posts, context={'request': request},
-                                 page=serializer_params.data.get('page', 1),
-                                 page_size=serializer_params.data.get('page_size', 10)
+                                 page=serializer_params.validated_data.get('page', 1),
+                                 page_size=serializer_params.validated_data.get('page_size', 10)
                                  )
         return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
 
