@@ -35,6 +35,7 @@ class Region(BaseModel):
 
 class CommissionCategory(BaseModel):
     name = models.CharField(max_length=250, verbose_name='Назавние')
+    description = models.TextField(verbose_name='описание')
 
     def __str__(self):
         return self.name
@@ -42,6 +43,20 @@ class CommissionCategory(BaseModel):
     class Meta:
         verbose_name = 'Категория комиссии'
         verbose_name_plural = 'Категория комиссий'
+        ordering = ('-created_at',)
+
+
+class CategoryImage(BaseModel):  # with pagination
+    image = models.ImageField(upload_to='category_image/', verbose_name='изображение')
+    category = models.ForeignKey(CommissionCategory, on_delete=models.CASCADE, related_name='category_image',
+                                 verbose_name='категория')
+
+    def __str__(self):
+        return self.category.name
+
+    class Meta:
+        verbose_name = 'изображение катогории'
+        verbose_name_plural = 'изображение катогорий'
         ordering = ('-created_at',)
 
 
@@ -195,4 +210,3 @@ class Video(BaseModel):
         verbose_name = 'Видео'
         verbose_name_plural = 'Видео'
         ordering = ('-created_at',)
-
