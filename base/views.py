@@ -110,8 +110,6 @@ class PollViewSet(ViewSet):
         if status.lower() == 'false':
             filter_ &= Q(status=2)
 
-        
-
         polls = Poll.objects.filter(filter_).order_by('-created_at')
 
         Poll.objects.filter(ended_at__lt=datetime.now().date()).update(status=2)
