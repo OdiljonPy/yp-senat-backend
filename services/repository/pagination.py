@@ -5,7 +5,7 @@ from services.serializers import PostSerializer, MandatCategorySerializer
 
 
 def get_post_list(context: dict, request_data, page, page_size):
-    season_query = context.get('query')
+    season_query = request_data
     total_count = season_query.aggregate(total_count=Count('id'))['total_count']
 
     paginator = Paginator(season_query, page_size)

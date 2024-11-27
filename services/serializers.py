@@ -69,10 +69,14 @@ class PostSerializer(serializers.ModelSerializer):
     views_count = serializers.IntegerField(source='views.count', read_only=True)
 
 
+
     class Meta:
         model = Post
         fields = ['id', 'title', 'views_count', 'image', 'short_description', 'description', 'commission_member',
                   'created_at', 'is_published', 'published_date']
+
+class MandatCategorySerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=250)
 
 
 class CommissionMemberSerializer(serializers.ModelSerializer):
@@ -89,9 +93,10 @@ class CommissionMemberSerializer(serializers.ModelSerializer):
         self.fields['education_degree'] = serializers.CharField(source=f'education_degree_{language}')
         self.fields['speciality'] = serializers.CharField(source=f'speciality_{language}')
 
+
     class Meta:
         model = CommissionMember
-        fields = ['id', 'full_name', 'commission_category', 'region', 'type', 'description', 'position', 'birthdate',
+        fields = ['id', 'full_name', 'commission_category','region', 'type', 'description', 'position', 'birthdate',
                   'nation', 'education_degree', 'speciality', 'email', 'telegram_url', 'facebook_url', 'instagram_url']
 
     def to_representation(self, instance):
@@ -101,7 +106,8 @@ class CommissionMemberSerializer(serializers.ModelSerializer):
         data['region'] = RegionSerializer(instance.region, context=self.context).data
         data['posts'] = PostSerializer(instance.member_post.filter(is_published=True).order_by('-created_at')[:6],
                                        many=True,
-                                       context=self.context).data  # here cannot be used select_related because it's cannot refer to the model through related_name.
+                                       context=self.context).data
+        data['mandat'] = MandatCategorySerializer(instance.mandat, context=self.context, many=True).data
         return data
 
 
@@ -138,9 +144,7 @@ class MandatFilterSerializer(ParamValidateSerializer):
     id = serializers.IntegerField(required=False)
 
 
-class MandatCategorySerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=250)
-    mandats = CommissionMemberSerializer(many=True)
+
 
 
 class AppealStatSerializer(serializers.Serializer):
