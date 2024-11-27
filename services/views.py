@@ -13,13 +13,14 @@ from .repository.get_project_filter import get_projects_filter
 from .models import (Region, CommissionCategory,
                      CommissionMember, Projects,
                      Post, Visitors,
-                     AppealStat, MandatCategory, Video)
+                     AppealStat, MandatCategory, Video, PostCategory)
 from .serializers import (
     RegionSerializer, CommissionMemberSerializer,
     ProjectsSerializer, CommissionCategorySerializer,
     AppealSerializer, ParamValidateSerializer,
     PostSerializer, PostFilterSerializer,
-    AppealStatSerializer, MandatFilterSerializer, VideoSerializer
+    AppealStatSerializer, MandatFilterSerializer, VideoSerializer,
+    CategorySerializer, PostCategoryFilterSerializer
 )
 from .utils import get_ip
 
@@ -223,8 +224,8 @@ class PostViewSet(ViewSet):
 
         posts = Post.objects.filter(filter_).order_by('-created_at')
         response = get_post_list(context={'request': request}, request_data=posts,
-                                 page=serializer_params.data.get('page', 1),
-                                 page_size=serializer_params.data.get('page_size', 10))
+                                 page=serializer_params.validated_data.get('page', 1),
+                                 page_size=serializer_params.validated_data.get('page_size', 10))
 
         return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
 
@@ -240,6 +241,7 @@ class PostViewSet(ViewSet):
 
         if not obj:
             raise CustomApiException(ErrorCodes.NOT_FOUND)
+        related_posts = Post.objects.filter(category_id=obj.category.id).order_by('-created_at').exclude(pk=pk)[:2]
         ip = get_ip(request)
 
         if Visitors.objects.filter(ip=ip, created_at__day=current_time.day, created_at__month=current_time.month,
@@ -251,6 +253,64 @@ class PostViewSet(ViewSet):
             obj.views.add(ocj_create)
 
         serializer = PostSerializer(obj, context={'request': request})
+        related_serializer = PostSerializer(related_posts, many=True, context={'request': request})
+        return Response(data={'result': serializer.data, 'related_posts': related_serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(name='category_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER,
+                              description='Category id'),
+            openapi.Parameter(
+                name='page', in_=openapi.IN_QUERY, description='Page', type=openapi.TYPE_INTEGER),
+            openapi.Parameter(
+                name='page_size', in_=openapi.IN_QUERY, description='Page size', type=openapi.TYPE_INTEGER),
+        ],
+        operation_summary='List of posts by category id',
+        operation_description="List of posts by category id",
+        responses={200: PostSerializer(many=True)},
+        tags=['Post']
+    )
+    def post_list_by_category(self, request):
+        param = request.query_params
+        serializer_params = PostCategoryFilterSerializer(data=param, context={'request': request})
+        if not serializer_params.is_valid():
+            raise CustomApiException(error_code=ErrorCodes.VALIDATION_FAILED, message=serializer_params.errors)
+        category_id = serializer_params.validated_data.get('category_id')
+        filter_ = Q()
+        if category_id:
+            filter_ &= Q(category_id=category_id)
+        posts = Post.objects.filter(filter_, is_published=True).order_by('-created_at')
+        response = get_post_list(request_data=posts, context={'request': request},
+                                 page=serializer_params.validated_data.get('page', 1),
+                                 page_size=serializer_params.validated_data.get('page_size', 10)
+                                 )
+        return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary='Banner posts',
+        operation_description='Banner posts',
+        responses={200: PostSerializer()},
+        tags=['Post']
+    )
+    def banner(self, request):
+        posts = Post.objects.filter(is_published=True, is_banner=True).order_by('views')[:3]
+        if len(posts) == 0:
+            posts = Post.objects.filter(is_published=True).order_by('views')[:3]
+        serializer = PostSerializer(posts, many=True, context={'request': request})
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+
+
+
+class CategoryViewSet(ViewSet):
+    @swagger_auto_schema(
+        operation_summary='Category list',
+        operation_description='Category list',
+        responses={200: CategorySerializer(many=True)},
+        tags=['Category']
+    )
+    def list(self, request):
+        categories = PostCategory.objects.all()
+        serializer = CategorySerializer(categories, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
 

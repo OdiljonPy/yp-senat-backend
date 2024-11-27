@@ -1,7 +1,7 @@
 from modeltranslation.translator import translator, TranslationOptions
 from .models import (Region, CommissionCategory,
                      CommissionMember, Projects,
-                     Appeal, Post, Video)
+                     Appeal, Post, Video, PostCategory)
 
 
 class VideoTranslationOption(TranslationOptions):
@@ -31,6 +31,12 @@ class PostTranslationOption(TranslationOptions):
     fields = ('title', 'short_description', 'description')
 
 
+class PostCategoryTranslationOption(TranslationOptions):
+    fields = ('name',)
+
+
+
+
 translator.register(Video, VideoTranslationOption)
 translator.register(Region, RegionTranslationOption)
 translator.register(Post, PostTranslationOption)
@@ -38,3 +44,4 @@ translator.register(CommissionMember, CommissionMemberTranslationOption)
 translator.register(CommissionCategory, CommissionCategoryTranslationOption)
 translator.register(Projects, ProjectsTranslationOption)
 translator.register(Appeal, AppealTranslationOption)
+translator.register(PostCategory, PostCategoryTranslationOption)

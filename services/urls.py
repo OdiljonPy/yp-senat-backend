@@ -4,7 +4,7 @@ from .views import (
     RegionViewSet, CommissionViewSet,
     ProjectViewSet, AppealViewSet,
     PostViewSet, VisitorsViewSet,
-    AppealStatViewSet, MandatCategoryViewSet, VideoViewSet
+    AppealStatViewSet, MandatCategoryViewSet, VideoViewSet, CategoryViewSet
 )
 
 urlpatterns = [
@@ -12,6 +12,9 @@ urlpatterns = [
     path('projects/', ProjectViewSet.as_view({'get': 'filter_by_query_param'}), name='projects'),
     path('post/member/', PostViewSet.as_view({'get': 'post_list_by_members'}), name='post_by_member'),
     path('post/<int:pk>/', PostViewSet.as_view({'get': "post_detail"}), name='post_detail'),
+    path('post/category/', PostViewSet.as_view({'get': 'post_list_by_category'}), name='posts_by_category_id'),
+    path('categories/', CategoryViewSet.as_view({'get': 'list'}), name='category_list'),
+    path('banner/', PostViewSet.as_view({'get': 'banner'}), name='banner'),
 
     path('commission/<int:pk>/', CommissionViewSet.as_view({'get': 'commission_member_detail'}),
          name='commission_detail'),
