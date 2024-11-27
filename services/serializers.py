@@ -48,6 +48,13 @@ class CommissionCategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 
+class PostCategory(serializers.Serializer):
+    name = serializers.CharField()
+
+
+
+
+
 class PostSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -60,6 +67,7 @@ class PostSerializer(serializers.ModelSerializer):
         self.fields['description'] = serializers.CharField(source=f'description_{language}')
 
     views_count = serializers.IntegerField(source='views.count', read_only=True)
+
 
     class Meta:
         model = Post

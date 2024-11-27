@@ -183,7 +183,7 @@ class PostViewSet(ViewSet):
             filter_ &= (Q(commission_member__isnull=False, is_published=True))
 
         posts = Post.objects.filter(filter_).order_by('-created_at')
-        response = get_post_list(context={'request': request, 'query': posts},
+        response = get_post_list(context={'request': request}, request_data=posts,
                                  page=serializer_params.data.get('page', 1),
                                  page_size=serializer_params.data.get('page_size', 10))
 
@@ -253,7 +253,7 @@ class MandatCategoryViewSet(ViewSet):
 
         members = MandatCategory.objects.filter(filter_).order_by('created_at')
 
-        response = get_mandat_filter(context={'request': request, 'query': members},
+        response = get_mandat_filter(context={'request': request}, request_data=members,
                                      page=serializer_params.data.get('page', 1),
                                      page_size=serializer_params.data.get('page_size', 10))
 

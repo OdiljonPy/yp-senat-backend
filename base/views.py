@@ -102,9 +102,9 @@ class PollViewSet(ViewSet):
         filter_ = Q()
         if param:
             filter_ &= Q(name__icontains=param)
-        if status == 'true':
+        if status.lower() == 'true':
             filter_ &= Q(status=1)
-        if status == 'false':
+        if status.lower() == 'false':
             filter_ &= Q(status=2)
 
         poll = Poll.objects.filter(filter_).order_by('-created_at')

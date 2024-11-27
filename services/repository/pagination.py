@@ -4,7 +4,7 @@ from django.db.models import Count
 from services.serializers import PostSerializer, MandatCategorySerializer
 
 
-def get_post_list(context: dict, page, page_size):
+def get_post_list(context: dict, request_data, page, page_size):
     season_query = context.get('query')
     total_count = season_query.aggregate(total_count=Count('id'))['total_count']
 
@@ -26,8 +26,8 @@ def get_post_list(context: dict, page, page_size):
     return responses
 
 
-def get_mandat_filter(context: dict, page, page_size):
-    season_query = context.get('query')
+def get_mandat_filter(context: dict, request_data, page, page_size):
+    season_query = request_data
     total_count = season_query.aggregate(total_count=Count('id'))['total_count']
 
     paginator = Paginator(season_query, page_size)
