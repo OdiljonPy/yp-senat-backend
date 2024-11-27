@@ -69,10 +69,14 @@ class PostSerializer(serializers.ModelSerializer):
     views_count = serializers.IntegerField(source='views.count', read_only=True)
 
 
+
     class Meta:
         model = Post
         fields = ['id', 'title', 'views_count', 'image', 'short_description', 'description', 'commission_member',
                   'created_at', 'is_published', 'published_date']
+
+class MandatCategorySerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=250)
 
 
 class CommissionMemberSerializer(serializers.ModelSerializer):
@@ -89,9 +93,11 @@ class CommissionMemberSerializer(serializers.ModelSerializer):
         self.fields['education_degree'] = serializers.CharField(source=f'education_degree_{language}')
         self.fields['speciality'] = serializers.CharField(source=f'speciality_{language}')
 
+    mandat = MandatCategorySerializer(source='mandat_name', read_only=True)
+
     class Meta:
         model = CommissionMember
-        fields = ['id', 'full_name', 'commission_category', 'region', 'type', 'description', 'position', 'birthdate',
+        fields = ['id', 'full_name', 'commission_category', 'mandat','region', 'type', 'description', 'position', 'birthdate',
                   'nation', 'education_degree', 'speciality', 'email', 'telegram_url', 'facebook_url', 'instagram_url']
 
     def to_representation(self, instance):
@@ -138,9 +144,7 @@ class MandatFilterSerializer(ParamValidateSerializer):
     id = serializers.IntegerField(required=False)
 
 
-class MandatCategorySerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=250)
-    mandats = CommissionMemberSerializer(many=True)
+
 
 
 class AppealStatSerializer(serializers.Serializer):

@@ -1,20 +1,20 @@
 from datetime import date
+
 from django.db.models import Q
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
-from .utils import get_ip
 
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
-from .repository.pagination import get_post_list, get_mandat_filter
-from .repository.get_project_filter import get_projects_filter
 from .models import (Region, CommissionCategory,
                      CommissionMember, Projects,
                      Post, Visitors,
                      AppealStat, MandatCategory)
+from .repository.get_project_filter import get_projects_filter
+from .repository.pagination import get_post_list, get_mandat_filter
 from .serializers import (
     RegionSerializer, CommissionMemberSerializer,
     ProjectsSerializer, CommissionCategorySerializer,
@@ -22,6 +22,7 @@ from .serializers import (
     PostSerializer, PostFilterSerializer,
     AppealStatSerializer, MandatFilterSerializer
 )
+from .utils import get_ip
 
 
 class RegionViewSet(ViewSet):
@@ -53,24 +54,34 @@ class CommissionViewSet(ViewSet):
 
     @swagger_auto_schema(
         operation_summary='Commission members by region id',
-        manual_parameters=[openapi.Parameter(name='region_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER,
-                                             description='Region id')],
+        manual_parameters=[
+            openapi.Parameter(
+                name='region_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Region id'),
+            openapi.Parameter(
+                name='mandat_id', in_=openapi.IN_QUERY, description='get commissions related to mandat',
+                type=openapi.TYPE_INTEGER
+            ),
+        ],
         operation_description='List of commission members by region id',
         responses={200: CommissionMemberSerializer(many=True)},
         tags=['Commission']
     )
     def commission_member_by_region(self, request):
-        param = request.query_params.get('region_id')
-        if param:
+        param = request.query_params
+        if not param.get('mandat_id').isdigit():
+            raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT, message=ErrorCodes.INVALID_INPUT)
+
+        if param.get('region_id'):
             if not str(param).isdigit():
                 raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT, message='region id must be integer')
 
-            commission_members = CommissionMember.objects.filter(region_id=param)
+
+            commission_members = CommissionMember.objects.filter(region_id=param, mandat__name_id=param.get('mandat_id'))
             return Response(
                 data={'result': CommissionMemberSerializer(commission_members, many=True, context={'request': request}
                                                            ).data, 'ok': True}, status=status.HTTP_200_OK)
 
-        commission_members = CommissionMember.objects.filter(type=1)
+        commission_members = CommissionMember.objects.filter(type=1, mandat__name_id=param.get('mandat_id'))
         serializer = CommissionMemberSerializer(commission_members, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
