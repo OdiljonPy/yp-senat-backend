@@ -11,7 +11,7 @@ class VideoAdmin(admin.ModelAdmin):
     list_display = ('id', 'title')
     list_display_links = ('id', 'title')
     search_fields = ('title',)
-                     Visitors, MandatCategory, AppealStat, CategoryImage)
+
 
 
 class CommissionMemberTabularInline(admin.TabularInline):

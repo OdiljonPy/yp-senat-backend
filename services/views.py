@@ -8,14 +8,8 @@ from rest_framework.viewsets import ViewSet
 
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
-from .repository.pagination import get_post_list, get_mandat_filter
-from .repository.get_project_filter import get_projects_filter
-from .models import (Region, CommissionCategory,
-                     CommissionMember, Projects,
-                     Post, Visitors,
-                     AppealStat, MandatCategory, Video)
 from .models import (Region, CommissionCategory, CommissionMember, Projects,
-                     Post, Visitors, AppealStat, MandatCategory)
+                     Post, Visitors, AppealStat, MandatCategory, Video)
 from .repository.get_project_filter import get_projects_filter
 from .repository.pagination import get_post_list
 from .serializers import (
@@ -23,8 +17,8 @@ from .serializers import (
     ProjectsSerializer, CommissionCategorySerializer,
     AppealSerializer, ParamValidateSerializer,
     PostSerializer, PostFilterSerializer,
-    AppealStatSerializer, MandatFilterSerializer, VideoSerializer
-    AppealStatSerializer, MandatCategorySerializer, CategoryImageResponseSerializer,
+     MandatFilterSerializer, VideoSerializer,
+    AppealStatSerializer,
     CommissionCategoryResponseSerializer
 )
 from .utils import get_ip
