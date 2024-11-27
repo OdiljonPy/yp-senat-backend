@@ -16,7 +16,7 @@ STATUS_POLL = (
 
 class Banner(BaseModel):
     image = models.ImageField(upload_to='banner/', verbose_name='Изображение')
-    title = models.CharField(max_length=255, verbose_name='текст')
+    title = models.CharField(max_length=255, verbose_name='Текст')
     is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
 
     def __str__(self):
@@ -101,7 +101,6 @@ class Poll(BaseModel):
     result = HTMLField(verbose_name='Результат')
 
     link_to_poll = models.URLField(verbose_name='Ссылка на опрос')
-
 
     def __str__(self):
         return self.name

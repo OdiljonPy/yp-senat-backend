@@ -2,6 +2,7 @@ from django.core.paginator import Paginator
 from django.db.models import Count
 from services.serializers import ProjectsSerializer
 
+
 def get_projects_filter(context: dict, page: int, page_size: int):
     projects = context.get('project_param')
     total_projects = projects.aggregate(count=Count('id'))['count']

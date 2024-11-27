@@ -1,6 +1,7 @@
 from modeltranslation.translator import translator, TranslationOptions
-
-from .models import AboutUs, AdditionalLinks, FAQ, Poll, BaseInfo, Banner
+from .models import (AboutUs, AdditionalLinks,
+                     FAQ, Poll,
+                     BaseInfo, Banner)
 
 
 class BannerTranslationOption(TranslationOptions):

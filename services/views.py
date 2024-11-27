@@ -1,25 +1,27 @@
 from datetime import date
-
 from django.db.models import Q
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
+from .utils import get_ip
 
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
-from .models import (Region, CommissionCategory, CommissionMember, Projects,
-                     Post, Visitors, AppealStat, MandatCategory)
 from .repository.get_posts_list import get_post_list
 from .repository.get_project_filter import get_projects_filter
+from .models import (Region, CommissionCategory,
+                     CommissionMember, Projects,
+                     Post, Visitors,
+                     AppealStat, MandatCategory)
 from .serializers import (
     RegionSerializer, CommissionMemberSerializer,
     ProjectsSerializer, CommissionCategorySerializer,
     AppealSerializer, ParamValidateSerializer,
-    PostSerializer, PostFilterSerializer, AppealStatSerializer, MandatCategorySerializer
+    PostSerializer, PostFilterSerializer,
+    AppealStatSerializer, MandatCategorySerializer
 )
-from .utils import get_ip
 
 
 class RegionViewSet(ViewSet):

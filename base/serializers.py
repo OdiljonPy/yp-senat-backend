@@ -1,7 +1,8 @@
-from rest_framework import serializers
-
 from config import settings
-from .models import FAQ, AboutUs, AdditionalLinks, Poll, BaseInfo, Banner
+from rest_framework import serializers
+from .models import (FAQ, AboutUs,
+                     AdditionalLinks, Poll,
+                     BaseInfo, Banner)
 
 
 class BannerSerializer(serializers.ModelSerializer):
