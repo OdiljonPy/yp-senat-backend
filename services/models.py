@@ -34,6 +34,7 @@ class Region(BaseModel):
 
 class CommissionCategory(BaseModel):
     name = models.CharField(max_length=250, verbose_name='Назавние')
+    description = models.TextField(verbose_name='описание')
 
     def __str__(self):
         return self.name
@@ -43,6 +44,19 @@ class CommissionCategory(BaseModel):
         verbose_name_plural = 'Категория комиссий'
         ordering = ('-created_at',)
 
+
+class CategoryImage(BaseModel):  # with pagination
+    image = models.ImageField(upload_to='category_image/', verbose_name='изображение')
+    category = models.ForeignKey(CommissionCategory, on_delete=models.CASCADE, related_name='category_image',
+                                 verbose_name='категория')
+
+    def __str__(self):
+        return self.category.name
+
+    class Meta:
+        verbose_name = 'изображение катогории'
+        verbose_name_plural = 'изображение катогорий'
+        ordering = ('-created_at',)
 
 class MandatCategory(BaseModel):
     name = models.CharField(max_length=250, verbose_name='Назавние')
@@ -63,7 +77,7 @@ class CommissionMember(BaseModel):
 
     mandat = models.ManyToManyField(MandatCategory, verbose_name='Мандат', related_name='mandats')
 
-    image = models.ImageField(upload_to='commission_member/')
+    image = models.ImageField(upload_to='commission_member/', verbose_name='изображение')
     full_name = models.CharField(max_length=100, verbose_name='полное имя')
     type = models.PositiveIntegerField(choices=MEMBER_TYPE, default=1, verbose_name='тип')
     description = HTMLField(verbose_name='описание')
