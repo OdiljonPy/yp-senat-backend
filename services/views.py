@@ -18,9 +18,7 @@ from .serializers import (
     RegionSerializer, CommissionMemberSerializer,
     ProjectsSerializer, CommissionCategorySerializer,
     AppealSerializer, ParamValidateSerializer,
-    PostSerializer, PostFilterSerializer,
-    AppealStatSerializer, MandatFilterSerializer, VideoSerializer,
-    CategorySerializer, PostCategoryFilterSerializer
+    CategorySerializer, PostCategoryFilterSerializer,
     PostSerializer, PostFilterSerializer, MandatCategorySerializer,
     AppealStatSerializer, MandatFilterSerializer, VideoSerializer, CommissionCategoryResponseSerializer
 )

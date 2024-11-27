@@ -3,7 +3,7 @@ from .models import (Region, CommissionCategory,
                      CommissionMember, Projects,
                      Appeal, Post, PostCategory,
                      Visitors, MandatCategory,
-                     AppealStat, Video)
+                     AppealStat, Video, CategoryImage)
 
 
 @admin.register(Video)
