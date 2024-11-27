@@ -34,4 +34,8 @@ class BaseInfoAdmin(admin.ModelAdmin):
 
 @admin.register(Poll)
 class PollAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name')
+    list_display = ('id', 'name', 'started_at', 'ended_at', 'status')
+    list_display_links = ('id', 'name')
+    search_fields = ('name',)
+    list_filter = ('status',)
+
