@@ -68,9 +68,9 @@ class CommissionViewSet(ViewSet):
     )
     def commission_member_by_region(self, request):
         param = request.query_params
-
-        if not str(param.get('mandat_id')).isdigit():
-            raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT)
+        filter_ = Q()
+        if str(param.get('mandat_id')).isdigit():
+            filter_ &= Q(mandat__id__in=list(param.get('mandat_id')))
 
 
         if param.get('region_id'):
@@ -87,7 +87,7 @@ class CommissionViewSet(ViewSet):
 
 
 
-        commission_members = CommissionMember.objects.filter(type=1, mandat__id__in=list(param.get('mandat_id')))
+        commission_members = CommissionMember.objects.filter(filter_).filter(type=1)
 
 
 
