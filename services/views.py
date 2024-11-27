@@ -72,26 +72,16 @@ class CommissionViewSet(ViewSet):
         if str(param.get('mandat_id')).isdigit():
             filter_ &= Q(mandat__id__in=list(param.get('mandat_id')))
 
-
         if param.get('region_id'):
             if not str(param.get('region_id')).isdigit():
                 raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT, message='region id must be integer')
-
 
             commission_members = CommissionMember.objects.filter(region_id=param.get('region_id'))
             return Response(
                 data={'result': CommissionMemberSerializer(commission_members, many=True, context={'request': request}
                                                            ).data, 'ok': True}, status=status.HTTP_200_OK)
 
-
-
-
-
         commission_members = CommissionMember.objects.filter(filter_).filter(type=1)
-
-
-
-
 
         serializer = CommissionMemberSerializer(commission_members, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
