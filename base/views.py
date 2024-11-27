@@ -114,4 +114,4 @@ class PollViewSet(ViewSet):
 
         Poll.objects.filter(ended_at__lt=datetime.now().date()).update(status=2)
 
-        return Response(data={'result': PollSerializer(polls, many=True).data, 'ok': True}, )
+        return Response(data={'result': PollSerializer(polls, many=True, context={'request': request}).data, 'ok': True}, )
