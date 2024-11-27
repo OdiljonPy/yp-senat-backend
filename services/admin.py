@@ -2,7 +2,15 @@ from django.contrib import admin
 from .models import (Region, CommissionCategory,
                      CommissionMember, Projects,
                      Appeal, Post,
-                     Visitors, MandatCategory, AppealStat)
+                     Visitors, MandatCategory,
+                     AppealStat, Video)
+
+
+@admin.register(Video)
+class VideoAdmin(admin.ModelAdmin):
+    list_display = ('id', 'title')
+    list_display_links = ('id', 'title')
+    search_fields = ('title',)
 
 
 class CommissionMemberTabularInline(admin.TabularInline):

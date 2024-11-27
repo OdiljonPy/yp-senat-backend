@@ -9,20 +9,45 @@ from rest_framework.viewsets import ViewSet
 
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
+from .repository.pagination import get_post_list, get_mandat_filter
+from .repository.get_project_filter import get_projects_filter
+from .repository.video_pagination import get_video_list
 from .models import (Region, CommissionCategory,
                      CommissionMember, Projects,
                      Post, Visitors,
-                     AppealStat, MandatCategory)
-from .repository.get_project_filter import get_projects_filter
-from .repository.pagination import get_post_list, get_mandat_filter
+                     AppealStat, MandatCategory, Video)
 from .serializers import (
     RegionSerializer, CommissionMemberSerializer,
     ProjectsSerializer, CommissionCategorySerializer,
     AppealSerializer, ParamValidateSerializer,
     PostSerializer, PostFilterSerializer,
-    AppealStatSerializer, MandatFilterSerializer
+    AppealStatSerializer, MandatFilterSerializer, VideoSerializer
 )
 from .utils import get_ip
+
+
+class VideoViewSet(ViewSet):
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(name='page', in_=openapi.IN_QUERY, description='Page number', type=openapi.TYPE_INTEGER),
+            openapi.Parameter(name='page_size', in_=openapi.IN_QUERY, description='Page size',
+                              type=openapi.TYPE_INTEGER)
+        ],
+        operation_summary='Video',
+        operation_description='Video',
+        responses={200: VideoSerializer()},
+        tags=['Video']
+    )
+    def video_list(self, request):
+        param_serializer = ParamValidateSerializer(data=request.query_params, context={'request': request})
+        if not param_serializer.is_valid():
+            raise CustomApiException(error_code=ErrorCodes.VALIDATION_FAILED, message=param_serializer.errors)
+
+        video = Video.objects.all()
+        pagination = get_video_list(context={'request': request}, response_data=video,
+                                    page=param_serializer.validated_data.get('page'),
+                                    page_size=param_serializer.validated_data.get('page_size'))
+        return Response(data={'result': pagination, 'ok': True}, status=status.HTTP_200_OK)
 
 
 class RegionViewSet(ViewSet):

@@ -181,3 +181,16 @@ class AppealStat(BaseModel):
         verbose_name = 'Статистика обрашения'
         verbose_name_plural = 'Статистики обрашений'
         ordering = ('-created_at',)
+
+
+class Video(BaseModel):
+    title = models.CharField(max_length=150, verbose_name='название')
+    video = models.URLField(verbose_name='видео')
+
+    def __str__(self):
+        return str(self.id)
+
+    class Meta:
+        verbose_name = 'Видео'
+        verbose_name_plural = 'Видео'
+        ordering = ('-created_at',)
