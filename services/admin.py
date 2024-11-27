@@ -1,6 +1,9 @@
 from django.contrib import admin
-from .models import (Region, CommissionCategory, CommissionMember, Projects, CategoryImage,
-                     Appeal, Post, Visitors, MandatCategory, AppealStat, Video)
+from .models import (Region, CommissionCategory,
+                     CommissionMember, Projects,
+                     Appeal, Post, PostCategory,
+                     Visitors, MandatCategory,
+                     AppealStat, Video)
 
 
 @admin.register(Video)
@@ -87,3 +90,10 @@ class AppealStatAdmin(admin.ModelAdmin):
 @admin.register(CategoryImage)
 class CategoryImageAdmin(admin.ModelAdmin):
     list_display = ('id', 'category')
+
+
+@admin.register(PostCategory)
+class PostCategoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+    list_display_links = ('id', 'name')
+    search_fields = ('name',)

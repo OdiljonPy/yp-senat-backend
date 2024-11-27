@@ -174,6 +174,7 @@ class Post(BaseModel):
     description = HTMLField(verbose_name="описание")
     published_date = models.DateField()
     is_published = models.BooleanField(default=True, verbose_name="опубликовано")
+    is_banner = models.BooleanField(default=False, verbose_name='это баннер')
 
     def __str__(self):
         return self.title

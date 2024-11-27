@@ -162,6 +162,15 @@ class PostFilterSerializer(ParamValidateSerializer):
     status = serializers.ChoiceField(PROJECT_STATUS, required=False)
 
 
+class PostCategoryFilterSerializer(ParamValidateSerializer):
+    category_id = serializers.IntegerField(required=False)
+
+    def validate(self, data):
+        if data.get('category_id') and data.get('category_id') <= 0:
+            raise CustomApiException(ErrorCodes.VALIDATION_FAILED, message='Category id must be positive integer')
+        return data
+
+
 class MandatFilterSerializer(ParamValidateSerializer):
     id = serializers.IntegerField(required=False)
 
@@ -171,3 +180,16 @@ class AppealStatSerializer(serializers.Serializer):
     resolved_appeals = serializers.IntegerField(required=False, default=0)
     explained_appeals = serializers.IntegerField(required=False, default=0)
     rejected_appeals = serializers.IntegerField(required=False, default=0)
+
+
+class CategorySerializer(serializers.Serializer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get('request')
+        language = 'ru'
+        if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
+            language = request.META.get('HTTP_ACCEPT_LANGUAGE')
+        self.fields['name'] = serializers.CharField(source=f'name_{language}')
+
+    id = serializers.IntegerField()
+    name = serializers.CharField(max_length=250)
