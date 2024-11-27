@@ -6,8 +6,21 @@ from exceptions.exception import CustomApiException
 from .models import (
     Region, CommissionCategory,
     CommissionMember, Projects,
-    Post, Appeal, PROJECT_STATUS)
+    Post, Appeal, PROJECT_STATUS, Video)
 
+
+class VideoSerializer(serializers.ModelSerializer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get('request')
+        language = 'ru'
+        if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
+            language = request.META.get('HTTP_ACCEPT_LANGUAGE')
+        self.fields['title'] = serializers.CharField(source=f'title_{language}')
+
+    class Meta:
+        model = Video
+        fields = ['id', 'title', 'video']
 
 class ParamValidateSerializer(serializers.Serializer):
     page = serializers.IntegerField(required=False, default=1)

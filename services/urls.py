@@ -4,7 +4,7 @@ from .views import (
     RegionViewSet, CommissionViewSet,
     ProjectViewSet, AppealViewSet,
     PostViewSet, VisitorsViewSet,
-    AppealStatViewSet, MandatCategoryViewSet
+    AppealStatViewSet, MandatCategoryViewSet, VideoViewSet
 )
 
 urlpatterns = [
@@ -21,8 +21,10 @@ urlpatterns = [
          name='commission_category'),
     path('commission/images/<int:pk>/', CommissionViewSet.as_view({'get': 'image_list'}), name='images_of_category'),
 
+    path('management/', CommissionViewSet.as_view({'get': 'management_members'}), name='management_members'),
     path('appeal/', AppealViewSet.as_view({'post': 'create_appeal'}), name='appeal'),
     path('visitors/', VisitorsViewSet.as_view({'get': 'get'}), name='visitors'),
     path('statistics/', AppealStatViewSet.as_view({'get': 'stats'}), name='appeal_stat'),
     path('mandat/', MandatCategoryViewSet.as_view({'get': 'get'}), name='mandat_category'),
+    path('video/', VideoViewSet.as_view({'get': 'video_list'}), name='videos_list')
 ]

@@ -1,5 +1,4 @@
 from datetime import date
-
 from django.db.models import Q
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -9,6 +8,12 @@ from rest_framework.viewsets import ViewSet
 
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
+from .repository.pagination import get_post_list, get_mandat_filter
+from .repository.get_project_filter import get_projects_filter
+from .models import (Region, CommissionCategory,
+                     CommissionMember, Projects,
+                     Post, Visitors,
+                     AppealStat, MandatCategory, Video)
 from .models import (Region, CommissionCategory, CommissionMember, Projects,
                      Post, Visitors, AppealStat, MandatCategory)
 from .repository.get_project_filter import get_projects_filter
@@ -18,10 +23,28 @@ from .serializers import (
     ProjectsSerializer, CommissionCategorySerializer,
     AppealSerializer, ParamValidateSerializer,
     PostSerializer, PostFilterSerializer,
-    AppealStatSerializer, MandatFilterSerializer, MandatCategorySerializer, CategoryImageResponseSerializer,
+    AppealStatSerializer, MandatFilterSerializer, VideoSerializer
+    AppealStatSerializer, MandatCategorySerializer, CategoryImageResponseSerializer,
     CommissionCategoryResponseSerializer
 )
 from .utils import get_ip
+
+
+class VideoViewSet(ViewSet):
+    @swagger_auto_schema(
+        operation_summary='Video',
+        operation_description='Video',
+        responses={200: VideoSerializer(many=True)},
+        tags=['Video']
+    )
+    def video_list(self, request):
+        param_serializer = ParamValidateSerializer(data=request.query_params, context={'request': request})
+        if not param_serializer.is_valid():
+            raise CustomApiException(error_code=ErrorCodes.VALIDATION_FAILED, message=param_serializer.errors)
+
+        video = Video.objects.all()
+        serializer = VideoSerializer(video, many=True)
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
 
 class RegionViewSet(ViewSet):
@@ -49,6 +72,17 @@ class CommissionViewSet(ViewSet):
         if not member:
             raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
         serializer = CommissionMemberSerializer(member, context={'request': request})
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary='Management members',
+        operation_description='Management members',
+        responses={200: CommissionMemberSerializer(many=True)},
+        tags=["Commission"]
+    )
+    def management_members(self, request):
+        management_members = CommissionMember.objects.filter(type=3)
+        serializer = CommissionMemberSerializer(management_members, many=True)
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
