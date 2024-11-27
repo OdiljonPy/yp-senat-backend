@@ -100,14 +100,14 @@ class PollViewSet(ViewSet):
     def poll(self, request):
 
         param = request.query_params.get('poll_name', None)
-        status = request.query_params.get('poll_status', '')
+        status_ = request.query_params.get('poll_status', '')
 
         filter_ = Q()
         if param:
             filter_ &= Q(name__icontains=param)
-        if status.lower() == 'true':
+        if status_.lower() == 'true':
             filter_ &= Q(status=1)
-        if status.lower() == 'false':
+        if status_.lower() == 'false':
             filter_ &= Q(status=2)
 
         polls = Poll.objects.filter(filter_).order_by('-created_at')
