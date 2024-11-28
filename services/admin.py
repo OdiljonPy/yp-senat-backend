@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import (
     Region, CommissionCategory, CommissionMember, Projects,
     Appeal, Post, PostCategory, Visitors, MandatCategory,
-    AppealStat, Video, CategoryImage, Management
+    AppealStat, Video, CategoryImage, Management, NormativeDocuments
 )
 
 

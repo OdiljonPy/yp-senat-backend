@@ -17,7 +17,8 @@ from .repository.management_pagination import get_managements
 from .repository.comm_pagination import get_commissions
 from .models import (
     Region, CommissionCategory, CommissionMember, Projects,
-    Post, Visitors, AppealStat, MandatCategory, Video, PostCategory, Management
+    Post, Visitors, AppealStat, MandatCategory, Video, PostCategory,
+    Management, NormativeDocuments
 )
 from .serializers import (
     RegionSerializer, CommissionMemberSerializer,
@@ -27,7 +28,7 @@ from .serializers import (
     PostSerializer, PostFilterSerializer, MandatCategorySerializer,
     AppealStatSerializer, MandatFilterSerializer, VideoSerializer,
     MandatCategoryDetailSerializer, ProjectsResponseSerializer,
-    CommMemberFilterSerializer, ManagementSerializer
+    CommMemberFilterSerializer, ManagementSerializer, NormativeDocumentsSerializer
 )
 
 

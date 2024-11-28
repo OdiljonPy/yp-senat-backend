@@ -5,7 +5,8 @@ from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
 from .models import (
     Region, CommissionCategory, CommissionMember, Projects,
-    Post, Appeal, PROJECT_STATUS, Video, Management, MandatCategory, CategoryImage
+    Post, Appeal, PROJECT_STATUS, Video, Management, MandatCategory,
+    CategoryImage, DOC_TYPE_CHOICES
 )
 
 
