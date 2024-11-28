@@ -60,24 +60,10 @@ class CategoryImage(BaseModel):  # with pagination
         ordering = ('-created_at',)
 
 
-class MandatCategory(BaseModel):
-    name = models.CharField(max_length=250, verbose_name='Назавние')
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = 'Категория мандата'
-        verbose_name_plural = 'Категория мандатов'
-        ordering = ('-created_at',)
-
-
 class CommissionMember(BaseModel):
     commission_category = models.ForeignKey(CommissionCategory, on_delete=models.CASCADE,
                                             verbose_name='Категория комиссии', related_name='commission_categories')
     region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=True, null=True, verbose_name='регион')
-
-    mandat = models.ManyToManyField(MandatCategory, verbose_name='Мандат', related_name='mandats')
 
     image = models.ImageField(upload_to='commission_member/')
     full_name = models.CharField(max_length=100, verbose_name='полное имя')
@@ -103,6 +89,18 @@ class CommissionMember(BaseModel):
         verbose_name_plural = 'члены комисси'
         ordering = ('-created_at',)
 
+
+class MandatCategory(BaseModel):
+    name = models.CharField(max_length=250, verbose_name='Назавние')
+    commission_members = models.ManyToManyField(CommissionMember, related_name='members', verbose_name='члены комиссии')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Категория мандата'
+        verbose_name_plural = 'Категория мандатов'
+        ordering = ('-created_at',)
 
 class Projects(BaseModel):
     name = models.CharField(max_length=100, verbose_name='навзание')

@@ -6,7 +6,7 @@ from exceptions.exception import CustomApiException
 from .models import (
     Region, CommissionCategory,
     CommissionMember, Projects,
-    Post, Appeal, PROJECT_STATUS, Video)
+    Post, Appeal, PROJECT_STATUS, Video, MandatCategory)
 
 
 class VideoSerializer(serializers.ModelSerializer):
@@ -91,8 +91,7 @@ class PostSerializer(serializers.ModelSerializer):
                   'created_at', 'is_published', 'published_date']
 
 
-class MandatCategorySerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=250)
+
 
 
 class CommissionMemberSerializer(serializers.ModelSerializer):
@@ -113,7 +112,7 @@ class CommissionMemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CommissionMember
-        fields = ['id', 'full_name', 'commission_category', 'region', 'type', 'description', 'position', 'birthdate',
+        fields = ['id', 'full_name', "image", 'commission_category', 'region', 'type', 'description', 'position', 'birthdate',
                   'nation', 'education_degree', 'speciality', 'email', 'telegram_url', 'facebook_url', 'instagram_url']
 
     def to_representation(self, instance):
@@ -124,7 +123,6 @@ class CommissionMemberSerializer(serializers.ModelSerializer):
         data['posts'] = PostSerializer(instance.member_post.filter(is_published=True).order_by('-created_at')[:6],
                                        many=True,
                                        context=self.context).data
-        data['mandat'] = MandatCategorySerializer(instance.mandat, context=self.context, many=True).data
         return data
 
 
@@ -197,3 +195,19 @@ class CategorySerializer(serializers.Serializer):
 
     id = serializers.IntegerField()
     name = serializers.CharField(max_length=250)
+
+class MandatCategorySerializer(serializers.Serializer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get('request')
+        language = 'ru'
+        if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
+            language = request.META.get('HTTP_ACCEPT_LANGUAGE')
+        self.fields['name'] = serializers.CharField(source=f'name_{language}')
+
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+
+
+class MandatCategoryDetailSerializer(MandatCategorySerializer):
+    commission_members = CommissionMemberSerializer(many=True)

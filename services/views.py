@@ -1,4 +1,7 @@
 from datetime import date
+from operator import setitem
+from tarfile import TruncatedHeaderError
+
 from django.db.models import Q
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -20,7 +23,8 @@ from .serializers import (
     AppealSerializer, ParamValidateSerializer,
     CategorySerializer, PostCategoryFilterSerializer,
     PostSerializer, PostFilterSerializer, MandatCategorySerializer,
-    AppealStatSerializer, MandatFilterSerializer, VideoSerializer, CommissionCategoryResponseSerializer
+    AppealStatSerializer, MandatFilterSerializer, VideoSerializer, CommissionCategoryResponseSerializer,
+    MandatCategoryDetailSerializer
 )
 from .utils import get_ip
 
@@ -314,29 +318,27 @@ class PostViewSet(ViewSet):
 
 class MandatCategoryViewSet(ViewSet):
     @swagger_auto_schema(
-        operation_summary='Mandat Category',
-        operation_description='Mandat Category',
-        manual_parameters=[
-            openapi.Parameter(
-                name='mandat_id', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, description='Mandat id'),
-        ],
+        operation_summary='Mandat categories list',
+        operation_description='Mandat categories list',
+        responses={200: MandatCategorySerializer(many=True)},
         tags=['Mandat'])
-    def get(self, request):
-        param = request.query_params
-        serializer_params = MandatFilterSerializer(data=param, context={'request': request})
-        if not serializer_params.is_valid():
-            raise CustomApiException(error_code=ErrorCodes.VALIDATION_FAILED, message=serializer_params.errors)
+    def mandat_list(self, request):
+        mandat = MandatCategory.objects.all()
+        serializer = MandatCategorySerializer(mandat, many=True, context={'request': request})
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
-        mandat_id = serializer_params.validated_data.get('mandat_id')
+    @swagger_auto_schema(
+        operation_summary='Mandat category detail, pk receive mandat category id',
+        operation_description="Mandat category detail, pk receive mandat category id",
+        responses={200: MandatCategoryDetailSerializer()},
+        tags=['Mandat']
+    )
+    def mandat_detail(self, request, pk):
+        mandat = MandatCategory.objects.filter(id=pk).first()
+        if not mandat:
+            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
 
-        filter_ = Q()
-
-        if mandat_id and mandat_id.isdigit():
-            filter_ &= Q(id=param)
-
-        members = MandatCategory.objects.filter(filter_).order_by('created_at')
-        serializer = MandatCategorySerializer(members, many=True, context={'request': request})
-
+        serializer = MandatCategoryDetailSerializer(mandat, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
 

@@ -24,6 +24,7 @@ urlpatterns = [
     path('management/', CommissionViewSet.as_view({'get': 'management_members'}), name='management_members'),
     path('appeal/', AppealViewSet.as_view({'post': 'create_appeal'}), name='appeal'),
     path('statistics/', AppealStatViewSet.as_view({'get': 'stats'}), name='appeal_stat'),
-    path('mandat/', MandatCategoryViewSet.as_view({'get': 'get'}), name='mandat_category'),
+    path('mandat/', MandatCategoryViewSet.as_view({'get': 'mandat_list'}), name='mandat_list'),
+    path('mandat/<int:pk>/', MandatCategoryViewSet.as_view({'get': "mandat_detail"}), name="mandat_detail"),
     path('video/', VideoViewSet.as_view({'get': 'video_list'}), name='videos_list')
 ]
