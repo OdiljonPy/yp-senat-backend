@@ -1,7 +1,11 @@
+import os
+from datetime import datetime
+
 from django.db import models
 from tinymce.models import HTMLField
 
 from abstract_models.base_model import BaseModel
+from services.utils import validate_file_type_and_size
 from utils.validations import phone_number_validation
 
 GENDER = (
@@ -18,6 +22,12 @@ MEMBER_TYPE = (
     (1, "Постоянный"),
     (2, "Региональный"),
     (3, "Руководство")
+)
+
+DOC_TYPE_CHOICES = (
+    ('pdf', 'PDF'),
+    ('doc', 'Word'),
+    ('xls', 'Excel'),
 )
 
 
@@ -102,12 +112,13 @@ class MandatCategory(BaseModel):
         verbose_name_plural = 'Категория мандатов'
         ordering = ('-created_at',)
 
+
 class Projects(BaseModel):
     name = models.CharField(max_length=100, verbose_name='навзание')
     short_description = models.CharField(max_length=200, verbose_name='Краткое описание')
     description = HTMLField(verbose_name='описание')
     image = models.ImageField(upload_to='project/', verbose_name='изображение')
-    file = models.FileField(upload_to="project/", verbose_name='файл')
+    file = models.FileField(upload_to="project/", verbose_name='файл', validators=[validate_file_type_and_size])
     status = models.PositiveIntegerField(choices=PROJECT_STATUS, default=2, verbose_name='статус')
     is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
 
@@ -121,8 +132,6 @@ class Projects(BaseModel):
 
 
 class Appeal(BaseModel):
-    commission_member = models.ForeignKey(CommissionMember, on_delete=models.CASCADE, blank=True, null=True)
-
     full_name = models.CharField(max_length=100, verbose_name='Полное имя')
     phone_number = models.CharField(max_length=14, validators=[phone_number_validation], verbose_name='номер телефона')
     email = models.EmailField(verbose_name='электронная почта')
@@ -159,18 +168,13 @@ class PostCategory(BaseModel):
 
 
 class Post(BaseModel):
-    commission_member = models.ForeignKey(CommissionMember, on_delete=models.SET_NULL, blank=True, null=True,
-                                          related_name='member_post',
-                                          verbose_name="член комиссии")
     views = models.ManyToManyField(Visitors, blank=True, verbose_name="количество просмотров")
-
-    category = models.ForeignKey(PostCategory, on_delete=models.SET_NULL, blank=True, null=True)
-
+    category = models.ForeignKey(PostCategory, on_delete=models.CASCADE, blank=True, null=True)
     title = models.CharField(max_length=255, verbose_name="заголовок")
     image = models.ImageField(upload_to='post/', verbose_name="изображение")
     short_description = models.CharField(max_length=200, verbose_name="краткое описание")
     description = HTMLField(verbose_name="описание")
-    published_date = models.DateField()
+    published_date = models.DateField(default=datetime.now())
     is_published = models.BooleanField(default=True, verbose_name="опубликовано")
     is_banner = models.BooleanField(default=False, verbose_name='это баннер')
 
@@ -190,7 +194,7 @@ class AppealStat(BaseModel):
     rejected_appeals = models.PositiveIntegerField(default=0, verbose_name='отклоненные обрашения')
 
     def __str__(self):
-        return str(self.incoming_appeals)
+        return str(self.id)
 
     class Meta:
         verbose_name = 'Статистика обрашения'
@@ -203,7 +207,7 @@ class Video(BaseModel):
     video = models.URLField(verbose_name='видео')
 
     def __str__(self):
-        return str(self.id)
+        return self.title
 
     class Meta:
         verbose_name = 'Видео'
@@ -211,12 +215,29 @@ class Video(BaseModel):
         ordering = ('-created_at',)
 
 
-class Normative_documents(BaseModel):
-    file = models.FileField(upload_to='normative/', verbose_name='файл')
-    content = HTMLField(verbose_name='контент')
+class NormativeDocuments(BaseModel):
+    name = models.CharField(max_length=200, null=True, blank=True)
+    file = models.FileField(upload_to='normative/', verbose_name='файл', null=True, blank=True,
+                            validators=[validate_file_type_and_size])
+    doc_type = models.CharField(max_length=5, choices=DOC_TYPE_CHOICES, editable=False)
+
+    def save(self, *args, **kwargs):
+        if self.file:
+            # Extract file extension
+            ext = os.path.splitext(self.file.name)[1].lower()
+
+            # Set doc_type based on file extension
+            if ext in ['.doc', '.docx']:
+                self.doc_type = 'doc'
+            elif ext in ['.xls', '.xlsx']:
+                self.doc_type = 'xls'
+            elif ext == '.pdf':
+                self.doc_type = 'pdf'
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.id
+        return self.name
 
     class Meta:
         verbose_name = 'нормативный документ'

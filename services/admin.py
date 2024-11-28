@@ -70,10 +70,6 @@ class PostAdmin(admin.ModelAdmin):
     view_count.short_description = 'Количество просмотров'
 
 
-@admin.register(Visitors)
-class VisitorsAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'ip', 'created_at')
-    list_display_links = ('id', 'ip', 'name')
 
 
 @admin.register(MandatCategory)

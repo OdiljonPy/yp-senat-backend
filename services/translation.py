@@ -2,7 +2,8 @@ from modeltranslation.translator import translator, TranslationOptions
 from .models import (Region, CommissionCategory,
                      CommissionMember, Projects,
                      Appeal, Post, Video, PostCategory,
-                     MandatCategory)
+                     MandatCategory, NormativeDocuments
+                     )
 
 class MandatCategoryTranslationOption(TranslationOptions):
     fields = ('name',)
@@ -38,8 +39,13 @@ class PostCategoryTranslationOption(TranslationOptions):
     fields = ('name',)
 
 
+class NormativeDocumentsTranslationOption(TranslationOptions):
+    fields = ('name',)
+
+
 
 translator.register(MandatCategory, MandatCategoryTranslationOption)
+translator.register(NormativeDocuments, NormativeDocumentsTranslationOption)
 translator.register(Video, VideoTranslationOption)
 translator.register(Region, RegionTranslationOption)
 translator.register(Post, PostTranslationOption)

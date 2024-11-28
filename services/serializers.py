@@ -1,3 +1,6 @@
+from random import choices
+from urllib.request import Request
+
 from rest_framework import serializers
 
 from config import settings
@@ -6,7 +9,7 @@ from exceptions.exception import CustomApiException
 from .models import (
     Region, CommissionCategory,
     CommissionMember, Projects,
-    Post, Appeal, PROJECT_STATUS, Video, MandatCategory)
+    Post, Appeal, PROJECT_STATUS, Video, MandatCategory, DOC_TYPE_CHOICES)
 
 
 class VideoSerializer(serializers.ModelSerializer):
@@ -91,11 +94,8 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'views_count', 'image', 'short_description', 'description', 'commission_member',
+        fields = ['id', 'title', 'views_count', 'image', 'short_description', 'description',
                   'created_at', 'is_published', 'published_date']
-
-
-
 
 
 class CommissionMemberSerializer(serializers.ModelSerializer):
@@ -114,7 +114,8 @@ class CommissionMemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CommissionMember
-        fields = ['id', 'full_name', "image", 'commission_category', 'region', 'type', 'description', 'position', 'birthdate',
+        fields = ['id', 'full_name', "image", 'commission_category', 'region', 'type', 'description', 'position',
+                  'birthdate',
                   'nation', 'education_degree', 'speciality', 'email', 'telegram_url', 'facebook_url', 'instagram_url']
 
     def to_representation(self, instance):
@@ -196,6 +197,7 @@ class CategorySerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField(max_length=250)
 
+
 class MandatCategorySerializer(serializers.Serializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -211,3 +213,18 @@ class MandatCategorySerializer(serializers.Serializer):
 
 class MandatCategoryDetailSerializer(MandatCategorySerializer):
     commission_members = CommissionMemberSerializer(many=True)
+
+
+class NormativeDocumentsSerializer(serializers.Serializer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get('request')
+        language = 'ru'
+        if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
+            language = request.META.get('HTTP_ACCEPT_LANGUAGE')
+        self.fields['name'] = serializers.CharField(source=f'name_{language}')
+
+    id = serializers.IntegerField()
+    name = serializers.CharField(max_length=250)
+    file = serializers.FileField()
+    doc_type = serializers.CharField(max_length=5, choices=DOC_TYPE_CHOICES)

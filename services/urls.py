@@ -3,7 +3,7 @@ from django.urls import path
 from .views import (
     RegionViewSet, CommissionViewSet,
     ProjectViewSet, AppealViewSet,
-    PostViewSet, AppealStatViewSet, MandatCategoryViewSet, VideoViewSet
+    PostViewSet, AppealStatViewSet, MandatCategoryViewSet, VideoViewSet, NormativeDocumentsViewSet
 )
 
 urlpatterns = [
@@ -28,5 +28,6 @@ urlpatterns = [
     path('statistics/', AppealStatViewSet.as_view({'get': 'stats'}), name='appeal_stat'),
     path('mandat/', MandatCategoryViewSet.as_view({'get': 'mandat_list'}), name='mandat_list'),
     path('mandat/<int:pk>/', MandatCategoryViewSet.as_view({'get': "mandat_detail"}), name="mandat_detail"),
-    path('video/', VideoViewSet.as_view({'get': 'video_list'}), name='videos_list')
+    path('video/', VideoViewSet.as_view({'get': 'video_list'}), name='videos_list'),
+    path('documents/', NormativeDocumentsViewSet.as_view({'get': 'list'}), name='list_documents'),
 ]
