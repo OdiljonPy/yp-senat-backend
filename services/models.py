@@ -73,7 +73,7 @@ class CommissionMember(BaseModel):
     description = HTMLField(verbose_name='описание')
     commission_category = models.ForeignKey(CommissionCategory, on_delete=models.CASCADE,
                                             verbose_name='Категория комиссии', related_name='commission_categories')
-    mandat = models.ForeignKey(to='MandatCategory', on_delete=models.CASCADE, related_name='mandat')
+    mandat = models.ForeignKey(to='MandatCategory', on_delete=models.CASCADE, related_name='mandat', null=True, blank=True)
     region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=True, null=True, verbose_name='регион')
     order = models.PositiveIntegerField(default=1)
     image = models.ImageField(upload_to='commission_member/')
