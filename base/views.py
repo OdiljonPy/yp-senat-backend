@@ -20,7 +20,7 @@ class BannerViewSet(ViewSet):
         operation_summary='List Of Banners',
         operation_description='List of banners',
         responses={200: BannerSerializer(many=True)},
-        tags=['Banner']
+        tags=['Base']
     )
     def banner_list(self, request):
         banners = Banner.objects.filter(is_published=True).order_by('-created_at')[:3]
@@ -34,7 +34,7 @@ class FAQViewSet(ViewSet):
         operation_summary='FAQ',
         operation_description='Frequently Asked Questions',
         responses={200: FAQSerializer(many=True)},
-        tags=['FAQ']
+        tags=['Base']
     )
     def faq_get(self, request):
         faqs = FAQ.objects.filter(is_visible=True)
@@ -47,7 +47,7 @@ class AboutUsViewSet(ViewSet):
         operation_summary='About Us',
         operation_description='Data About Us',
         responses={200: AboutUsSerializer()},
-        tags=['About Us']
+        tags=['Base']
     )
     def about_us_get(self, request):
         data = AboutUs.objects.order_by('-created_at').first()
@@ -61,7 +61,7 @@ class AdditionalLinksViewSet(ViewSet):
         operation_summary='Additional Links',
         operation_description='Additional Links',
         responses={200: AdditionalLinksSerializer(many=True)},
-        tags=['Additional Links']
+        tags=['Base']
     )
     def additional_links_get(self, request):
         links = AdditionalLinks.objects.filter(is_visible=True)
@@ -75,7 +75,7 @@ class BaseInfoViewSet(ViewSet):
         operation_summary='Contact Us',
         operation_description='Contact Us',
         responses={200: BaseInfoSerializer()},
-        tags=['Contact Us']
+        tags=['Base']
     )
     def base_info_get(self, request):
         data = BaseInfo.objects.order_by('-created_at').first()
@@ -95,7 +95,7 @@ class PollViewSet(ViewSet):
                               description='Poll Status'),
         ],
         responses={200: PollSerializer()},
-        tags=['Poll']
+        tags=['Base']
     )
     def poll(self, request):
 
