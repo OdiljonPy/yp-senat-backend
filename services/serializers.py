@@ -207,7 +207,6 @@ class MandatCategorySerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
 
-
 class MandatCategoryDetailSerializer(MandatCategorySerializer):
     commission_members = CommissionMemberSerializer(many=True)
 

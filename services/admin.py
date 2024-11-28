@@ -2,8 +2,9 @@ from django.contrib import admin
 from .models import (Region, CommissionCategory,
                      CommissionMember, Projects,
                      Appeal, Post, PostCategory,
-                     Visitors, MandatCategory,
-                     AppealStat, Video, CategoryImage, NormativeDocuments)
+                     MandatCategory,
+                     AppealStat, Video,
+                     CategoryImage, NormativeDocuments)
 
 
 @admin.register(Video)
@@ -62,7 +63,7 @@ class PostAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'view_count')
     list_display_links = ('id', 'title')
     search_fields = ('title', 'description', 'short_description')
-    list_filter = ('is_published',)
+    list_filter = ("is_banner", 'is_published')
 
     def view_count(self, obj):
         return obj.views.count()
@@ -97,4 +98,7 @@ class PostCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(NormativeDocuments)
 class NormativeDocumentsAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('id', 'name', 'doc_type')
+    list_display_links = ('id', 'name')
+    search_fields = ('name',)
+    list_filter = ('doc_type',)
