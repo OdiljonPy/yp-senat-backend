@@ -5,8 +5,11 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
-
+from .repository.get_project_filter import get_projects_filter
+from .repository.pagination import get_post_list
+from .utils import get_ip
 from exceptions.error_messages import ErrorCodes
+
 from exceptions.exception import CustomApiException
 from .repository.pagination import get_post_list
 from .repository.get_project_filter import get_projects_filter
@@ -26,7 +29,6 @@ from .serializers import (
     MandatCategoryDetailSerializer, ProjectsResponseSerializer,
     CommMemberFilterSerializer, ManagementSerializer
 )
-from .utils import get_ip
 
 
 class VideoViewSet(ViewSet):
@@ -177,9 +179,9 @@ class ProjectViewSet(ViewSet):
         query = Q()
         if status_:
             query &= Q(status=status_)
-        projects = Projects.objects.filter(query, is_published=True).order_by('id')
+        projects = Projects.objects.filter(query, is_published=True).order_by('-created_at')
         response = get_projects_filter(
-            context={'request': request, 'project_param': projects}, page=page, page_size=page_size)
+            context={'request': request}, project_param=projects, page=page, page_size=page_size)
         return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
 
 
@@ -201,45 +203,6 @@ class AppealViewSet(ViewSet):
 
 
 class PostViewSet(ViewSet):
-    @swagger_auto_schema(
-        operation_summary='List of posts by commission members',
-        operation_description="List of posts by commission members",
-        manual_parameters=[
-            openapi.Parameter(name='post_member_exist', in_=openapi.IN_QUERY, type=openapi.TYPE_BOOLEAN,
-                              description='post member exist'),
-            openapi.Parameter(
-                name='q', in_=openapi.IN_QUERY, description='Search q', type=openapi.TYPE_STRING),
-            openapi.Parameter(
-                name='page', in_=openapi.IN_QUERY, description='Page', type=openapi.TYPE_INTEGER),
-            openapi.Parameter(
-                name='page_size', in_=openapi.IN_QUERY, description='Page size', type=openapi.TYPE_INTEGER),
-        ],
-        responses={200: PostSerializer(many=True)},
-        tags=['Post']
-    )
-    def post_list_by_members(self, request):
-        param = request.query_params
-        serializer_params = PostFilterSerializer(data=param, context={'request': request})
-        if not serializer_params.is_valid():
-            raise CustomApiException(error_code=ErrorCodes.VALIDATION_FAILED, message=serializer_params.errors)
-
-        q = serializer_params.validated_data.get('q', '')
-        post_member = serializer_params.validated_data.get('post_member_exist')
-
-        filter_ = Q()
-        if q:
-            filter_ &= (Q(short_description__icontains=q) | Q(description__icontains=q) | Q(title__icontains=q))
-        if post_member is True:
-            filter_ &= (Q(commission_member__isnull=True, is_published=True))
-        if post_member is False:
-            filter_ &= (Q(commission_member__isnull=False, is_published=True))
-
-        posts = Post.objects.filter(filter_).order_by('-created_at')
-        response = get_post_list(context={'request': request}, request_data=posts,
-                                 page=serializer_params.validated_data.get('page', 1),
-                                 page_size=serializer_params.validated_data.get('page_size', 10))
-
-        return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         operation_summary='Post detail, pk receive post id',
@@ -295,8 +258,8 @@ class PostViewSet(ViewSet):
             filter_ &= Q(category_id=category_id)
         posts = Post.objects.filter(filter_, is_published=True).order_by('-created_at')
         response = get_post_list(request_data=posts, context={'request': request},
-                                 page=serializer_params.validated_data.get('page', 1),
-                                 page_size=serializer_params.validated_data.get('page_size', 10)
+                                 page=serializer_params.validated_data.get('page'),
+                                 page_size=serializer_params.validated_data.get('page_size')
                                  )
         return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
 
@@ -307,9 +270,9 @@ class PostViewSet(ViewSet):
         tags=['Post']
     )
     def banner(self, request):
-        posts = Post.objects.filter(is_published=True, is_banner=True).order_by('views')[:3]
+        posts = Post.objects.filter(is_published=True, is_banner=True).order_by('-created_at').order_by('-views')[:3]
         if len(posts) == 0:
-            posts = Post.objects.filter(is_published=True).order_by('views')[:3]
+            posts = Post.objects.filter(is_published=True).order_by('-views')[:3]
         serializer = PostSerializer(posts, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
@@ -362,3 +325,15 @@ class AppealStatViewSet(ViewSet):
         stats = AppealStat.objects.order_by('-created_at').first()
         return Response(data={'result': AppealStatSerializer(stats, context={'request': request}).data, 'ok': True},
                         status=status.HTTP_200_OK)
+
+
+class NormativeDocumentsViewSet(ViewSet):
+    @swagger_auto_schema(
+        operation_summary="Get list documents",
+        responses={200: NormativeDocumentsSerializer(many=True)},
+        tags=['NormativeDocuments']
+    )
+    def list(self, request):
+        documents = NormativeDocuments.objects.all().order_by('-created_at')
+        serializer = NormativeDocumentsSerializer(documents, many=True, context={'request': request})
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)

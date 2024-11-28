@@ -99,7 +99,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'views_count', 'image', 'short_description', 'description', 'commission_member',
+        fields = ['id', 'title', 'views_count', 'image', 'short_description', 'description',
                   'created_at', 'is_published', 'published_date']
 
 
@@ -143,7 +143,7 @@ class ProjectsSerializer(serializers.ModelSerializer):
 class AppealSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appeal
-        fields = ['id', 'commission_member', 'full_name', 'phone_number', 'email', 'message']
+        fields = ['id', 'full_name', 'phone_number', 'email', 'message']
 
 
 class PostFilterSerializer(ParamValidateSerializer):
@@ -234,3 +234,19 @@ class ManagementSerializer(serializers.ModelSerializer):
             'id', 'full_name', 'description', 'phone_number', 'position', 'twitter_url', 'instagram_url', 'order',
             'facebook_url', 'image'
         )
+
+
+
+class NormativeDocumentsSerializer(serializers.Serializer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get('request')
+        language = 'ru'
+        if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
+            language = request.META.get('HTTP_ACCEPT_LANGUAGE')
+        self.fields['name'] = serializers.CharField(source=f'name_{language}')
+
+    id = serializers.IntegerField()
+    name = serializers.CharField(max_length=250)
+    file = serializers.FileField()
+    doc_type = serializers.ChoiceField(choices=DOC_TYPE_CHOICES)

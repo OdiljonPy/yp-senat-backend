@@ -50,7 +50,7 @@ class ProjectsAdmin(admin.ModelAdmin):
 
 @admin.register(Appeal)
 class AppealAdmin(admin.ModelAdmin):
-    list_display = ('id', 'full_name', 'commission_member', 'phone_number', 'is_resolved')
+    list_display = ('id', 'full_name', 'phone_number', 'is_resolved')
     list_display_links = ('id', 'full_name')
     search_fields = ('full_name', 'phone_number', 'email')
     list_filter = ('is_resolved',)
@@ -58,21 +58,15 @@ class AppealAdmin(admin.ModelAdmin):
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'view_count')
+    list_display = ('id', 'title', 'view_count', "category")
     list_display_links = ('id', 'title')
     search_fields = ('title', 'description', 'short_description')
-    list_filter = ('is_published',)
+    list_filter = ("is_banner", 'is_published')
 
     def view_count(self, obj):
         return obj.views.count()
 
     view_count.short_description = 'Количество просмотров'
-
-
-@admin.register(Visitors)
-class VisitorsAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'ip', 'created_at')
-    list_display_links = ('id', 'ip', 'name')
 
 
 @admin.register(MandatCategory)
@@ -102,3 +96,10 @@ class PostCategoryAdmin(admin.ModelAdmin):
 class ManagementAdmin(admin.ModelAdmin):
     list_display = ('id', 'full_name','order')
     list_display_links = ('id', 'full_name')
+
+@admin.register(NormativeDocuments)
+class NormativeDocumentsAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'doc_type')
+    list_display_links = ('id', 'name')
+    search_fields = ('name',)
+    list_filter = ('doc_type',)

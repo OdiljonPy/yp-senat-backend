@@ -1,4 +1,4 @@
-from datetime import timezone, datetime
+from datetime import datetime
 
 from django.db.models import Q
 from drf_yasg import openapi
@@ -7,26 +7,14 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
-from .models import FAQ, AboutUs, AdditionalLinks, BaseInfo, Banner, Poll
+from exceptions.error_messages import ErrorCodes
+from exceptions.exception import CustomApiException
+from .models import FAQ, AboutUs, AdditionalLinks, BaseInfo, Poll
 from .serializers import (
     FAQSerializer, AdditionalLinksSerializer,
     AboutUsSerializer, BaseInfoSerializer,
-    BannerSerializer, PollSerializer
+    PollSerializer, PollParamSerializer
 )
-
-
-class BannerViewSet(ViewSet):
-    @swagger_auto_schema(
-        operation_summary='List Of Banners',
-        operation_description='List of banners',
-        responses={200: BannerSerializer(many=True)},
-        tags=['Base']
-    )
-    def banner_list(self, request):
-        banners = Banner.objects.filter(is_published=True).order_by('-created_at')[:3]
-        serializer = BannerSerializer(banners, many=True, context={'request': request})
-
-        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
 
 class FAQViewSet(ViewSet):
@@ -91,27 +79,29 @@ class PollViewSet(ViewSet):
         manual_parameters=[
             openapi.Parameter(name='poll_name', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING,
                               description='Poll Name'),
-            openapi.Parameter(name='poll_status', in_=openapi.IN_QUERY, type=openapi.TYPE_BOOLEAN,
-                              description='Poll Status'),
+            openapi.Parameter(name='poll_status', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER,
+                              description='Poll Status, receive 1-active or 2-finished'),
         ],
         responses={200: PollSerializer()},
         tags=['Base']
     )
     def poll(self, request):
+        param_serializer = PollParamSerializer(data=request.query_params, context={"request": request})
+        if not param_serializer.is_valid():
+            raise CustomApiException(error_code=ErrorCodes.VALIDATION_FAILED, message=param_serializer.errors)
 
-        param = request.query_params.get('poll_name', None)
-        status_ = request.query_params.get('poll_status', '')
-
+        param = param_serializer.validated_data.get('poll_name')
+        status_ = param_serializer.validated_data.get('poll_status')
+        print(param)
         filter_ = Q()
         if param:
             filter_ &= Q(name__icontains=param)
-        if status_.lower() == 'true':
-            filter_ &= Q(status=1)
-        if status_.lower() == 'false':
-            filter_ &= Q(status=2)
+        if status_:
+            filter_ &= Q(status=status_)
 
         polls = Poll.objects.filter(filter_).order_by('-created_at')
-
         Poll.objects.filter(ended_at__lt=datetime.now().date()).update(status=2)
 
-        return Response(data={'result': PollSerializer(polls, many=True, context={'request': request}).data, 'ok': True}, )
+        return Response(
+            data={'result': PollSerializer(polls, many=True, context={'request': request}).data, 'ok': True},
+            status=status.HTTP_200_OK)

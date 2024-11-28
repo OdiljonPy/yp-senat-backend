@@ -45,8 +45,12 @@ class PostCategoryTranslationOption(TranslationOptions):
 class ManagementTranslationOption(TranslationOptions):
     fields = ('full_name', 'description', 'position')
 
+class NormativeDocumentsTranslationOption(TranslationOptions):
+    fields = ('name',)
+
 
 translator.register(MandatCategory, MandatCategoryTranslationOption)
+translator.register(NormativeDocuments, NormativeDocumentsTranslationOption)
 translator.register(Video, VideoTranslationOption)
 translator.register(Region, RegionTranslationOption)
 translator.register(Post, PostTranslationOption)
