@@ -45,7 +45,7 @@ class FAQViewSet(ViewSet):
 class AboutUsViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='About Us',
-        operation_description='Data About Us',
+        operation_description='About Us',
         responses={200: AboutUsSerializer()},
         tags=['Base']
     )

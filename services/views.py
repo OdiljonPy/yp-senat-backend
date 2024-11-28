@@ -54,8 +54,8 @@ class RegionViewSet(ViewSet):
 
 class CommissionViewSet(ViewSet):
     @swagger_auto_schema(
-        operation_summary='Detail Of Commission Member',
-        operation_description='Detail of commission member',
+        operation_summary='Detail Of Commission Member, pk receive commission member id',
+        operation_description='Detail of commission member, pk receive commission member id',
         responses={200: CommissionMemberSerializer()},
         tags=['Commission']
     )
@@ -116,7 +116,7 @@ class CommissionViewSet(ViewSet):
         operation_summary='List Of Commission Categories',
         manual_parameters=[
             openapi.Parameter(name='category_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER,
-                              description='Category id')
+                              description='Receive category id and return category detail')
         ],
         operation_description='List of commission categories',
         responses={200: CommissionCategorySerializer(many=True)},
@@ -146,11 +146,12 @@ class ProjectViewSet(ViewSet):
             openapi.Parameter(
                 name='page_size', in_=openapi.IN_QUERY, description='Page size', type=openapi.TYPE_INTEGER),
             openapi.Parameter(
-                name='status', in_=openapi.IN_QUERY, description='1 = Finished, 2 = Inprocess',
+                name='status', in_=openapi.IN_QUERY,
+                description='Receive two status numbers: 1 = Finished, 2 = Inprocess',
                 type=openapi.TYPE_INTEGER)
         ],
-        operation_summary='List of projects by type',
-        operation_description='List of projects by type',
+        operation_summary='List of projects by status',
+        operation_description='List of projects by status',
         responses={200: ProjectsSerializer(many=True)},
         tags=['Project']
     )
@@ -229,8 +230,8 @@ class PostViewSet(ViewSet):
         return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
-        operation_summary='Post detail',
-        operation_description='Post detail',
+        operation_summary='Post detail, pk receive post id',
+        operation_description='Post detail, pk receive post id',
         responses={200: PostSerializer()},
         tags=['Post']
     )
@@ -288,8 +289,8 @@ class PostViewSet(ViewSet):
         return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
-        operation_summary='Banner posts',
-        operation_description='Banner posts',
+        operation_summary='Banner posts, return posts with status is_bunner=True',
+        operation_description='Banner posts, return posts with status is_bunner=True',
         responses={200: PostSerializer()},
         tags=['Post']
     )
