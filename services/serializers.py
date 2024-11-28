@@ -35,7 +35,7 @@ class ParamValidateSerializer(serializers.Serializer):
 
 
 class ProjectsResponseSerializer(ParamValidateSerializer):
-    status = serializers.ChoiceField(choices=PROJECT_STATUS)
+    status = serializers.ChoiceField(choices=PROJECT_STATUS, required=False)
 
 
 class RegionSerializer(serializers.ModelSerializer):
