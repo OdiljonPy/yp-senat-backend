@@ -55,8 +55,8 @@ class CategoryImage(BaseModel):  # with pagination
         return self.category.name
 
     class Meta:
-        verbose_name = 'изображение катогории'
-        verbose_name_plural = 'изображение катогорий'
+        verbose_name = 'изображение категории'
+        verbose_name_plural = 'изображение категорий'
         ordering = ('-created_at',)
 
 
