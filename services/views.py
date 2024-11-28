@@ -28,18 +28,14 @@ from .utils import get_ip
 
 class VideoViewSet(ViewSet):
     @swagger_auto_schema(
-        operation_summary='Video',
-        operation_description='Video',
+        operation_summary='Videos list',
+        operation_description='Videos list',
         responses={200: VideoSerializer(many=True)},
         tags=['Video']
     )
     def video_list(self, request):
-        param_serializer = ParamValidateSerializer(data=request.query_params, context={'request': request})
-        if not param_serializer.is_valid():
-            raise CustomApiException(error_code=ErrorCodes.VALIDATION_FAILED, message=param_serializer.errors)
-
         video = Video.objects.all()
-        serializer = VideoSerializer(video, many=True)
+        serializer = VideoSerializer(video, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
 
