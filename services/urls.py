@@ -10,7 +10,7 @@ from .views import (
 urlpatterns = [
     path('region/', RegionViewSet.as_view({'get': 'region_list'}), name='region'),
     path('projects/', ProjectViewSet.as_view({'get': 'filter_by_query_param'}), name='projects'),
-    path('post/member/', PostViewSet.as_view({'get': 'post_list_by_members'}), name='post_by_member'),
+    # path('post/member/', PostViewSet.as_view({'get': 'post_list_by_members'}), name='post_by_member'),
     path('post/<int:pk>/', PostViewSet.as_view({'get': "post_detail"}), name='post_detail'),
     path('post/category/', PostViewSet.as_view({'get': 'post_list_by_category'}), name='posts_by_category_id'),
     path('categories/', CategoryViewSet.as_view({'get': 'list'}), name='category_list'),
