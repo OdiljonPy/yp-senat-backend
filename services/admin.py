@@ -60,7 +60,7 @@ class AppealAdmin(admin.ModelAdmin):
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'view_count')
+    list_display = ('id', 'title', 'view_count', "category")
     list_display_links = ('id', 'title')
     search_fields = ('title', 'description', 'short_description')
     list_filter = ("is_banner", 'is_published')
