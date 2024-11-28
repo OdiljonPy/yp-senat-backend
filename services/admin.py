@@ -1,9 +1,8 @@
 from django.contrib import admin
-from .models import (Region, CommissionCategory,
-                     CommissionMember, Projects,
-                     Appeal, Post, PostCategory,
-                     Visitors, MandatCategory,
-                     AppealStat, Video, CategoryImage)
+from .models import (
+    Region, CommissionCategory, CommissionMember, Projects,
+    Appeal, Post, PostCategory, MandatCategory, AppealStat, Video, CategoryImage
+)
 
 
 @admin.register(Video)
@@ -70,12 +69,6 @@ class PostAdmin(admin.ModelAdmin):
     view_count.short_description = 'Количество просмотров'
 
 
-@admin.register(Visitors)
-class VisitorsAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'ip', 'created_at')
-    list_display_links = ('id', 'ip', 'name')
-
-
 @admin.register(MandatCategory)
 class MandatCategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
@@ -86,6 +79,7 @@ class MandatCategoryAdmin(admin.ModelAdmin):
 @admin.register(AppealStat)
 class AppealStatAdmin(admin.ModelAdmin):
     list_display = ('id', 'incoming_appeals', 'resolved_appeals', 'explained_appeals', 'rejected_appeals')
+
 
 @admin.register(CategoryImage)
 class CategoryImageAdmin(admin.ModelAdmin):

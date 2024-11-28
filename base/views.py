@@ -11,22 +11,8 @@ from .models import FAQ, AboutUs, AdditionalLinks, BaseInfo, Banner, Poll
 from .serializers import (
     FAQSerializer, AdditionalLinksSerializer,
     AboutUsSerializer, BaseInfoSerializer,
-    BannerSerializer, PollSerializer
+    PollSerializer
 )
-
-
-class BannerViewSet(ViewSet):
-    @swagger_auto_schema(
-        operation_summary='List Of Banners',
-        operation_description='List of banners',
-        responses={200: BannerSerializer(many=True)},
-        tags=['Base']
-    )
-    def banner_list(self, request):
-        banners = Banner.objects.filter(is_published=True).order_by('-created_at')[:3]
-        serializer = BannerSerializer(banners, many=True, context={'request': request})
-
-        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
 
 class FAQViewSet(ViewSet):
@@ -114,4 +100,5 @@ class PollViewSet(ViewSet):
 
         Poll.objects.filter(ended_at__lt=datetime.now().date()).update(status=2)
 
-        return Response(data={'result': PollSerializer(polls, many=True, context={'request': request}).data, 'ok': True}, )
+        return Response(
+            data={'result': PollSerializer(polls, many=True, context={'request': request}).data, 'ok': True}, )

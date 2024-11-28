@@ -1,14 +1,7 @@
 from django.contrib import admin
-from .models import (FAQ, AboutUs,
-                     AdditionalLinks, BaseInfo,
-                     Banner, Poll)
-
-
-@admin.register(Banner)
-class BannerAdmin(admin.ModelAdmin):
-    list_display = ('id',)
-    search_fields = ('title',)
-    list_filter = ('is_published',)
+from .models import (
+    FAQ, AboutUs, AdditionalLinks, BaseInfo, Poll
+)
 
 
 @admin.register(FAQ)
