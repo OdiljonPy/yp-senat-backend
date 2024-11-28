@@ -8,7 +8,7 @@ from rest_framework.viewsets import ViewSet
 
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
-from .repository.pagination import get_post_list, get_mandat_filter
+from .repository.pagination import get_post_list
 from .repository.get_project_filter import get_projects_filter
 from .models import (Region, CommissionCategory,
                      CommissionMember, Projects,
@@ -18,9 +18,9 @@ from .serializers import (
     RegionSerializer, CommissionMemberSerializer,
     ProjectsSerializer, CommissionCategorySerializer,
     AppealSerializer, ParamValidateSerializer,
-    PostSerializer, PostFilterSerializer,
-    AppealStatSerializer, MandatFilterSerializer, VideoSerializer,
-    CategorySerializer, PostCategoryFilterSerializer
+    CategorySerializer, PostCategoryFilterSerializer,
+    PostSerializer, PostFilterSerializer, MandatCategorySerializer,
+    AppealStatSerializer, MandatFilterSerializer, VideoSerializer, CommissionCategoryResponseSerializer
 )
 from .utils import get_ip
 
@@ -139,7 +139,16 @@ class CommissionViewSet(ViewSet):
         serializer = CommissionCategorySerializer(categories, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        operation_description='get image related to category',
+        operation_summary='get image related to  category',
+        tags=['Commission']
+    )
+    def image_list(self, request, pk):
+        cat = CommissionCategory.objects.filter(id=pk).first()
+        serializer = CommissionCategoryResponseSerializer(cat, context={'request': request})
 
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 class ProjectViewSet(ViewSet):
     @swagger_auto_schema(
         manual_parameters=[
@@ -319,11 +328,6 @@ class MandatCategoryViewSet(ViewSet):
         manual_parameters=[
             openapi.Parameter(
                 name='mandat_id', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, description='Mandat id'),
-            openapi.Parameter(
-                name='page', in_=openapi.IN_QUERY, description='Page', type=openapi.TYPE_INTEGER),
-            openapi.Parameter(
-                name='page_size', in_=openapi.IN_QUERY, description='Page size', type=openapi.TYPE_INTEGER),
-
         ],
         tags=['Mandat'])
     def get(self, request):
@@ -340,12 +344,9 @@ class MandatCategoryViewSet(ViewSet):
             filter_ &= Q(id=param)
 
         members = MandatCategory.objects.filter(filter_).order_by('created_at')
+        serializer = MandatCategorySerializer(members, many=True, context={'request': request})
 
-        response = get_mandat_filter(context={'request': request}, request_data=members,
-                                     page=serializer_params.data.get('page', 1),
-                                     page_size=serializer_params.data.get('page_size', 10))
-
-        return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
 
 class AppealStatViewSet(ViewSet):
