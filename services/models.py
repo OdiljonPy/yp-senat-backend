@@ -174,7 +174,7 @@ class Post(BaseModel):
     image = models.ImageField(upload_to='post/', verbose_name="изображение")
     short_description = models.CharField(max_length=200, verbose_name="краткое описание")
     description = HTMLField(verbose_name="описание")
-    published_date = models.DateField(default=datetime.now())
+    published_date = models.DateField()
     is_published = models.BooleanField(default=True, verbose_name="опубликовано")
     is_banner = models.BooleanField(default=False, verbose_name='это баннер')
 

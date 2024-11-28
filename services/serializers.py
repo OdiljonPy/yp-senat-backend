@@ -227,4 +227,4 @@ class NormativeDocumentsSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField(max_length=250)
     file = serializers.FileField()
-    doc_type = serializers.CharField(max_length=5, choices=DOC_TYPE_CHOICES)
+    doc_type = serializers.ChoiceField(choices=DOC_TYPE_CHOICES)
