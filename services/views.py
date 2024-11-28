@@ -11,18 +11,24 @@ from .utils import get_ip
 from exceptions.error_messages import ErrorCodes
 
 from exceptions.exception import CustomApiException
-from .models import (Region, CommissionCategory,
-                     CommissionMember, Projects,
-                     Post, Visitors,
-                     AppealStat, MandatCategory, Video, PostCategory, NormativeDocuments)
-
+from .repository.pagination import get_post_list
+from .repository.get_project_filter import get_projects_filter
+from .repository.management_pagination import get_managements
+from .repository.comm_pagination import get_commissions
+from .models import (
+    Region, CommissionCategory, CommissionMember, Projects,
+    Post, Visitors, AppealStat, MandatCategory, Video, PostCategory,
+    Management, NormativeDocuments
+)
 from .serializers import (
     RegionSerializer, CommissionMemberSerializer,
     ProjectsSerializer, CommissionCategorySerializer,
-    AppealSerializer, CategorySerializer, PostCategoryFilterSerializer,
-    PostSerializer, MandatCategorySerializer,
-    AppealStatSerializer, VideoSerializer, CommissionCategoryResponseSerializer,
-    MandatCategoryDetailSerializer, ProjectsResponseSerializer, NormativeDocumentsSerializer
+    AppealSerializer, ParamValidateSerializer,
+    CategorySerializer, PostCategoryFilterSerializer,
+    PostSerializer, PostFilterSerializer, MandatCategorySerializer,
+    AppealStatSerializer, MandatFilterSerializer, VideoSerializer,
+    MandatCategoryDetailSerializer, ProjectsResponseSerializer,
+    CommMemberFilterSerializer, ManagementSerializer, NormativeDocumentsSerializer
 )
 
 
@@ -54,62 +60,48 @@ class RegionViewSet(ViewSet):
 
 class CommissionViewSet(ViewSet):
     @swagger_auto_schema(
-        operation_summary='Detail Of Commission Member, pk receive commission member id',
-        operation_description='Detail of commission member, pk receive commission member id',
-        responses={200: CommissionMemberSerializer()},
-        tags=['Commission']
-    )
-    def commission_member_detail(self, request, pk):
-        member = CommissionMember.objects.filter(id=pk).first()
-        if not member:
-            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
-        serializer = CommissionMemberSerializer(member, context={'request': request})
-        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
-
-    @swagger_auto_schema(
-        operation_summary='Management members',
-        operation_description='Management members',
+        operation_summary='List Of Commission Members',
+        operation_description='List Of Commission Members',
+        manual_parameters=[
+            openapi.Parameter(
+                name='page', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Page'),
+            openapi.Parameter(
+                name='page_size', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Page size'),
+            openapi.Parameter(
+                name='mandat_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='mandat_id'),
+            openapi.Parameter(
+                name='category_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='category id'),
+            openapi.Parameter(
+                name='region_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='region id'),
+        ],
         responses={200: CommissionMemberSerializer(many=True)},
         tags=["Commission"]
     )
-    def management_members(self, request):
-        management_members = CommissionMember.objects.filter(type=3)
-        serializer = CommissionMemberSerializer(management_members, many=True)
-        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+    def commission_list(self, request):
+        serializer = CommMemberFilterSerializer(data=request.query_params, context={'request': request})
+        if not serializer.is_valid():
+            raise CustomApiException(ErrorCodes.VALIDATION_FAILED, message=serializer.errors)
 
-    @swagger_auto_schema(
-        operation_summary='Commission members by Region id and Mandat id',
-        operation_description='Commission members by Region id and Mandat id',
-        manual_parameters=[
-            openapi.Parameter(
-                name='region_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER,
-                description='Get commissions related to region'),
-            openapi.Parameter(
-                name='mandat_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER,
-                description='Get commissions related to mandat'
-            ),
-        ],
-        responses={200: CommissionMemberSerializer(many=True)},
-        tags=['Commission']
-    )
-    def commission_member_by_region(self, request):
-        param = request.query_params
         filter_ = Q()
-        if str(param.get('mandat_id')).isdigit():
-            filter_ &= Q(mandat__id__in=list(param.get('mandat_id')))
+        data = serializer.data
+        mandat_id = data.get('mandat_id')
+        if not mandat_id:
+            last_mandat = MandatCategory.objects.first()
+            mandat_id = 0
+            if last_mandat:
+                mandat_id = last_mandat.id
 
-        if param.get('region_id'):
-            if not str(param.get('region_id')).isdigit():
-                raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT, message='region id must be integer')
+        filter_ &= Q(mandat_id=mandat_id)
+        if data.get('category_id'):
+            filter_ &= Q(commission_category_id=data.get('category_id'))
 
-            commission_members = CommissionMember.objects.filter(region_id=param.get('region_id'))
-            return Response(
-                data={'result': CommissionMemberSerializer(commission_members, many=True, context={'request': request}
-                                                           ).data, 'ok': True}, status=status.HTTP_200_OK)
+        if data.get('region_id'):
+            filter_ &= Q(region_id=data.get('region_id'))
 
-        commission_members = CommissionMember.objects.filter(filter_).filter(type=1)
-        serializer = CommissionMemberSerializer(commission_members, many=True, context={'request': request})
-        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+        commission_members = CommissionMember.objects.filter(filter_)
+        result = get_commissions(
+            commission_members, context={'request': request}, page=data.get('page'), page_size=data.get('page_size'))
+        return Response(data={'result': result, 'ok': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         operation_summary='List Of Commission Categories',
@@ -125,16 +117,40 @@ class CommissionViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary="Commission category detail, pk receive category id",
         operation_description="Commission category detail, pk receive category id, return all information about members, images and description related to this category",
-        responses={200: CommissionCategoryResponseSerializer()},
+        responses={200: CommissionCategorySerializer()},
         tags=["Commission"]
     )
     def commission_category_detail(self, request, pk):
-        cat = CommissionCategory.objects.filter(id=pk).first()
-        if not cat:
+        category = CommissionCategory.objects.filter(id=pk).first()
+        if not category:
             raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
 
-        serializer = CommissionCategoryResponseSerializer(cat, context={'request': request})
+        serializer = CommissionCategorySerializer(category, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+
+
+class ManagementViewSet(ViewSet):
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                name='page', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Page'),
+            openapi.Parameter(
+                name='page_size', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Page size'),
+        ],
+        operation_description='Management members',
+        operation_summary='Management members',
+        responses={200: MandatCategorySerializer(many=True)},
+        tags=['Management']
+    )
+    def management_list(self, request):
+        serializer = ParamValidateSerializer(data=request.query_params, context={'request': request})
+        if not serializer.is_valid():
+            raise CustomApiException(ErrorCodes.VALIDATION_FAILED, message=serializer.errors)
+        data = serializer.data
+        managements = Management.objects.all()
+        result = get_managements(
+            managements, context={'request': request}, page=data.get('page'), page_size=data.get('page_size'))
+        return Response(data={'result': result, 'ok': True}, status=status.HTTP_200_OK)
 
 
 class ProjectViewSet(ViewSet):

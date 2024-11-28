@@ -69,25 +69,14 @@ class CategoryImage(BaseModel):  # with pagination
 
 
 class CommissionMember(BaseModel):
+    full_name = models.CharField(max_length=100, verbose_name='полное имя')
+    description = HTMLField(verbose_name='описание')
     commission_category = models.ForeignKey(CommissionCategory, on_delete=models.CASCADE,
                                             verbose_name='Категория комиссии', related_name='commission_categories')
+    mandat = models.ForeignKey(to='MandatCategory', on_delete=models.CASCADE, related_name='mandat')
     region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=True, null=True, verbose_name='регион')
-
+    order = models.PositiveIntegerField(default=1)
     image = models.ImageField(upload_to='commission_member/')
-    full_name = models.CharField(max_length=100, verbose_name='полное имя')
-    type = models.PositiveIntegerField(choices=MEMBER_TYPE, default=1, verbose_name='тип')
-    description = HTMLField(verbose_name='описание')
-    position = models.CharField(max_length=80, verbose_name='позиция')
-    birthdate = models.DateField(verbose_name='дата рождения')
-
-    nation = models.CharField(max_length=100, verbose_name='нация')
-    education_degree = models.CharField(max_length=100, verbose_name='степень образования')
-    speciality = models.CharField(max_length=150, verbose_name='специальность')
-    email = models.EmailField(verbose_name='электронная почта')
-
-    telegram_url = models.URLField(blank=True, null=True, verbose_name="телеграм_url")
-    instagram_url = models.URLField(blank=True, null=True, verbose_name="инстаграм_url")
-    facebook_url = models.URLField(blank=True, null=True, verbose_name="фэйсбук_url")
 
     def __str__(self):
         return self.full_name
@@ -95,12 +84,11 @@ class CommissionMember(BaseModel):
     class Meta:
         verbose_name = 'член комиссии'
         verbose_name_plural = 'члены комисси'
-        ordering = ('-created_at',)
+        ordering = ('order',)
 
 
 class MandatCategory(BaseModel):
     name = models.CharField(max_length=250, verbose_name='Назавние')
-    commission_members = models.ManyToManyField(CommissionMember, related_name='members', verbose_name='члены комиссии')
 
     def __str__(self):
         return self.name
@@ -241,3 +229,24 @@ class NormativeDocuments(BaseModel):
         verbose_name = 'нормативный документ'
         verbose_name_plural = 'нормативные документы'
         ordering = ('-created_at',)
+
+
+class Management(BaseModel):
+    full_name = models.CharField(max_length=100, verbose_name='полное имя')
+    description = HTMLField(verbose_name='описание')
+    phone_number = models.CharField(max_length=15)
+    position = models.CharField(max_length=150, verbose_name='позиция')
+    twitter_url = models.URLField(blank=True, null=True, verbose_name="телеграм_url")
+    instagram_url = models.URLField(blank=True, null=True, verbose_name="инстаграм_url")
+    facebook_url = models.URLField(blank=True, null=True, verbose_name="фейсбук_url")
+    order = models.PositiveIntegerField(default=1)
+    image = models.ImageField(upload_to='managements/')
+
+    def __str__(self):
+        return self.full_name
+
+    class Meta:
+        verbose_name = 'Управление'
+        verbose_name_plural = 'Управлении'
+        ordering = ('-created_at',)
+
