@@ -108,7 +108,6 @@ class CommissionViewSet(ViewSet):
                                                            ).data, 'ok': True}, status=status.HTTP_200_OK)
 
         commission_members = CommissionMember.objects.filter(filter_).filter(type=1)
-
         serializer = CommissionMemberSerializer(commission_members, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
@@ -125,7 +124,7 @@ class CommissionViewSet(ViewSet):
 
     @swagger_auto_schema(
         operation_summary="Commission category detail, pk receive category id",
-        operation_description="Commission category detail, pk receive category id",
+        operation_description="Commission category detail, pk receive category id, return all information about members, images and description related to this category",
         responses={200: CommissionCategoryResponseSerializer()},
         tags=["Commission"]
     )
