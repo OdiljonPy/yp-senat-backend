@@ -20,7 +20,8 @@ from .serializers import (
     AppealSerializer, ParamValidateSerializer,
     CategorySerializer, PostCategoryFilterSerializer,
     PostSerializer, PostFilterSerializer, MandatCategorySerializer,
-    AppealStatSerializer, MandatFilterSerializer, VideoSerializer, CommissionCategoryResponseSerializer
+    AppealStatSerializer, MandatFilterSerializer, VideoSerializer, CommissionCategoryResponseSerializer,
+    ProjectsResponseSerializer
 )
 from .utils import get_ip
 
@@ -156,7 +157,7 @@ class ProjectViewSet(ViewSet):
         tags=['Project']
     )
     def filter_by_query_param(self, request):
-        serializer = ParamValidateSerializer(data=request.query_params, context={'request': request})
+        serializer = ProjectsResponseSerializer(data=request.query_params, context={'request': request})
         if not serializer.is_valid():
             raise CustomApiException(ErrorCodes.VALIDATION_FAILED, serializer.errors)
         status_ = serializer.validated_data.get('status')
