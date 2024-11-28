@@ -12,7 +12,7 @@ class RegionTranslationOption(TranslationOptions):
 
 
 class CommissionCategoryTranslationOption(TranslationOptions):
-    fields = ('name',)
+    fields = ('name', "description",)
 
 
 class CommissionMemberTranslationOption(TranslationOptions):
