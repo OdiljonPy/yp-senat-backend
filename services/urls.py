@@ -21,8 +21,6 @@ urlpatterns = [
          name='region_commission'),
     path('commission/category/', CommissionViewSet.as_view({'get': 'commission_category_list'}),
          name='commission_category'),
-    path('commission/images/<int:pk>/', CommissionViewSet.as_view({'get': 'image_list'}), name='images_of_category'),
-
     path('management/', CommissionViewSet.as_view({'get': 'management_members'}), name='management_members'),
     path('appeal/', AppealViewSet.as_view({'post': 'create_appeal'}), name='appeal'),
     path('statistics/', AppealStatViewSet.as_view({'get': 'stats'}), name='appeal_stat'),
