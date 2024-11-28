@@ -74,7 +74,7 @@ class MandatCategory(BaseModel):
 
 class CommissionMember(BaseModel):
     commission_category = models.ForeignKey(CommissionCategory, on_delete=models.CASCADE,
-                                            verbose_name='Категория комиссии')
+                                            verbose_name='Категория комиссии', related_name='commission_categories')
     region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=True, null=True, verbose_name='регион')
 
     mandat = models.ManyToManyField(MandatCategory, verbose_name='Мандат', related_name='mandats')

@@ -68,13 +68,6 @@ class CategoryImageResponseSerializer(serializers.Serializer):
     image = serializers.ImageField(read_only=True)
 
 
-class CommissionCategoryResponseSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    name = serializers.CharField(read_only=True)
-    description = serializers.CharField(read_only=True)
-    category_image = CategoryImageResponseSerializer(many=True, read_only=True)
-
-
 class PostCategory(serializers.Serializer):
     name = serializers.CharField()
 
@@ -116,6 +109,8 @@ class CommissionMemberSerializer(serializers.ModelSerializer):
         self.fields['education_degree'] = serializers.CharField(source=f'education_degree_{language}')
         self.fields['speciality'] = serializers.CharField(source=f'speciality_{language}')
 
+
+
     class Meta:
         model = CommissionMember
         fields = ['id', 'full_name', 'commission_category', 'region', 'type', 'description', 'position', 'birthdate',
@@ -131,6 +126,15 @@ class CommissionMemberSerializer(serializers.ModelSerializer):
                                        context=self.context).data
         data['mandat'] = MandatCategorySerializer(instance.mandat, context=self.context, many=True).data
         return data
+
+
+class CommissionCategoryResponseSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField(read_only=True)
+    description = serializers.CharField(read_only=True)
+
+    category_image = CategoryImageResponseSerializer(many=True, read_only=True)
+    commission_categories = CommissionMemberSerializer(many=True, read_only=True)
 
 
 class ProjectsSerializer(serializers.ModelSerializer):

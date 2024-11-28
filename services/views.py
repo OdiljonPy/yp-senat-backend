@@ -130,25 +130,16 @@ class CommissionViewSet(ViewSet):
             if not str(param).isdigit():
                 raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT, message='category id must be integer')
 
-            members = CommissionMember.objects.filter(commission_category_id=param).select_related(
-                'commission_category', 'region')
-            serializer = CommissionMemberSerializer(members, many=True, context={'request': request})
+            cat = CommissionCategory.objects.filter(id=param).first()
+
+            serializer = CommissionCategoryResponseSerializer(cat, context={'request': request})
             return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
         categories = CommissionCategory.objects.all()
         serializer = CommissionCategorySerializer(categories, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
-    @swagger_auto_schema(
-        operation_description='get image related to category',
-        operation_summary='get image related to  category',
-        tags=['Commission']
-    )
-    def image_list(self, request, pk):
-        cat = CommissionCategory.objects.filter(id=pk).first()
-        serializer = CommissionCategoryResponseSerializer(cat, context={'request': request})
 
-        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 class ProjectViewSet(ViewSet):
     @swagger_auto_schema(
         manual_parameters=[
