@@ -134,7 +134,7 @@ class CommissionCategoryResponseSerializer(serializers.Serializer):
     description = serializers.CharField(read_only=True)
 
     category_image = CategoryImageResponseSerializer(many=True, read_only=True)
-    commission_categoryes = CommissionMemberSerializer(many=True, read_only=True)
+    commission_categories = CommissionMemberSerializer(many=True, read_only=True)
 
 
 class ProjectsSerializer(serializers.ModelSerializer):
