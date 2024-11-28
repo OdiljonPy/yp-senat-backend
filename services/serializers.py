@@ -1,6 +1,3 @@
-from random import choices
-from urllib.request import Request
-
 from rest_framework import serializers
 
 from config import settings
@@ -9,7 +6,7 @@ from exceptions.exception import CustomApiException
 from .models import (
     Region, CommissionCategory,
     CommissionMember, Projects,
-    Post, Appeal, PROJECT_STATUS, Video, MandatCategory, DOC_TYPE_CHOICES)
+    Post, Appeal, PROJECT_STATUS, Video, DOC_TYPE_CHOICES)
 
 
 class VideoSerializer(serializers.ModelSerializer):
@@ -156,7 +153,7 @@ class ProjectsSerializer(serializers.ModelSerializer):
 class AppealSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appeal
-        fields = ['id', 'commission_member', 'full_name', 'phone_number', 'email', 'message']
+        fields = ['id', 'full_name', 'phone_number', 'email', 'message']
 
 
 class PostFilterSerializer(ParamValidateSerializer):

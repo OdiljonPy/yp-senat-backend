@@ -3,7 +3,7 @@ from .models import (Region, CommissionCategory,
                      CommissionMember, Projects,
                      Appeal, Post, PostCategory,
                      Visitors, MandatCategory,
-                     AppealStat, Video, CategoryImage)
+                     AppealStat, Video, CategoryImage, NormativeDocuments)
 
 
 @admin.register(Video)
@@ -93,3 +93,8 @@ class PostCategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     list_display_links = ('id', 'name')
     search_fields = ('name',)
+
+
+@admin.register(NormativeDocuments)
+class NormativeDocumentsAdmin(admin.ModelAdmin):
+    pass
