@@ -1,14 +1,18 @@
 from modeltranslation.translator import translator, TranslationOptions
-from .models import (Region, CommissionCategory,
-                     CommissionMember, Projects,
-                     Appeal, Post, Video, PostCategory,
-                     MandatCategory)
+from .models import (
+    Region, CommissionCategory, CommissionMember,
+    Projects, Appeal, Post, Video, PostCategory,
+    MandatCategory, Management
+)
+
 
 class MandatCategoryTranslationOption(TranslationOptions):
     fields = ('name',)
 
+
 class VideoTranslationOption(TranslationOptions):
     fields = ('title',)
+
 
 class RegionTranslationOption(TranslationOptions):
     fields = ('name',)
@@ -19,7 +23,7 @@ class CommissionCategoryTranslationOption(TranslationOptions):
 
 
 class CommissionMemberTranslationOption(TranslationOptions):
-    fields = ('full_name', 'description', 'position', 'nation', 'education_degree', 'speciality')
+    fields = ('full_name', 'description',)
 
 
 class ProjectsTranslationOption(TranslationOptions):
@@ -38,6 +42,9 @@ class PostCategoryTranslationOption(TranslationOptions):
     fields = ('name',)
 
 
+class ManagementTranslationOption(TranslationOptions):
+    fields = ('full_name', 'description', 'position')
+
 
 translator.register(MandatCategory, MandatCategoryTranslationOption)
 translator.register(Video, VideoTranslationOption)
@@ -48,3 +55,4 @@ translator.register(CommissionCategory, CommissionCategoryTranslationOption)
 translator.register(Projects, ProjectsTranslationOption)
 translator.register(Appeal, AppealTranslationOption)
 translator.register(PostCategory, PostCategoryTranslationOption)
+translator.register(Management, ManagementTranslationOption)

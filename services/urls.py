@@ -1,9 +1,9 @@
 from django.urls import path
 
 from .views import (
-    RegionViewSet, CommissionViewSet,
-    ProjectViewSet, AppealViewSet,
-    PostViewSet, AppealStatViewSet, MandatCategoryViewSet, VideoViewSet
+    RegionViewSet, CommissionViewSet, ProjectViewSet, AppealViewSet,
+    PostViewSet, AppealStatViewSet, MandatCategoryViewSet, VideoViewSet,
+    ManagementViewSet
 )
 
 urlpatterns = [
@@ -15,15 +15,12 @@ urlpatterns = [
     path('categories/', PostViewSet.as_view({'get': 'list'}), name='category_list'),
     path('banner/', PostViewSet.as_view({'get': 'banner'}), name='banner'),
 
-    path('commission/<int:pk>/', CommissionViewSet.as_view({'get': 'commission_member_detail'}),
-         name='commission_detail'),
-    path('region/commissions/', CommissionViewSet.as_view({'get': 'commission_member_by_region'}),
-         name='region_commission'),
+    path('commission/', CommissionViewSet.as_view({'get': 'commission_list'}), name='commission_list'),
     path('commission/category/', CommissionViewSet.as_view({'get': 'commission_category_list'}),
          name='commission_category'),
     path('commission/category/<int:pk>/', CommissionViewSet.as_view({'get': "commission_category_detail"}),
          name='commission_category_detail'),
-    path('management/', CommissionViewSet.as_view({'get': 'management_members'}), name='management_members'),
+    path('management/', ManagementViewSet.as_view({'get': 'management_list'}), name='management_members'),
     path('appeal/', AppealViewSet.as_view({'post': 'create_appeal'}), name='appeal'),
     path('statistics/', AppealStatViewSet.as_view({'get': 'stats'}), name='appeal_stat'),
     path('mandat/', MandatCategoryViewSet.as_view({'get': 'mandat_list'}), name='mandat_list'),
