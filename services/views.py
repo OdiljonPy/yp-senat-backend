@@ -82,16 +82,17 @@ class CommissionViewSet(ViewSet):
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
-        operation_summary='Commission members by region id',
+        operation_summary='Commission members by Region id and Mandat id',
+        operation_description='Commission members by Region id and Mandat id',
         manual_parameters=[
             openapi.Parameter(
-                name='region_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Region id'),
+                name='region_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER,
+                description='Get commissions related to region'),
             openapi.Parameter(
-                name='mandat_id', in_=openapi.IN_QUERY, description='get commissions related to mandat',
-                type=openapi.TYPE_INTEGER
+                name='mandat_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER,
+                description='Get commissions related to mandat'
             ),
         ],
-        operation_description='List of commission members by region id',
         responses={200: CommissionMemberSerializer(many=True)},
         tags=['Commission']
     )
@@ -149,7 +150,8 @@ class ProjectViewSet(ViewSet):
             openapi.Parameter(
                 name='page_size', in_=openapi.IN_QUERY, description='Page size', type=openapi.TYPE_INTEGER),
             openapi.Parameter(
-                name='status', in_=openapi.IN_QUERY, description='Status', type=openapi.TYPE_INTEGER)
+                name='status', in_=openapi.IN_QUERY, description='1 = Finished, 2 = Inprocess',
+                type=openapi.TYPE_INTEGER)
         ],
         operation_summary='List of projects by type',
         operation_description='List of projects by type',
@@ -259,16 +261,17 @@ class PostViewSet(ViewSet):
                         status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
-        manual_parameters=[
-            openapi.Parameter(name='category_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER,
-                              description='Category id'),
-            openapi.Parameter(
-                name='page', in_=openapi.IN_QUERY, description='Page', type=openapi.TYPE_INTEGER),
-            openapi.Parameter(
-                name='page_size', in_=openapi.IN_QUERY, description='Page size', type=openapi.TYPE_INTEGER),
-        ],
         operation_summary='List of posts by category id',
         operation_description="List of posts by category id",
+        manual_parameters=[
+            openapi.Parameter(
+                name='category_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER,
+                description='Get posts related to category id'),
+            openapi.Parameter(
+                name='page', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Page'),
+            openapi.Parameter(
+                name='page_size', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Page size'),
+        ],
         responses={200: PostSerializer(many=True)},
         tags=['Post']
     )
