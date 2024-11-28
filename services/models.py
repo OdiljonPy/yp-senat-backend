@@ -209,3 +209,16 @@ class Video(BaseModel):
         verbose_name = 'Видео'
         verbose_name_plural = 'Видео'
         ordering = ('-created_at',)
+
+
+class Normative_documents(BaseModel):
+    file = models.FileField(upload_to='normative/', verbose_name='файл')
+    content = HTMLField(verbose_name='контент')
+
+    def __str__(self):
+        return self.id
+
+    class Meta:
+        verbose_name = 'нормативный документ'
+        verbose_name_plural = 'нормативные документы'
+        ordering = ('-created_at',)
