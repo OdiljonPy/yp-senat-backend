@@ -164,9 +164,9 @@ class ProjectViewSet(ViewSet):
         query = Q()
         if status_:
             query &= Q(status=status_)
-        projects = Projects.objects.filter(query, is_published=True).order_by('id')
+        projects = Projects.objects.filter(query, is_published=True).order_by('-created_at')
         response = get_projects_filter(
-            context={'request': request, 'project_param': projects}, page=page, page_size=page_size)
+            context={'request': request}, project_param=projects, page=page, page_size=page_size)
         return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
 
 
