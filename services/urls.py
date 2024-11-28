@@ -19,7 +19,7 @@ urlpatterns = [
          name='region_commission'),
     path('commission/category/', CommissionViewSet.as_view({'get': 'commission_category_list'}),
          name='commission_category'),
-
+    path('management/', CommissionViewSet.as_view({'get': 'management_members'}), name='management_members'),
     path('appeal/', AppealViewSet.as_view({'post': 'create_appeal'}), name='appeal'),
     path('visitors/', VisitorsViewSet.as_view({'get': 'get'}), name='visitors'),
     path('statistics/', AppealStatViewSet.as_view({'get': 'stats'}), name='appeal_stat'),

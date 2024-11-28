@@ -1,5 +1,4 @@
 from datetime import date
-
 from django.db.models import Q
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -11,7 +10,6 @@ from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
 from .repository.pagination import get_post_list, get_mandat_filter
 from .repository.get_project_filter import get_projects_filter
-from .repository.video_pagination import get_video_list
 from .models import (Region, CommissionCategory,
                      CommissionMember, Projects,
                      Post, Visitors,
@@ -28,14 +26,9 @@ from .utils import get_ip
 
 class VideoViewSet(ViewSet):
     @swagger_auto_schema(
-        manual_parameters=[
-            openapi.Parameter(name='page', in_=openapi.IN_QUERY, description='Page number', type=openapi.TYPE_INTEGER),
-            openapi.Parameter(name='page_size', in_=openapi.IN_QUERY, description='Page size',
-                              type=openapi.TYPE_INTEGER)
-        ],
         operation_summary='Video',
         operation_description='Video',
-        responses={200: VideoSerializer()},
+        responses={200: VideoSerializer(many=True)},
         tags=['Video']
     )
     def video_list(self, request):
@@ -44,10 +37,8 @@ class VideoViewSet(ViewSet):
             raise CustomApiException(error_code=ErrorCodes.VALIDATION_FAILED, message=param_serializer.errors)
 
         video = Video.objects.all()
-        pagination = get_video_list(context={'request': request}, response_data=video,
-                                    page=param_serializer.validated_data.get('page'),
-                                    page_size=param_serializer.validated_data.get('page_size'))
-        return Response(data={'result': pagination, 'ok': True}, status=status.HTTP_200_OK)
+        serializer = VideoSerializer(video, many=True)
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
 
 class RegionViewSet(ViewSet):
@@ -75,6 +66,17 @@ class CommissionViewSet(ViewSet):
         if not member:
             raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
         serializer = CommissionMemberSerializer(member, context={'request': request})
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary='Management members',
+        operation_description='Management members',
+        responses={200: CommissionMemberSerializer(many=True)},
+        tags=["Commission"]
+    )
+    def management_members(self, request):
+        management_members = CommissionMember.objects.filter(type=3)
+        serializer = CommissionMemberSerializer(management_members, many=True)
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(

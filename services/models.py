@@ -15,8 +15,9 @@ PROJECT_STATUS = (
 )
 
 MEMBER_TYPE = (
-    (1, 'Постоянный'),
+    (1, "Постоянный"),
     (2, "Региональный"),
+    (3, "Руководство")
 )
 
 
@@ -194,3 +195,4 @@ class Video(BaseModel):
         verbose_name = 'Видео'
         verbose_name_plural = 'Видео'
         ordering = ('-created_at',)
+
