@@ -248,5 +248,4 @@ class Management(BaseModel):
     class Meta:
         verbose_name = 'Управление'
         verbose_name_plural = 'Управлении'
-        ordering = ('-created_at',)
-
+        ordering = ('order',)
