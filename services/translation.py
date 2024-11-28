@@ -5,11 +5,14 @@ from .models import (Region, CommissionCategory,
                      MandatCategory, NormativeDocuments
                      )
 
+
 class MandatCategoryTranslationOption(TranslationOptions):
     fields = ('name',)
 
+
 class VideoTranslationOption(TranslationOptions):
     fields = ('title',)
+
 
 class RegionTranslationOption(TranslationOptions):
     fields = ('name',)
@@ -41,7 +44,6 @@ class PostCategoryTranslationOption(TranslationOptions):
 
 class NormativeDocumentsTranslationOption(TranslationOptions):
     fields = ('name',)
-
 
 
 translator.register(MandatCategory, MandatCategoryTranslationOption)

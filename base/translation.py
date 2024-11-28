@@ -3,6 +3,7 @@ from .models import (AboutUs, AdditionalLinks,
                      FAQ, Poll,
                      BaseInfo)
 
+
 class AboutUsTranslationOption(TranslationOptions):
     fields = ('description',)
 

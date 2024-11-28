@@ -1,29 +1,29 @@
 from datetime import date
-
 from django.db.models import Q
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
-
+from .repository.get_project_filter import get_projects_filter
+from .repository.pagination import get_post_list
+from .utils import get_ip
 from exceptions.error_messages import ErrorCodes
+
 from exceptions.exception import CustomApiException
 from .models import (Region, CommissionCategory,
                      CommissionMember, Projects,
                      Post, Visitors,
                      AppealStat, MandatCategory, Video, PostCategory, NormativeDocuments)
-from .repository.get_project_filter import get_projects_filter
-from .repository.pagination import get_post_list
+
 from .serializers import (
     RegionSerializer, CommissionMemberSerializer,
     ProjectsSerializer, CommissionCategorySerializer,
     AppealSerializer, CategorySerializer, PostCategoryFilterSerializer,
-    PostSerializer, PostFilterSerializer, MandatCategorySerializer,
+    PostSerializer, MandatCategorySerializer,
     AppealStatSerializer, VideoSerializer, CommissionCategoryResponseSerializer,
     MandatCategoryDetailSerializer, ProjectsResponseSerializer, NormativeDocumentsSerializer
 )
-from .utils import get_ip
 
 
 class VideoViewSet(ViewSet):
@@ -243,8 +243,8 @@ class PostViewSet(ViewSet):
             filter_ &= Q(category_id=category_id)
         posts = Post.objects.filter(filter_, is_published=True).order_by('-created_at')
         response = get_post_list(request_data=posts, context={'request': request},
-                                 page=serializer_params.validated_data.get('page', 1),
-                                 page_size=serializer_params.validated_data.get('page_size', 10)
+                                 page=serializer_params.validated_data.get('page'),
+                                 page_size=serializer_params.validated_data.get('page_size')
                                  )
         return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
 
