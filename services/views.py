@@ -254,7 +254,8 @@ class PostViewSet(ViewSet):
 
         serializer = PostSerializer(obj, context={'request': request})
         related_serializer = PostSerializer(related_posts, many=True, context={'request': request})
-        return Response(data={'result': serializer.data, 'related_posts': related_serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+        return Response(data={'result': serializer.data, 'related_posts': related_serializer.data, 'ok': True},
+                        status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         manual_parameters=[
@@ -299,28 +300,16 @@ class PostViewSet(ViewSet):
         serializer = PostSerializer(posts, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
-
-
-class CategoryViewSet(ViewSet):
     @swagger_auto_schema(
-        operation_summary='Category list',
-        operation_description='Category list',
+        operation_summary='Category list of posts',
+        operation_description='Category list of posts',
         responses={200: CategorySerializer(many=True)},
-        tags=['Category']
+        tags=['Post']
     )
     def list(self, request):
         categories = PostCategory.objects.all()
         serializer = CategorySerializer(categories, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
-
-
-class VisitorsViewSet(ViewSet):
-    @swagger_auto_schema(
-        operation_summary='Visitors',
-        operation_description='Visitors',
-        tags=['Visitors'])
-    def get(self, request):
-        return Response(data={'result': Visitors.objects.all().count(), 'ok': True}, status=status.HTTP_200_OK)
 
 
 class MandatCategoryViewSet(ViewSet):

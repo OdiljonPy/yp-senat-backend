@@ -3,8 +3,7 @@ from django.urls import path
 from .views import (
     RegionViewSet, CommissionViewSet,
     ProjectViewSet, AppealViewSet,
-    PostViewSet, VisitorsViewSet,
-    AppealStatViewSet, MandatCategoryViewSet, VideoViewSet, CategoryViewSet
+    PostViewSet, AppealStatViewSet, MandatCategoryViewSet, VideoViewSet
 )
 
 urlpatterns = [
@@ -13,7 +12,7 @@ urlpatterns = [
     # path('post/member/', PostViewSet.as_view({'get': 'post_list_by_members'}), name='post_by_member'),
     path('post/<int:pk>/', PostViewSet.as_view({'get': "post_detail"}), name='post_detail'),
     path('posts/', PostViewSet.as_view({'get': 'post_list_by_category'}), name='posts_by_category_id'),
-    path('categories/', CategoryViewSet.as_view({'get': 'list'}), name='category_list'),
+    path('categories/', PostViewSet.as_view({'get': 'list'}), name='category_list'),
     path('banner/', PostViewSet.as_view({'get': 'banner'}), name='banner'),
 
     path('commission/<int:pk>/', CommissionViewSet.as_view({'get': 'commission_member_detail'}),
