@@ -114,27 +114,27 @@ class CommissionViewSet(ViewSet):
 
     @swagger_auto_schema(
         operation_summary='List Of Commission Categories',
-        manual_parameters=[
-            openapi.Parameter(name='category_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER,
-                              description='Receive category id and return category detail')
-        ],
         operation_description='List of commission categories',
         responses={200: CommissionCategorySerializer(many=True)},
         tags=['Commission']
     )
     def commission_category_list(self, request):
-        param = request.query_params.get('category_id')
-        if param:
-            if not str(param).isdigit():
-                raise CustomApiException(error_code=ErrorCodes.INVALID_INPUT, message='category id must be integer')
-
-            cat = CommissionCategory.objects.filter(id=param).first()
-
-            serializer = CommissionCategoryResponseSerializer(cat, context={'request': request})
-            return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
-
         categories = CommissionCategory.objects.all()
         serializer = CommissionCategorySerializer(categories, many=True, context={'request': request})
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_summary="Commission category detail, pk receive category id",
+        operation_description="Commission category detail, pk receive category id",
+        responses={200: CommissionCategoryResponseSerializer()},
+        tags=["Commission"]
+    )
+    def commission_category_detail(self, request, pk):
+        cat = CommissionCategory.objects.filter(id=pk).first()
+        if not cat:
+            raise CustomApiException(error_code=ErrorCodes.NOT_FOUND)
+
+        serializer = CommissionCategoryResponseSerializer(cat, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
 
@@ -216,7 +216,7 @@ class PostViewSet(ViewSet):
 
         filter_ = Q()
         if q:
-            filter_ &= (Q(short_description__icontains=q) | Q(description__icontains=q))
+            filter_ &= (Q(short_description__icontains=q) | Q(description__icontains=q) | Q(title__icontains=q))
         if post_member is True:
             filter_ &= (Q(commission_member__isnull=True, is_published=True))
         if post_member is False:
