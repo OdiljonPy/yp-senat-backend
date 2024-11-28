@@ -22,6 +22,7 @@ class VideoSerializer(serializers.ModelSerializer):
         model = Video
         fields = ['id', 'title', 'video']
 
+
 class ParamValidateSerializer(serializers.Serializer):
     page = serializers.IntegerField(required=False, default=1)
     page_size = serializers.IntegerField(required=False, default=10)
@@ -55,17 +56,27 @@ class CommissionCategorySerializer(serializers.ModelSerializer):
         if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
             language = request.META.get('HTTP_ACCEPT_LANGUAGE')
         self.fields['name'] = serializers.CharField(source=f'name_{language}')
+        self.fields['description'] = serializers.CharField(source=f'description_{language}')
 
     class Meta:
         model = CommissionCategory
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'description']
+
+
+class CategoryImageResponseSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    image = serializers.ImageField(read_only=True)
+
+
+class CommissionCategoryResponseSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField(read_only=True)
+    description = serializers.CharField(read_only=True)
+    category_image = CategoryImageResponseSerializer(many=True, read_only=True)
 
 
 class PostCategory(serializers.Serializer):
     name = serializers.CharField()
-
-
-
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -81,12 +92,11 @@ class PostSerializer(serializers.ModelSerializer):
 
     views_count = serializers.IntegerField(source='views.count', read_only=True)
 
-
-
     class Meta:
         model = Post
         fields = ['id', 'title', 'views_count', 'image', 'short_description', 'description', 'commission_member',
                   'created_at', 'is_published', 'published_date']
+
 
 class MandatCategorySerializer(serializers.Serializer):
     name = serializers.CharField(max_length=250)
@@ -106,10 +116,9 @@ class CommissionMemberSerializer(serializers.ModelSerializer):
         self.fields['education_degree'] = serializers.CharField(source=f'education_degree_{language}')
         self.fields['speciality'] = serializers.CharField(source=f'speciality_{language}')
 
-
     class Meta:
         model = CommissionMember
-        fields = ['id', 'full_name', 'commission_category','region', 'type', 'description', 'position', 'birthdate',
+        fields = ['id', 'full_name', 'commission_category', 'region', 'type', 'description', 'position', 'birthdate',
                   'nation', 'education_degree', 'speciality', 'email', 'telegram_url', 'facebook_url', 'instagram_url']
 
     def to_representation(self, instance):
@@ -164,9 +173,6 @@ class PostCategoryFilterSerializer(ParamValidateSerializer):
 
 class MandatFilterSerializer(ParamValidateSerializer):
     id = serializers.IntegerField(required=False)
-
-
-
 
 
 class AppealStatSerializer(serializers.Serializer):

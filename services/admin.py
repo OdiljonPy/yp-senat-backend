@@ -3,7 +3,7 @@ from .models import (Region, CommissionCategory,
                      CommissionMember, Projects,
                      Appeal, Post, PostCategory,
                      Visitors, MandatCategory,
-                     AppealStat, Video)
+                     AppealStat, Video, CategoryImage)
 
 
 @admin.register(Video)
@@ -22,7 +22,7 @@ class CommissionMemberTabularInline(admin.TabularInline):
 class RegionAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     list_display_links = ('id', 'name')
-    search_fields = ('region',)
+    search_fields = ('name',)
     inlines = [CommissionMemberTabularInline]
 
 
@@ -86,6 +86,10 @@ class MandatCategoryAdmin(admin.ModelAdmin):
 @admin.register(AppealStat)
 class AppealStatAdmin(admin.ModelAdmin):
     list_display = ('id', 'incoming_appeals', 'resolved_appeals', 'explained_appeals', 'rejected_appeals')
+
+@admin.register(CategoryImage)
+class CategoryImageAdmin(admin.ModelAdmin):
+    list_display = ('id', 'category')
 
 
 @admin.register(PostCategory)
