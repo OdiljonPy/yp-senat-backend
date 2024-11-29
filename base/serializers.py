@@ -2,21 +2,12 @@ from config import settings
 from rest_framework import serializers
 from .models import (FAQ, AboutUs,
                      AdditionalLinks, Poll,
-                     BaseInfo, Banner)
+                     BaseInfo, STATUS_POLL)
 
 
-class BannerSerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        request = self.context.get('request')
-        language = 'ru'
-        if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
-            language = request.META.get('HTTP_ACCEPT_LANGUAGE')
-        self.fields['title'] = serializers.CharField(source=f'title_{language}')
-
-    class Meta:
-        model = Banner
-        fields = ['id', 'image', 'title', 'created_at', 'is_published']
+class PollParamSerializer(serializers.Serializer):
+    poll_name = serializers.CharField(max_length=150, required=False)
+    poll_status = serializers.ChoiceField(choices=STATUS_POLL, required=False)
 
 
 class FAQSerializer(serializers.ModelSerializer):

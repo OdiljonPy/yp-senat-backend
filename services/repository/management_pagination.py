@@ -1,12 +1,11 @@
 from django.core.paginator import Paginator
 from django.db.models import Count
-from services.serializers import ProjectsSerializer
+from services.serializers import ManagementSerializer
 
 
-def get_projects_filter(context: dict, project_param, page: int, page_size: int):
-    projects = project_param
-    total_projects = projects.aggregate(count=Count('id'))['count']
-    paginator = Paginator(projects, page_size)
+def get_managements(managements, context: dict, page: int, page_size: int):
+    total_projects = managements.aggregate(count=Count('id'))['count']
+    paginator = Paginator(managements, page_size)
     page_obj = paginator.get_page(page)
 
     responses = {
@@ -18,6 +17,6 @@ def get_projects_filter(context: dict, project_param, page: int, page_size: int)
         "first": not page_obj.has_previous(),
         "last": not page_obj.has_next(),
         "empty": total_projects == 0,
-        "content": ProjectsSerializer(page_obj, many=True, context=context).data,
+        "content": ManagementSerializer(page_obj, many=True, context=context).data,
     }
     return responses

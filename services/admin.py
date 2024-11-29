@@ -1,7 +1,8 @@
 from django.contrib import admin
 from .models import (
     Region, CommissionCategory, CommissionMember, Projects,
-    Appeal, Post, PostCategory, MandatCategory, AppealStat, Video, CategoryImage
+    Appeal, Post, PostCategory, Visitors, MandatCategory,
+    AppealStat, Video, CategoryImage, Management, NormativeDocuments
 )
 
 
@@ -34,10 +35,9 @@ class CommissionCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(CommissionMember)
 class CommissionMemberAdmin(admin.ModelAdmin):
-    list_display = ('id', 'full_name', 'type')
+    list_display = ('id', 'full_name', 'order')
     list_display_links = ('id', 'full_name')
     search_fields = ('full_name', 'description')
-    list_filter = ('type',)
 
 
 @admin.register(Projects)
@@ -50,7 +50,7 @@ class ProjectsAdmin(admin.ModelAdmin):
 
 @admin.register(Appeal)
 class AppealAdmin(admin.ModelAdmin):
-    list_display = ('id', 'full_name', 'commission_member', 'phone_number', 'is_resolved')
+    list_display = ('id', 'full_name', 'phone_number', 'is_resolved')
     list_display_links = ('id', 'full_name')
     search_fields = ('full_name', 'phone_number', 'email')
     list_filter = ('is_resolved',)
@@ -58,10 +58,10 @@ class AppealAdmin(admin.ModelAdmin):
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'view_count')
+    list_display = ('id', 'title', 'view_count', "category")
     list_display_links = ('id', 'title')
     search_fields = ('title', 'description', 'short_description')
-    list_filter = ('is_published',)
+    list_filter = ("is_banner", 'is_published')
 
     def view_count(self, obj):
         return obj.views.count()
@@ -91,3 +91,15 @@ class PostCategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     list_display_links = ('id', 'name')
     search_fields = ('name',)
+
+@admin.register(Management)
+class ManagementAdmin(admin.ModelAdmin):
+    list_display = ('id', 'full_name','order')
+    list_display_links = ('id', 'full_name')
+
+@admin.register(NormativeDocuments)
+class NormativeDocumentsAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'doc_type')
+    list_display_links = ('id', 'name')
+    search_fields = ('name',)
+    list_filter = ('doc_type',)

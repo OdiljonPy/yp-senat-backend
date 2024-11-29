@@ -1,7 +1,7 @@
 from django.contrib import admin
-from .models import (
-    FAQ, AboutUs, AdditionalLinks, BaseInfo, Poll
-)
+from .models import (FAQ, AboutUs,
+                     AdditionalLinks, BaseInfo,
+                     Poll)
 
 
 @admin.register(FAQ)

@@ -14,20 +14,6 @@ STATUS_POLL = (
 )
 
 
-class Banner(BaseModel):
-    image = models.ImageField(upload_to='banner/', verbose_name='Изображение')
-    title = models.CharField(max_length=255, verbose_name='Текст')
-    is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
-
-    def __str__(self):
-        return str(self.id) or ''
-
-    class Meta:
-        verbose_name = 'Баннер'
-        verbose_name_plural = 'Баннеры'
-        ordering = ('-created_at',)
-
-
 class FAQ(BaseModel):
     question = models.TextField(max_length=700, verbose_name='вопрос')
     answer = models.TextField(max_length=1000, verbose_name='ответ')

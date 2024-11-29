@@ -1,7 +1,9 @@
+import os
 from django.db import models
 from tinymce.models import HTMLField
 
 from abstract_models.base_model import BaseModel
+from services.utils import validate_file_type_and_size
 from utils.validations import phone_number_validation
 
 GENDER = (
@@ -18,6 +20,12 @@ MEMBER_TYPE = (
     (1, "Постоянный"),
     (2, "Региональный"),
     (3, "Руководство")
+)
+
+DOC_TYPE_CHOICES = (
+    ('pdf', 'PDF'),
+    ('doc', 'Word'),
+    ('xls', 'Excel'),
 )
 
 
@@ -61,25 +69,14 @@ class CategoryImage(BaseModel):  # with pagination
 
 
 class CommissionMember(BaseModel):
+    full_name = models.CharField(max_length=100, verbose_name='полное имя')
+    description = HTMLField(verbose_name='описание')
     commission_category = models.ForeignKey(CommissionCategory, on_delete=models.CASCADE,
                                             verbose_name='Категория комиссии', related_name='commission_categories')
+    mandat = models.ForeignKey(to='MandatCategory', on_delete=models.CASCADE, related_name='mandat', null=True, blank=True)
     region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=True, null=True, verbose_name='регион')
-
+    order = models.PositiveIntegerField(default=1)
     image = models.ImageField(upload_to='commission_member/')
-    full_name = models.CharField(max_length=100, verbose_name='полное имя')
-    type = models.PositiveIntegerField(choices=MEMBER_TYPE, default=1, verbose_name='тип')
-    description = HTMLField(verbose_name='описание')
-    position = models.CharField(max_length=80, verbose_name='позиция')
-    birthdate = models.DateField(verbose_name='дата рождения')
-
-    nation = models.CharField(max_length=100, verbose_name='нация')
-    education_degree = models.CharField(max_length=100, verbose_name='степень образования')
-    speciality = models.CharField(max_length=150, verbose_name='специальность')
-    email = models.EmailField(verbose_name='электронная почта')
-
-    telegram_url = models.URLField(blank=True, null=True, verbose_name="телеграм_url")
-    instagram_url = models.URLField(blank=True, null=True, verbose_name="инстаграм_url")
-    facebook_url = models.URLField(blank=True, null=True, verbose_name="фэйсбук_url")
 
     def __str__(self):
         return self.full_name
@@ -87,12 +84,11 @@ class CommissionMember(BaseModel):
     class Meta:
         verbose_name = 'член комиссии'
         verbose_name_plural = 'члены комисси'
-        ordering = ('-created_at',)
+        ordering = ('order',)
 
 
 class MandatCategory(BaseModel):
     name = models.CharField(max_length=250, verbose_name='Назавние')
-    commission_members = models.ManyToManyField(CommissionMember, related_name='members', verbose_name='члены комиссии')
 
     def __str__(self):
         return self.name
@@ -102,12 +98,13 @@ class MandatCategory(BaseModel):
         verbose_name_plural = 'Категория мандатов'
         ordering = ('-created_at',)
 
+
 class Projects(BaseModel):
     name = models.CharField(max_length=100, verbose_name='навзание')
     short_description = models.CharField(max_length=200, verbose_name='Краткое описание')
     description = HTMLField(verbose_name='описание')
     image = models.ImageField(upload_to='project/', verbose_name='изображение')
-    file = models.FileField(upload_to="project/", verbose_name='файл')
+    file = models.FileField(upload_to="project/", verbose_name='файл', validators=[validate_file_type_and_size])
     status = models.PositiveIntegerField(choices=PROJECT_STATUS, default=2, verbose_name='статус')
     is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
 
@@ -121,12 +118,10 @@ class Projects(BaseModel):
 
 
 class Appeal(BaseModel):
-    commission_member = models.ForeignKey(CommissionMember, on_delete=models.CASCADE, blank=True, null=True)
-
-    full_name = models.CharField(max_length=100, verbose_name='Полное имя')
+    full_name = models.CharField(max_length=100, verbose_name='Полное имя', null=True, blank=True)
     phone_number = models.CharField(max_length=14, validators=[phone_number_validation], verbose_name='номер телефона')
-    email = models.EmailField(verbose_name='электронная почта')
-    message = models.TextField(verbose_name='сообщение')
+    email = models.EmailField(verbose_name='электронная почта', null=True, blank=True)
+    message = models.TextField(verbose_name='сообщение', null=True, blank=True)
     is_resolved = models.BooleanField(default=False, verbose_name="решено")
 
     def __str__(self):
@@ -159,13 +154,8 @@ class PostCategory(BaseModel):
 
 
 class Post(BaseModel):
-    commission_member = models.ForeignKey(CommissionMember, on_delete=models.SET_NULL, blank=True, null=True,
-                                          related_name='member_post',
-                                          verbose_name="член комиссии")
     views = models.ManyToManyField(Visitors, blank=True, verbose_name="количество просмотров")
-
-    category = models.ForeignKey(PostCategory, on_delete=models.SET_NULL, blank=True, null=True)
-
+    category = models.ForeignKey(PostCategory, on_delete=models.CASCADE, blank=True, null=True)
     title = models.CharField(max_length=255, verbose_name="заголовок")
     image = models.ImageField(upload_to='post/', verbose_name="изображение")
     short_description = models.CharField(max_length=200, verbose_name="краткое описание")
@@ -190,7 +180,7 @@ class AppealStat(BaseModel):
     rejected_appeals = models.PositiveIntegerField(default=0, verbose_name='отклоненные обрашения')
 
     def __str__(self):
-        return str(self.incoming_appeals)
+        return str(self.id)
 
     class Meta:
         verbose_name = 'Статистика обрашения'
@@ -203,7 +193,7 @@ class Video(BaseModel):
     video = models.URLField(verbose_name='видео')
 
     def __str__(self):
-        return str(self.id)
+        return self.title
 
     class Meta:
         verbose_name = 'Видео'
@@ -211,14 +201,51 @@ class Video(BaseModel):
         ordering = ('-created_at',)
 
 
-class Normative_documents(BaseModel):
-    file = models.FileField(upload_to='normative/', verbose_name='файл')
-    content = HTMLField(verbose_name='контент')
+class NormativeDocuments(BaseModel):
+    name = models.CharField(max_length=200, null=True, blank=True, verbose_name='название')
+    file = models.FileField(upload_to='normative/', verbose_name='файл', null=True, blank=True,
+                            validators=[validate_file_type_and_size])
+    doc_type = models.CharField(max_length=5, choices=DOC_TYPE_CHOICES, editable=False, verbose_name="тип документа")
+
+    def save(self, *args, **kwargs):
+        if self.file:
+            # Extract file extension
+            ext = os.path.splitext(self.file.name)[1].lower()
+
+            # Set doc_type based on file extension
+            if ext in ['.doc', '.docx']:
+                self.doc_type = 'doc'
+            elif ext in ['.xls', '.xlsx']:
+                self.doc_type = 'xls'
+            elif ext == '.pdf':
+                self.doc_type = 'pdf'
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.id
+        return self.name
 
     class Meta:
         verbose_name = 'нормативный документ'
         verbose_name_plural = 'нормативные документы'
         ordering = ('-created_at',)
+
+
+class Management(BaseModel):
+    full_name = models.CharField(max_length=100, verbose_name='полное имя')
+    description = HTMLField(verbose_name='описание')
+    phone_number = models.CharField(max_length=15)
+    position = models.CharField(max_length=150, verbose_name='позиция')
+    twitter_url = models.URLField(blank=True, null=True, verbose_name="телеграм_url")
+    instagram_url = models.URLField(blank=True, null=True, verbose_name="инстаграм_url")
+    facebook_url = models.URLField(blank=True, null=True, verbose_name="фейсбук_url")
+    order = models.PositiveIntegerField(default=1)
+    image = models.ImageField(upload_to='managements/')
+
+    def __str__(self):
+        return self.full_name
+
+    class Meta:
+        verbose_name = 'Управление'
+        verbose_name_plural = 'Управлении'
+        ordering = ('order',)

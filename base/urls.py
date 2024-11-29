@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import (
-    FAQViewSet, AboutUsViewSet, AdditionalLinksViewSet, BaseInfoViewSet, PollViewSet
-)
+from .views import (FAQViewSet, AboutUsViewSet,
+                    AdditionalLinksViewSet, BaseInfoViewSet,
+                    PollViewSet)
 
 urlpatterns = [
     path('faq/', FAQViewSet.as_view({'get': 'faq_get'}), name='faq'),
