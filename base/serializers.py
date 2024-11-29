@@ -2,22 +2,7 @@ from config import settings
 from rest_framework import serializers
 from .models import (FAQ, AboutUs,
                      AdditionalLinks, Poll,
-                     BaseInfo, Banner)
-
-
-class BannerSerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        request = self.context.get('request')
-        language = 'ru'
-        if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
-            language = request.META.get('HTTP_ACCEPT_LANGUAGE')
-        self.fields['title'] = serializers.CharField(source=f'title_{language}')
-
-    class Meta:
-        model = Banner
-        fields = ['id', 'image', 'title', 'created_at', 'is_published']
-
+                     BaseInfo)
 
 class FAQSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):

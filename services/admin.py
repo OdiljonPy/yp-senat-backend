@@ -62,7 +62,7 @@ class PostAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'view_count')
     list_display_links = ('id', 'title')
     search_fields = ('title', 'description', 'short_description')
-    list_filter = ('is_published',)
+    list_filter = ("is_banner", 'is_published')
 
     def view_count(self, obj):
         return obj.views.count()

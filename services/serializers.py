@@ -94,10 +94,6 @@ class PostSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'views_count', 'image', 'short_description', 'description', 'commission_member',
                   'created_at', 'is_published', 'published_date']
 
-
-
-
-
 class CommissionMemberSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -207,7 +203,6 @@ class MandatCategorySerializer(serializers.Serializer):
 
     id = serializers.IntegerField()
     name = serializers.CharField()
-
 
 class MandatCategoryDetailSerializer(MandatCategorySerializer):
     commission_members = CommissionMemberSerializer(many=True)
