@@ -5,8 +5,6 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
-from .repository.get_project_filter import get_projects_filter
-from .repository.pagination import get_post_list
 from .utils import get_ip
 from exceptions.error_messages import ErrorCodes
 
@@ -25,10 +23,10 @@ from .serializers import (
     ProjectsSerializer, CommissionCategorySerializer,
     AppealSerializer, ParamValidateSerializer,
     CategorySerializer, PostCategoryFilterSerializer,
-    PostSerializer, PostFilterSerializer, MandatCategorySerializer,
-    AppealStatSerializer, MandatFilterSerializer, VideoSerializer,
+    PostSerializer, MandatCategorySerializer,
+    AppealStatSerializer, VideoSerializer,
     MandatCategoryDetailSerializer, ProjectsResponseSerializer,
-    CommMemberFilterSerializer, ManagementSerializer, NormativeDocumentsSerializer
+    CommMemberFilterSerializer, NormativeDocumentsSerializer
 )
 
 

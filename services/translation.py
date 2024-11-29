@@ -1,7 +1,7 @@
 from modeltranslation.translator import translator, TranslationOptions
 from .models import (
     Region, CommissionCategory, CommissionMember,
-    Projects, Appeal, Post, Video, PostCategory,
+    Projects, Post, Video, PostCategory,
     MandatCategory, Management, NormativeDocuments
 )
 

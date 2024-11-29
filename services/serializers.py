@@ -5,7 +5,7 @@ from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
 from .models import (
     Region, CommissionCategory, CommissionMember, Projects,
-    Post, Appeal, PROJECT_STATUS, Video, Management, MandatCategory,
+    Post, Appeal, PROJECT_STATUS, Video, Management,
     CategoryImage, DOC_TYPE_CHOICES
 )
 
@@ -147,12 +147,6 @@ class AppealSerializer(serializers.ModelSerializer):
         fields = ['id', 'full_name', 'phone_number', 'email', 'message']
 
 
-class PostFilterSerializer(ParamValidateSerializer):
-    q = serializers.CharField(required=False)
-    post_member_exist = serializers.BooleanField(required=False)
-    status = serializers.ChoiceField(PROJECT_STATUS, required=False)
-
-
 class PostCategoryFilterSerializer(ParamValidateSerializer):
     category_id = serializers.IntegerField(required=False)
 
@@ -160,11 +154,6 @@ class PostCategoryFilterSerializer(ParamValidateSerializer):
         if data.get('category_id') and data.get('category_id') <= 0:
             raise CustomApiException(ErrorCodes.VALIDATION_FAILED, message='Category id must be positive integer')
         return data
-
-
-class MandatFilterSerializer(ParamValidateSerializer):
-    id = serializers.IntegerField(required=False)
-
 
 class AppealStatSerializer(serializers.Serializer):
     incoming_appeals = serializers.IntegerField(required=False, default=0)
