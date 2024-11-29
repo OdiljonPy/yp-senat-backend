@@ -118,10 +118,10 @@ class Projects(BaseModel):
 
 
 class Appeal(BaseModel):
-    full_name = models.CharField(max_length=100, verbose_name='Полное имя')
+    full_name = models.CharField(max_length=100, verbose_name='Полное имя', null=True, blank=True)
     phone_number = models.CharField(max_length=14, validators=[phone_number_validation], verbose_name='номер телефона')
-    email = models.EmailField(verbose_name='электронная почта')
-    message = models.TextField(verbose_name='сообщение')
+    email = models.EmailField(verbose_name='электронная почта', null=True, blank=True)
+    message = models.TextField(verbose_name='сообщение', null=True, blank=True)
     is_resolved = models.BooleanField(default=False, verbose_name="решено")
 
     def __str__(self):

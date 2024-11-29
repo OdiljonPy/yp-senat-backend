@@ -30,10 +30,6 @@ class ProjectsTranslationOption(TranslationOptions):
     fields = ('name', 'short_description', 'description')
 
 
-class AppealTranslationOption(TranslationOptions):
-    fields = ('full_name', 'message')
-
-
 class PostTranslationOption(TranslationOptions):
     fields = ('title', 'short_description', 'description')
 
@@ -57,6 +53,5 @@ translator.register(Post, PostTranslationOption)
 translator.register(CommissionMember, CommissionMemberTranslationOption)
 translator.register(CommissionCategory, CommissionCategoryTranslationOption)
 translator.register(Projects, ProjectsTranslationOption)
-translator.register(Appeal, AppealTranslationOption)
 translator.register(PostCategory, PostCategoryTranslationOption)
 translator.register(Management, ManagementTranslationOption)
