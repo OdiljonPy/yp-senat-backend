@@ -3,7 +3,7 @@ from .models import (Region, CommissionCategory,
                      CommissionMember, Projects,
                      Appeal, Post, PostCategory,
                      Visitors, MandatCategory,
-                     AppealStat, Video, CategoryImage)
+                     AppealStat, Video, CategoryImage, NormativeDocuments)
 
 
 @admin.register(Video)
@@ -51,7 +51,7 @@ class ProjectsAdmin(admin.ModelAdmin):
 
 @admin.register(Appeal)
 class AppealAdmin(admin.ModelAdmin):
-    list_display = ('id', 'full_name', 'commission_member', 'phone_number', 'is_resolved')
+    list_display = ('id', 'full_name', 'phone_number', 'is_resolved')
     list_display_links = ('id', 'full_name')
     search_fields = ('full_name', 'phone_number', 'email')
     list_filter = ('is_resolved',)
@@ -70,10 +70,6 @@ class PostAdmin(admin.ModelAdmin):
     view_count.short_description = 'Количество просмотров'
 
 
-@admin.register(Visitors)
-class VisitorsAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'ip', 'created_at')
-    list_display_links = ('id', 'ip', 'name')
 
 
 @admin.register(MandatCategory)
@@ -97,3 +93,8 @@ class PostCategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     list_display_links = ('id', 'name')
     search_fields = ('name',)
+
+
+@admin.register(NormativeDocuments)
+class NormativeDocumentsAdmin(admin.ModelAdmin):
+    pass

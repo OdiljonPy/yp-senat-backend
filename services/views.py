@@ -1,4 +1,5 @@
 from datetime import date
+
 from django.db.models import Q
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -8,20 +9,19 @@ from rest_framework.viewsets import ViewSet
 
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
-from .repository.pagination import get_post_list
-from .repository.get_project_filter import get_projects_filter
 from .models import (Region, CommissionCategory,
                      CommissionMember, Projects,
                      Post, Visitors,
-                     AppealStat, MandatCategory, Video, PostCategory)
+                     AppealStat, MandatCategory, Video, PostCategory, NormativeDocuments)
+from .repository.get_project_filter import get_projects_filter
+from .repository.pagination import get_post_list
 from .serializers import (
     RegionSerializer, CommissionMemberSerializer,
     ProjectsSerializer, CommissionCategorySerializer,
-    AppealSerializer, ParamValidateSerializer,
-    CategorySerializer, PostCategoryFilterSerializer,
+    AppealSerializer, CategorySerializer, PostCategoryFilterSerializer,
     PostSerializer, PostFilterSerializer, MandatCategorySerializer,
-    AppealStatSerializer, MandatFilterSerializer, VideoSerializer, CommissionCategoryResponseSerializer,
-    MandatCategoryDetailSerializer, ProjectsResponseSerializer
+    AppealStatSerializer, VideoSerializer, CommissionCategoryResponseSerializer,
+    MandatCategoryDetailSerializer, ProjectsResponseSerializer, NormativeDocumentsSerializer
 )
 from .utils import get_ip
 
@@ -255,9 +255,9 @@ class PostViewSet(ViewSet):
         tags=['Post']
     )
     def banner(self, request):
-        posts = Post.objects.filter(is_published=True, is_banner=True).order_by('views')[:3]
+        posts = Post.objects.filter(is_published=True, is_banner=True).order_by('-created_at').order_by('-views')[:3]
         if len(posts) == 0:
-            posts = Post.objects.filter(is_published=True).order_by('views')[:3]
+            posts = Post.objects.filter(is_published=True).order_by('-views')[:3]
         serializer = PostSerializer(posts, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
@@ -310,3 +310,15 @@ class AppealStatViewSet(ViewSet):
         stats = AppealStat.objects.order_by('-created_at').first()
         return Response(data={'result': AppealStatSerializer(stats, context={'request': request}).data, 'ok': True},
                         status=status.HTTP_200_OK)
+
+
+class NormativeDocumentsViewSet(ViewSet):
+    @swagger_auto_schema(
+        operation_summary="Get list documents",
+        responses={200: NormativeDocumentsSerializer(many=True)},
+        tags=['NormativeDocuments']
+    )
+    def list(self, request):
+        documents = NormativeDocuments.objects.all().order_by('-created_at')
+        serializer = NormativeDocumentsSerializer(documents, many=True, context={'request': request})
+        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
