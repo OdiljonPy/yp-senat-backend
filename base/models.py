@@ -66,6 +66,8 @@ class BaseInfo(BaseModel):
     instagram_url = models.URLField(default='instagram.com', verbose_name="инстаграм_url")
     facebook_url = models.URLField(default='facebook.com', verbose_name="фэйсбук_url")
     youtube_url = models.URLField(default='youtube.com', verbose_name="ютубе_url")
+    twitter_url = models.URLField(default='twitter.com', verbose_name='твиттер_url')
+    linkedin_url = models.URLField(default='linkedin.com', verbose_name='линкедин_url')
 
     def __str__(self):
         return str(self.id) or ''
