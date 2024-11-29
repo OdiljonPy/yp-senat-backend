@@ -2,8 +2,13 @@ from config import settings
 from rest_framework import serializers
 from .models import (FAQ, AboutUs,
                      AdditionalLinks, Poll,
-                     BaseInfo, STATUS_POLL)
+                     BaseInfo, STATUS_POLL, AboutUsImage)
 
+
+class AboutUsImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AboutUsImage
+        fields = ('id', 'image', 'about_us')
 
 class PollParamSerializer(serializers.Serializer):
     poll_name = serializers.CharField(max_length=150, required=False)
@@ -37,6 +42,11 @@ class AboutUsSerializer(serializers.ModelSerializer):
     class Meta:
         model = AboutUs
         fields = ('id', 'description')
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['images'] = AboutUsImageSerializer(instance.about_image.all(), many=True, context=self.context).data
+        return data
 
 
 class AdditionalLinksSerializer(serializers.ModelSerializer):
