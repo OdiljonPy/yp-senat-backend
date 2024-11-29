@@ -80,19 +80,19 @@ class PollViewSet(ViewSet):
             openapi.Parameter(name='poll_name', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING,
                               description='Poll Name'),
             openapi.Parameter(name='poll_status', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER,
-                              description='Poll Status, receive 1-active or 0-finished'),
+                              description='Poll Status, receive 1-active or 2-finished'),
         ],
         responses={200: PollSerializer()},
         tags=['Base']
     )
     def poll(self, request):
-        param_serializer = PollParamSerializer(data=request.query_param, context={"request": request})
+        param_serializer = PollParamSerializer(data=request.query_params, context={"request": request})
         if not param_serializer.is_valid():
             raise CustomApiException(error_code=ErrorCodes.VALIDATION_FAILED, message=param_serializer.errors)
 
         param = param_serializer.validated_data.get('poll_name')
         status_ = param_serializer.validated_data.get('poll_status')
-
+        print(param)
         filter_ = Q()
         if param:
             filter_ &= Q(name__icontains=param)
