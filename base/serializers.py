@@ -65,7 +65,7 @@ class BaseInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = BaseInfo
         fields = ('id', 'email', 'phone_number', 'address', 'latitude', 'longitude', 'telegram_url',
-                  'instagram_url', 'facebook_url', 'youtube_url')
+                  'instagram_url', 'facebook_url', 'youtube_url', 'twitter_url', 'linkedin_url')
 
 
 class PollSerializer(serializers.ModelSerializer):
