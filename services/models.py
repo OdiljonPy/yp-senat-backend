@@ -1,6 +1,4 @@
 import os
-from datetime import datetime
-
 from django.db import models
 from tinymce.models import HTMLField
 

@@ -1,8 +1,16 @@
+from random import choices
+
 from config import settings
 from rest_framework import serializers
 from .models import (FAQ, AboutUs,
                      AdditionalLinks, Poll,
-                     BaseInfo)
+                     BaseInfo, STATUS_POLL)
+
+
+class PollParamSerializer(serializers.Serializer):
+    param = serializers.CharField(max_length=150, required=False)
+    status_ = serializers.IntegerField(choices=STATUS_POLL, required=False)
+
 
 class FAQSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):

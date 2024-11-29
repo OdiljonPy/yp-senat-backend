@@ -71,8 +71,6 @@ class PostAdmin(admin.ModelAdmin):
     view_count.short_description = 'Количество просмотров'
 
 
-
-
 @admin.register(MandatCategory)
 class MandatCategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
@@ -83,6 +81,7 @@ class MandatCategoryAdmin(admin.ModelAdmin):
 @admin.register(AppealStat)
 class AppealStatAdmin(admin.ModelAdmin):
     list_display = ('id', 'incoming_appeals', 'resolved_appeals', 'explained_appeals', 'rejected_appeals')
+
 
 @admin.register(CategoryImage)
 class CategoryImageAdmin(admin.ModelAdmin):
