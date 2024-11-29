@@ -4,9 +4,10 @@ from config import settings
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
 from .models import (
-    Region, CommissionCategory,
-    CommissionMember, Projects,
-    Post, Appeal, PROJECT_STATUS, Video, DOC_TYPE_CHOICES)
+    Region, CommissionCategory, CommissionMember, Projects,
+    Post, Appeal, PROJECT_STATUS, Video, Management, MandatCategory,
+    CategoryImage, DOC_TYPE_CHOICES
+)
 
 
 class VideoSerializer(serializers.ModelSerializer):
@@ -52,6 +53,11 @@ class RegionSerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 
+class CategoryImageResponseSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    image = serializers.ImageField(read_only=True)
+
+
 class CommissionCategorySerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -64,12 +70,15 @@ class CommissionCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CommissionCategory
-        fields = ['id', 'name', 'description']
+        fields = ('id', 'name', 'description')
 
-
-class CategoryImageResponseSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    image = serializers.ImageField(read_only=True)
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['images'] = CategoryImageResponseSerializer(
+            CategoryImage.objects.filter(category_id=instance.id), many=True, context=self.context).data
+        data['members'] = CommissionMemberSerializer(
+            instance.commission_categories.all(), many=True, context=self.context).data
+        return data
 
 
 class PostCategory(serializers.Serializer):
@@ -104,33 +113,15 @@ class CommissionMemberSerializer(serializers.ModelSerializer):
             language = request.META.get('HTTP_ACCEPT_LANGUAGE')
         self.fields['full_name'] = serializers.CharField(source=f'full_name_{language}')
         self.fields['description'] = serializers.CharField(source=f'description_{language}')
-        self.fields['position'] = serializers.CharField(source=f'position_{language}')
-        self.fields['nation'] = serializers.CharField(source=f'nation_{language}')
-        self.fields['education_degree'] = serializers.CharField(source=f'education_degree_{language}')
-        self.fields['speciality'] = serializers.CharField(source=f'speciality_{language}')
 
     class Meta:
         model = CommissionMember
-        fields = ['id', 'full_name', "image", 'commission_category', 'region', 'type', 'description', 'position',
-                  'birthdate',
-                  'nation', 'education_degree', 'speciality', 'email', 'telegram_url', 'facebook_url', 'instagram_url']
+        fields = ('id', 'commission_category', 'mandat', 'region', 'full_name', 'image', 'description')
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data['region'] = RegionSerializer(instance.region, context=self.context).data
-        data['posts'] = PostSerializer(instance.member_post.filter(is_published=True).order_by('-created_at')[:6],
-                                       many=True,
-                                       context=self.context).data
         return data
-
-
-class CommissionCategoryResponseSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    name = serializers.CharField(read_only=True)
-    description = serializers.CharField(read_only=True)
-
-    category_image = CategoryImageResponseSerializer(many=True, read_only=True)
-    commission_categories = CommissionMemberSerializer(many=True, read_only=True)
 
 
 class ProjectsSerializer(serializers.ModelSerializer):
@@ -210,6 +201,41 @@ class MandatCategorySerializer(serializers.Serializer):
 
 class MandatCategoryDetailSerializer(MandatCategorySerializer):
     commission_members = CommissionMemberSerializer(many=True)
+
+
+class CommMemberFilterSerializer(ParamValidateSerializer):
+    mandat_id = serializers.IntegerField(required=False)
+    category_id = serializers.IntegerField(required=False)
+    region_id = serializers.IntegerField(required=False)
+
+    def validate(self, data):
+        if data.get('mandat_id') is not None and int(data.get('mandat_id')) <= 0:
+            raise CustomApiException(ErrorCodes.VALIDATION_FAILED, message='Mandat id must be positive integer')
+        if data.get('category_id') is not None and int(data.get('category_id')) <= 0:
+            raise CustomApiException(ErrorCodes.VALIDATION_FAILED, message='Category id must be positive integer')
+        if data.get('region_id') is not None and int(data.get('region_id')) <= 0:
+            raise CustomApiException(ErrorCodes.VALIDATION_FAILED, message='Region id must be positive integer')
+        return super().validate(data)
+
+
+class ManagementSerializer(serializers.ModelSerializer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get('request')
+        language = 'ru'
+        if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
+            language = request.META.get('HTTP_ACCEPT_LANGUAGE')
+        self.fields['full_name'] = serializers.CharField(source=f'full_name_{language}')
+        self.fields['description'] = serializers.CharField(source=f'description_{language}')
+        self.fields['position'] = serializers.CharField(source=f'position_{language}')
+
+    class Meta:
+        model = Management
+        fields = (
+            'id', 'full_name', 'description', 'phone_number', 'position', 'twitter_url', 'instagram_url', 'order',
+            'facebook_url', 'image'
+        )
+
 
 
 class NormativeDocumentsSerializer(serializers.Serializer):
