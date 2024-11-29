@@ -216,10 +216,10 @@ class Video(BaseModel):
 
 
 class NormativeDocuments(BaseModel):
-    name = models.CharField(max_length=200, null=True, blank=True)
+    name = models.CharField(max_length=200, null=True, blank=True, verbose_name='название')
     file = models.FileField(upload_to='normative/', verbose_name='файл', null=True, blank=True,
                             validators=[validate_file_type_and_size])
-    doc_type = models.CharField(max_length=5, choices=DOC_TYPE_CHOICES, editable=False)
+    doc_type = models.CharField(max_length=5, choices=DOC_TYPE_CHOICES, editable=False, verbose_name="тип документа")
 
     def save(self, *args, **kwargs):
         if self.file:
