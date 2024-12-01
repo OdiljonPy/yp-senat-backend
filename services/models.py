@@ -23,9 +23,9 @@ MEMBER_TYPE = (
 )
 
 DOC_TYPE_CHOICES = (
-    ('pdf', 'PDF'),
-    ('doc', 'Word'),
-    ('xls', 'Excel'),
+    ('PDF', 'PDF'),
+    ('DOCX', 'Word'),
+    ('XLS', 'Excel'),
 )
 
 
@@ -214,11 +214,11 @@ class NormativeDocuments(BaseModel):
 
             # Set doc_type based on file extension
             if ext in ['.doc', '.docx']:
-                self.doc_type = 'doc'
+                self.doc_type = 'DOCX'
             elif ext in ['.xls', '.xlsx']:
-                self.doc_type = 'xls'
+                self.doc_type = 'XLS'
             elif ext == '.pdf':
-                self.doc_type = 'pdf'
+                self.doc_type = 'PDF'
 
         super().save(*args, **kwargs)
 
