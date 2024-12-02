@@ -35,7 +35,7 @@ class CommissionCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(CommissionMember)
 class CommissionMemberAdmin(admin.ModelAdmin):
-    list_display = ('id', 'full_name', 'order')
+    list_display = ('id', 'full_name', 'order', 'region__name', 'mandat__name')
     list_display_links = ('id', 'full_name')
     search_fields = ('full_name', 'description')
 
