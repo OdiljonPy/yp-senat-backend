@@ -133,7 +133,7 @@ class Appeal(BaseModel):
     is_resolved = models.BooleanField(default=False, verbose_name="решено")
 
     def __str__(self):
-        return self.full_name
+        return self.phone_number
 
     class Meta:
         verbose_name = 'Запрос'
