@@ -23,7 +23,7 @@ class AboutUsAdmin(admin.ModelAdmin):
 
 @admin.register(AdditionalLinks)
 class AdditionalLinksAdmin(admin.ModelAdmin):
-    list_display = ('id',)
+    list_display = ('id', 'title', 'is_visible')
     search_fields = ('title',)
     list_filter = ('is_visible',)
 
