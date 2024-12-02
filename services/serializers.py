@@ -210,6 +210,7 @@ class MandatCategoryDetailSerializer(MandatCategorySerializer):
 
 
 class CommMemberFilterSerializer(ParamValidateSerializer):
+    q = serializers.CharField(required=False)
     mandat_id = serializers.IntegerField(required=False)
     category_id = serializers.IntegerField(required=False)
     region_id = serializers.IntegerField(required=False)

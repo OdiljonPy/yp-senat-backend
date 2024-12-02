@@ -1,4 +1,6 @@
 import os
+from email.policy import default
+
 from django.db import models
 from tinymce.models import HTMLField
 
@@ -80,9 +82,9 @@ class CommissionMember(BaseModel):
     image = models.ImageField(upload_to='commission_member/')
 
     phone_number = models.CharField(max_length=14, verbose_name='номер телефона', blank=True, null=True)
-    facebook = models.URLField(blank=True, null=True)
-    linkedin = models.URLField(blank=True, null=True)
-    twitter = models.URLField(blank=True, null=True)
+    facebook = models.URLField(default='facebook.com', verbose_name="фэйсбук_url")
+    linkedin = models.URLField(default='linkedin.com', verbose_name="линкедин_url")
+    twitter = models.URLField(default='twitter.com', verbose_name="твиттер_url")
 
     def __str__(self):
         return self.full_name
@@ -157,6 +159,11 @@ class PostCategory(BaseModel):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = "Категория постов"
+        verbose_name_plural = "Категории постов"
+        ordering = ('-created_at',)
 
 
 class Post(BaseModel):

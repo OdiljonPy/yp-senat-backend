@@ -71,6 +71,9 @@ class CommissionViewSet(ViewSet):
                 name='category_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='category id'),
             openapi.Parameter(
                 name='region_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='region id'),
+            openapi.Parameter(
+                name="q", in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, description="Search"
+            )
         ],
         responses={200: CommissionMemberSerializer(many=True)},
         tags=["Commission"]
@@ -80,9 +83,13 @@ class CommissionViewSet(ViewSet):
         if not serializer.is_valid():
             raise CustomApiException(ErrorCodes.VALIDATION_FAILED, message=serializer.errors)
 
+        mandat = MandatCategory.objects.order_by('-created_at').first()
+
         filter_ = Q()
         data = serializer.data
         mandat_id = data.get('mandat_id')
+        if data.get('q'):
+            filter_ &= Q(full_name__icontains=data.get('q'), mandat_id=mandat.id)
         if not mandat_id:
             last_mandat = MandatCategory.objects.first()
             mandat_id = 0
