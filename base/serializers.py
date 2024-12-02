@@ -38,10 +38,12 @@ class AboutUsSerializer(serializers.ModelSerializer):
         if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
             language = request.META.get('HTTP_ACCEPT_LANGUAGE')
         self.fields['description'] = serializers.CharField(source=f'description_{language}')
+        self.fields['short_description'] = serializers.CharField(source=f'short_description_{language}')
+
 
     class Meta:
         model = AboutUs
-        fields = ('id', 'description')
+        fields = ('id', "short_description", 'description')
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

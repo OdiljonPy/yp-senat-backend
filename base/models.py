@@ -29,6 +29,7 @@ class FAQ(BaseModel):
 
 
 class AboutUs(BaseModel):
+    short_description = models.CharField(max_length=300, verbose_name="краткое описание", blank=True, null=True)
     description = HTMLField(verbose_name="описание")
 
     def __str__(self):

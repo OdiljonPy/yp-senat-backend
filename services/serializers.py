@@ -58,6 +58,21 @@ class CategoryImageResponseSerializer(serializers.Serializer):
     image = serializers.ImageField(read_only=True)
 
 
+class CommissionCategoryListSerializer(serializers.ModelSerializer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get('request')
+        language = 'ru'
+        if request and request.META.get('HTTP_ACCEPT_LANGUAGE') in settings.MODELTRANSLATION_LANGUAGES:
+            language = request.META.get('HTTP_ACCEPT_LANGUAGE')
+        self.fields['name'] = serializers.CharField(source=f'name_{language}')
+        self.fields['description'] = serializers.CharField(source=f'description_{language}')
+
+    class Meta:
+        model = CommissionCategory
+        fields = ('id', 'name', "icon")
+
+
 class CommissionCategorySerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -116,7 +131,8 @@ class CommissionMemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CommissionMember
-        fields = ('id', 'commission_category', 'mandat', 'region', 'full_name', 'image', 'description')
+        fields = ('id', 'commission_category', 'mandat', 'region', 'full_name', 'image', 'description', 'phone_number',
+                  "facebook", "linkedin", 'twitter')
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -154,6 +170,7 @@ class PostCategoryFilterSerializer(ParamValidateSerializer):
         if data.get('category_id') and data.get('category_id') <= 0:
             raise CustomApiException(ErrorCodes.VALIDATION_FAILED, message='Category id must be positive integer')
         return data
+
 
 class AppealStatSerializer(serializers.Serializer):
     incoming_appeals = serializers.IntegerField(required=False, default=0)
@@ -224,7 +241,6 @@ class ManagementSerializer(serializers.ModelSerializer):
             'id', 'full_name', 'description', 'phone_number', 'position', 'twitter_url', 'instagram_url', 'order',
             'facebook_url', 'image'
         )
-
 
 
 class NormativeDocumentsSerializer(serializers.Serializer):

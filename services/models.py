@@ -42,8 +42,9 @@ class Region(BaseModel):
 
 
 class CommissionCategory(BaseModel):
-    name = models.CharField(max_length=250, verbose_name='Назавние')
+    name = models.CharField(max_length=250, verbose_name='назавние')
     description = models.TextField(verbose_name='описание')
+    icon = models.ImageField(upload_to='commission/category/', verbose_name="иконка", blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -70,13 +71,18 @@ class CategoryImage(BaseModel):  # with pagination
 
 class CommissionMember(BaseModel):
     full_name = models.CharField(max_length=100, verbose_name='полное имя')
-    description = HTMLField(verbose_name='описание')
+    description = models.CharField(max_length=255, verbose_name="описание")
     commission_category = models.ForeignKey(CommissionCategory, on_delete=models.CASCADE,
                                             verbose_name='Категория комиссии', related_name='commission_categories')
     mandat = models.ForeignKey(to='MandatCategory', on_delete=models.CASCADE, related_name='mandat', null=True, blank=True)
     region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=True, null=True, verbose_name='регион')
     order = models.PositiveIntegerField(default=1)
     image = models.ImageField(upload_to='commission_member/')
+
+    phone_number = models.CharField(max_length=14, verbose_name='номер телефона', blank=True, null=True)
+    facebook = models.URLField(blank=True, null=True)
+    linkedin = models.URLField(blank=True, null=True)
+    twitter = models.URLField(blank=True, null=True)
 
     def __str__(self):
         return self.full_name

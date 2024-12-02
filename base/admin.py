@@ -18,7 +18,7 @@ class FAQAdmin(admin.ModelAdmin):
 @admin.register(AboutUs)
 class AboutUsAdmin(admin.ModelAdmin):
     list_display = ('id',)
-    search_fields = ('description',)
+    search_fields = ('description', 'short_description')
 
 
 @admin.register(AdditionalLinks)

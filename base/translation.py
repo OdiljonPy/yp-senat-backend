@@ -5,7 +5,7 @@ from .models import (AboutUs, AdditionalLinks,
 
 
 class AboutUsTranslationOption(TranslationOptions):
-    fields = ('description',)
+    fields = ("short_description", 'description',)
 
 
 class AdditionalLinksTranslationOptions(TranslationOptions):

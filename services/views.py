@@ -26,7 +26,7 @@ from .serializers import (
     PostSerializer, MandatCategorySerializer,
     AppealStatSerializer, VideoSerializer,
     MandatCategoryDetailSerializer, ProjectsResponseSerializer,
-    CommMemberFilterSerializer, NormativeDocumentsSerializer
+    CommMemberFilterSerializer, NormativeDocumentsSerializer, CommissionCategoryListSerializer
 )
 
 
@@ -104,12 +104,12 @@ class CommissionViewSet(ViewSet):
     @swagger_auto_schema(
         operation_summary='List Of Commission Categories',
         operation_description='List of commission categories',
-        responses={200: CommissionCategorySerializer(many=True)},
+        responses={200: CommissionCategoryListSerializer(many=True)},
         tags=['Commission']
     )
     def commission_category_list(self, request):
         categories = CommissionCategory.objects.all()
-        serializer = CommissionCategorySerializer(categories, many=True, context={'request': request})
+        serializer = CommissionCategoryListSerializer(categories, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
