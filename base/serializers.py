@@ -10,6 +10,7 @@ class AboutUsImageSerializer(serializers.ModelSerializer):
         model = AboutUsImage
         fields = ('id', 'image', 'about_us')
 
+
 class PollParamSerializer(serializers.Serializer):
     poll_name = serializers.CharField(max_length=150, required=False)
     poll_status = serializers.ChoiceField(choices=STATUS_POLL, required=False)
@@ -39,7 +40,6 @@ class AboutUsSerializer(serializers.ModelSerializer):
             language = request.META.get('HTTP_ACCEPT_LANGUAGE')
         self.fields['description'] = serializers.CharField(source=f'description_{language}')
         self.fields['short_description'] = serializers.CharField(source=f'short_description_{language}')
-
 
     class Meta:
         model = AboutUs

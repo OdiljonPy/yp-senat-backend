@@ -40,9 +40,11 @@ class AboutUs(BaseModel):
         verbose_name_plural = 'О нас'
         ordering = ('-created_at',)
 
+
 class AboutUsImage(BaseModel):
     image = models.ImageField(upload_to='about_us/', verbose_name='Изоражение')
-    about_us = models.ForeignKey(AboutUs, on_delete=models.SET_NULL, null=True, related_name='about_image', verbose_name="о нас")
+    about_us = models.ForeignKey(AboutUs, on_delete=models.SET_NULL, null=True, related_name='about_image',
+                                 verbose_name="о нас")
 
     def __str__(self):
         return str(self.id)
@@ -51,6 +53,7 @@ class AboutUsImage(BaseModel):
         verbose_name = "Изображение о нас"
         verbose_name_plural = "изображения о нас"
         ordering = ('-created_at',)
+
 
 class AdditionalLinks(BaseModel):
     title = models.CharField(max_length=250, verbose_name='название')

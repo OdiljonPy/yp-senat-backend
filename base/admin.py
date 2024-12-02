@@ -3,10 +3,12 @@ from .models import (FAQ, AboutUs,
                      AdditionalLinks, BaseInfo,
                      Poll, AboutUsImage)
 
+
 @admin.register(AboutUsImage)
 class AboutUsImageAdmin(admin.ModelAdmin):
     list_display = ('id', 'about_us')
     list_display_links = ('id', 'about_us')
+
 
 @admin.register(FAQ)
 class FAQAdmin(admin.ModelAdmin):

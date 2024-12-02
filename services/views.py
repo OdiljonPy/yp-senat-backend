@@ -7,7 +7,6 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from .utils import get_ip
 from exceptions.error_messages import ErrorCodes
-
 from exceptions.exception import CustomApiException
 from .repository.pagination import get_post_list
 from .repository.get_project_filter import get_projects_filter
@@ -189,6 +188,7 @@ class ProjectViewSet(ViewSet):
         response = get_projects_filter(
             context={'request': request}, project_param=projects, page=page, page_size=page_size)
         return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
+
     @swagger_auto_schema(
         responses={200: ProjectsSerializer()},
         tags=['Project']

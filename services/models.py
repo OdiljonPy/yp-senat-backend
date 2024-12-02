@@ -1,9 +1,6 @@
 import os
-from email.policy import default
-
 from django.db import models
 from tinymce.models import HTMLField
-
 from abstract_models.base_model import BaseModel
 from services.utils import validate_file_type_and_size
 from utils.validations import phone_number_validation
@@ -76,10 +73,11 @@ class CommissionMember(BaseModel):
     description = models.CharField(max_length=255, verbose_name="описание")
     commission_category = models.ForeignKey(CommissionCategory, on_delete=models.CASCADE,
                                             verbose_name='Категория комиссии', related_name='commission_categories')
-    mandat = models.ForeignKey(to='MandatCategory', on_delete=models.CASCADE, related_name='mandat', null=True, blank=True)
+    mandat = models.ForeignKey(to='MandatCategory', on_delete=models.CASCADE, related_name='mandat', null=True,
+                               blank=True, verbose_name='мандат')
     region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=True, null=True, verbose_name='регион')
-    order = models.PositiveIntegerField(default=1)
-    image = models.ImageField(upload_to='commission_member/')
+    order = models.PositiveIntegerField(default=1, verbose_name="порядковый номер")
+    image = models.ImageField(upload_to='commission_member/', verbose_name="изображение")
 
     phone_number = models.CharField(max_length=14, verbose_name='номер телефона', blank=True, null=True)
     facebook = models.URLField(default='facebook.com', verbose_name="фэйсбук_url")
@@ -155,7 +153,7 @@ class Visitors(BaseModel):
 
 
 class PostCategory(BaseModel):
-    name = models.CharField(max_length=225)
+    name = models.CharField(max_length=225, verbose_name="название")
 
     def __str__(self):
         return self.name
@@ -168,12 +166,13 @@ class PostCategory(BaseModel):
 
 class Post(BaseModel):
     views = models.ManyToManyField(Visitors, blank=True, verbose_name="количество просмотров")
-    category = models.ForeignKey(PostCategory, on_delete=models.CASCADE, blank=True, null=True)
+    category = models.ForeignKey(PostCategory, on_delete=models.CASCADE, blank=True, null=True,
+                                 verbose_name="категория")
     title = models.CharField(max_length=255, verbose_name="заголовок")
     image = models.ImageField(upload_to='post/', verbose_name="изображение")
     short_description = models.CharField(max_length=200, verbose_name="краткое описание")
     description = HTMLField(verbose_name="описание")
-    published_date = models.DateField()
+    published_date = models.DateField(verbose_name="дата публикации")
     is_published = models.BooleanField(default=True, verbose_name="опубликовано")
     is_banner = models.BooleanField(default=False, verbose_name='это баннер')
 

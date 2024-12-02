@@ -41,6 +41,7 @@ class PostCategoryTranslationOption(TranslationOptions):
 class ManagementTranslationOption(TranslationOptions):
     fields = ('full_name', 'description', 'position')
 
+
 class NormativeDocumentsTranslationOption(TranslationOptions):
     fields = ('name',)
 

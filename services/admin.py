@@ -92,10 +92,12 @@ class PostCategoryAdmin(admin.ModelAdmin):
     list_display_links = ('id', 'name')
     search_fields = ('name',)
 
+
 @admin.register(Management)
 class ManagementAdmin(admin.ModelAdmin):
-    list_display = ('id', 'full_name','order')
+    list_display = ('id', 'full_name', 'order')
     list_display_links = ('id', 'full_name')
+
 
 @admin.register(NormativeDocuments)
 class NormativeDocumentsAdmin(admin.ModelAdmin):

@@ -1,5 +1,4 @@
 from rest_framework import serializers
-
 from config import settings
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException

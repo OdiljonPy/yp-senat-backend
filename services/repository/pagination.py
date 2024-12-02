@@ -1,6 +1,6 @@
 from django.core.paginator import Paginator
 from django.db.models import Count
-from services.serializers import PostSerializer, MandatCategorySerializer
+from services.serializers import PostSerializer
 
 
 def get_post_list(context: dict, request_data, page, page_size):
