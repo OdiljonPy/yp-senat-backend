@@ -246,8 +246,8 @@ class NormativeDocuments(BaseModel):
 
 class Management(BaseModel):
     full_name = models.CharField(max_length=100, verbose_name='полное имя')
-    description = HTMLField(verbose_name='описание')
-    phone_number = models.CharField(max_length=15)
+    description = models.CharField(max_length=300, verbose_name='описание')
+    phone_number = models.CharField(max_length=15, verbose_name="номер телефона")
     position = models.CharField(max_length=150, verbose_name='позиция')
     twitter_url = models.URLField(blank=True, null=True, verbose_name="телеграм_url")
     instagram_url = models.URLField(blank=True, null=True, verbose_name="инстаграм_url")
