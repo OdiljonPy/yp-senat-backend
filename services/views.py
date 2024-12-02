@@ -182,6 +182,16 @@ class ProjectViewSet(ViewSet):
         response = get_projects_filter(
             context={'request': request}, project_param=projects, page=page, page_size=page_size)
         return Response(data={'result': response, 'ok': True}, status=status.HTTP_200_OK)
+    @swagger_auto_schema(
+        responses={200: ProjectsSerializer()},
+        tags=['Project']
+    )
+    def project_detail(self, request, pk):
+        project = Projects.objects.filter(id=pk).first()
+        if not project:
+            raise CustomApiException(ErrorCodes.NOT_FOUND)
+        return Response({"result": ProjectsSerializer(project, context={'request': request}).data, 'ok': True},
+                        status=status.HTTP_200_OK)
 
 
 class AppealViewSet(ViewSet):

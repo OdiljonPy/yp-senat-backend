@@ -256,3 +256,4 @@ class NormativeDocumentsSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=250)
     file = serializers.FileField()
     doc_type = serializers.ChoiceField(choices=DOC_TYPE_CHOICES)
+    created_at = serializers.DateTimeField()
