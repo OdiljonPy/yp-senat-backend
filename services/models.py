@@ -27,9 +27,27 @@ DOC_TYPE_CHOICES = (
     ('XLS', 'Excel'),
 )
 
+REGIONS = [
+        (1, 'Andijon viloyati'),
+        (2, 'Buxoro viloyati'),
+        (3, 'Farg‘ona viloyati'),
+        (4, 'Jizzax viloyati'),
+        (5, 'Qashqadaryo viloyati'),
+        (6, 'Namangan viloyati'),
+        (7, 'Navoiy viloyati'),
+        (8, 'Samarqand viloyati'),
+        (9, 'Sirdaryo viloyati'),
+        (10, 'Surxondaryo viloyati'),
+        (11, 'Toshkent shahar'),
+        (11, 'Toshkent viloyati'),
+        (12, 'Xorazm viloyati'),
+        (13, 'Qoraqalpog‘iston Respublikasi'),
+    ]
+
 
 class Region(BaseModel):
     name = models.CharField(max_length=150, verbose_name='Назавние')
+    region = models.PositiveIntegerField(choices=REGIONS, blank=False, null=False)
 
     def __str__(self):
         return self.name
