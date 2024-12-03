@@ -106,7 +106,7 @@ class CommissionViewSet(ViewSet):
             filter_ &= Q(commission_category_id=data.get('category_id'))
 
         if data.get('region'):
-            filter_ &= Q(region__region=data.get('region'))
+            filter_ &= Q(region__static_region=data.get('region'))
 
         if data.get('region_id'):
             filter_ &= Q(region_id=data.get('region_id'))
