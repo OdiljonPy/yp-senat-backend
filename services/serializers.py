@@ -5,7 +5,7 @@ from exceptions.exception import CustomApiException
 from .models import (
     Region, CommissionCategory, CommissionMember, Projects,
     Post, Appeal, PROJECT_STATUS, Video, Management,
-    CategoryImage, DOC_TYPE_CHOICES
+    CategoryImage, DOC_TYPE_CHOICES, REGIONS
 )
 
 
@@ -212,7 +212,8 @@ class CommMemberFilterSerializer(ParamValidateSerializer):
     q = serializers.CharField(required=False)
     mandat_id = serializers.IntegerField(required=False)
     category_id = serializers.IntegerField(required=False)
-    region_name = serializers.CharField(required=False)
+    region = serializers.ChoiceField(choices=REGIONS, required=False)
+    region_id=serializers.IntegerField(required=False)
 
     def validate(self, data):
         if data.get('mandat_id') is not None and int(data.get('mandat_id')) <= 0:
