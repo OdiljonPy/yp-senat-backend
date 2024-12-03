@@ -39,15 +39,15 @@ REGIONS = [
         (9, 'Sirdaryo viloyati'),
         (10, 'Surxondaryo viloyati'),
         (11, 'Toshkent shahar'),
-        (11, 'Toshkent viloyati'),
-        (12, 'Xorazm viloyati'),
-        (13, 'Qoraqalpog‘iston Respublikasi'),
+        (12, 'Toshkent viloyati'),
+        (13, 'Xorazm viloyati'),
+        (14, 'Qoraqalpog‘iston Respublikasi'),
     ]
 
 
 class Region(BaseModel):
     name = models.CharField(max_length=150, verbose_name='Назавние')
-    region = models.PositiveIntegerField(choices=REGIONS, blank=False, null=False)
+    static_region = models.PositiveIntegerField(choices=REGIONS, blank=True, null=True)
 
     def __str__(self):
         return self.name
