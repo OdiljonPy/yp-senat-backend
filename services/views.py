@@ -69,7 +69,7 @@ class CommissionViewSet(ViewSet):
             openapi.Parameter(
                 name='category_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='category id'),
             openapi.Parameter(
-                name='region_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='region id'),
+                name='region_name', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, description='region name'),
             openapi.Parameter(
                 name="q", in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, description="Search"
             )
@@ -99,8 +99,8 @@ class CommissionViewSet(ViewSet):
         if data.get('category_id'):
             filter_ &= Q(commission_category_id=data.get('category_id'))
 
-        if data.get('region_id'):
-            filter_ &= Q(region_id=data.get('region_id'))
+        if data.get('region_name'):
+            filter_ &= Q(region__name__icontains=data.get('region_name'))
 
         commission_members = CommissionMember.objects.filter(filter_)
         result = get_commissions(
