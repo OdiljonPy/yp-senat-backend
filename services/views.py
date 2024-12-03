@@ -1,22 +1,23 @@
 from datetime import date
+
 from django.db.models import Q
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
-from .utils import get_ip
+
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
-from .repository.pagination import get_post_list
-from .repository.get_project_filter import get_projects_filter
-from .repository.management_pagination import get_managements
-from .repository.comm_pagination import get_commissions
 from .models import (
     Region, CommissionCategory, CommissionMember, Projects,
     Post, Visitors, AppealStat, MandatCategory, Video, PostCategory,
     Management, NormativeDocuments
 )
+from .repository.comm_pagination import get_commissions
+from .repository.get_project_filter import get_projects_filter
+from .repository.management_pagination import get_managements
+from .repository.pagination import get_post_list
 from .serializers import (
     RegionSerializer, CommissionMemberSerializer,
     ProjectsSerializer, CommissionCategorySerializer,
@@ -27,6 +28,7 @@ from .serializers import (
     MandatCategoryDetailSerializer, ProjectsResponseSerializer,
     CommMemberFilterSerializer, NormativeDocumentsSerializer, CommissionCategoryListSerializer
 )
+from .utils import get_ip
 
 
 class VideoViewSet(ViewSet):
@@ -69,7 +71,11 @@ class CommissionViewSet(ViewSet):
             openapi.Parameter(
                 name='category_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='category id'),
             openapi.Parameter(
-                name='region_name', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, description='region name'),
+                name='region', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER,
+                description='For the map region unique id'),
+            openapi.Parameter(
+                name='region_id', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER,
+                description='Get members through region id'),
             openapi.Parameter(
                 name="q", in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, description="Search"
             )
@@ -99,8 +105,11 @@ class CommissionViewSet(ViewSet):
         if data.get('category_id'):
             filter_ &= Q(commission_category_id=data.get('category_id'))
 
-        if data.get('region_name'):
-            filter_ &= Q(region__name__icontains=data.get('region_name'))
+        if data.get('region'):
+            filter_ &= Q(region__region=data.get('region'))
+
+        if data.get('region_id'):
+            filter_ &= Q(region_id=data.get('region_id'))
 
         commission_members = CommissionMember.objects.filter(filter_)
         result = get_commissions(
