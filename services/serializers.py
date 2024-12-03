@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from config import settings
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
@@ -213,7 +214,7 @@ class CommMemberFilterSerializer(ParamValidateSerializer):
     mandat_id = serializers.IntegerField(required=False)
     category_id = serializers.IntegerField(required=False)
     region = serializers.ChoiceField(choices=REGIONS, required=False)
-    region_id=serializers.IntegerField(required=False)
+    region_id = serializers.IntegerField(required=False)
 
     def validate(self, data):
         if data.get('mandat_id') is not None and int(data.get('mandat_id')) <= 0:

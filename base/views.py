@@ -1,10 +1,12 @@
 from datetime import datetime
+
 from django.db.models import Q
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
+
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
 from .models import FAQ, AboutUs, AdditionalLinks, BaseInfo, Poll
@@ -90,7 +92,7 @@ class PollViewSet(ViewSet):
 
         param = param_serializer.validated_data.get('poll_name')
         status_ = param_serializer.validated_data.get('poll_status')
-        print(param)
+
         filter_ = Q()
         if param:
             filter_ &= Q(name__icontains=param)

@@ -1,5 +1,6 @@
 from django.db import models
 from tinymce.models import HTMLField
+
 from abstract_models.base_model import BaseModel
 from utils.validations import phone_number_validation
 
@@ -29,7 +30,7 @@ class FAQ(BaseModel):
 
 
 class AboutUs(BaseModel):
-    short_description = models.CharField(max_length=300, verbose_name="краткое описание", blank=True, null=True)
+    short_description = models.CharField(max_length=300, verbose_name="краткое описание")
     description = HTMLField(verbose_name="описание")
 
     def __str__(self):

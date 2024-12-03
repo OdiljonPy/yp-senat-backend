@@ -1,6 +1,8 @@
 import os
+
 from django.db import models
 from tinymce.models import HTMLField
+
 from abstract_models.base_model import BaseModel
 from services.utils import validate_file_type_and_size
 from utils.validations import phone_number_validation
@@ -27,27 +29,28 @@ DOC_TYPE_CHOICES = (
     ('XLS', 'Excel'),
 )
 
-REGIONS = [
-        (1, 'Andijon viloyati'),
-        (2, 'Buxoro viloyati'),
-        (3, 'Farg‘ona viloyati'),
-        (4, 'Jizzax viloyati'),
-        (5, 'Qashqadaryo viloyati'),
-        (6, 'Namangan viloyati'),
-        (7, 'Navoiy viloyati'),
-        (8, 'Samarqand viloyati'),
-        (9, 'Sirdaryo viloyati'),
-        (10, 'Surxondaryo viloyati'),
-        (11, 'Toshkent shahar'),
-        (12, 'Toshkent viloyati'),
-        (13, 'Xorazm viloyati'),
-        (14, 'Qoraqalpog‘iston Respublikasi'),
-    ]
+REGIONS = (
+    (1, 'Andijon viloyati'),
+    (2, 'Buxoro viloyati'),
+    (3, 'Farg‘ona viloyati'),
+    (4, 'Jizzax viloyati'),
+    (5, 'Qashqadaryo viloyati'),
+    (6, 'Namangan viloyati'),
+    (7, 'Navoiy viloyati'),
+    (8, 'Samarqand viloyati'),
+    (9, 'Sirdaryo viloyati'),
+    (10, 'Surxondaryo viloyati'),
+    (11, 'Toshkent shahar'),
+    (12, 'Toshkent viloyati'),
+    (13, 'Xorazm viloyati'),
+    (14, 'Qoraqalpog‘iston Respublikasi'),
+)
 
 
 class Region(BaseModel):
     name = models.CharField(max_length=150, verbose_name='Назавние')
-    static_region = models.PositiveIntegerField(choices=REGIONS, blank=True, null=True)
+    static_region = models.PositiveIntegerField(choices=REGIONS, blank=True, null=True,
+                                                verbose_name='неизменяемый область')
 
     def __str__(self):
         return self.name
@@ -61,7 +64,7 @@ class Region(BaseModel):
 class CommissionCategory(BaseModel):
     name = models.CharField(max_length=250, verbose_name='назавние')
     description = models.TextField(verbose_name='описание')
-    icon = models.ImageField(upload_to='commission/category/', verbose_name="иконка", blank=True, null=True)
+    icon = models.ImageField(upload_to='commission/category/', verbose_name="иконка")
 
     def __str__(self):
         return self.name
@@ -88,11 +91,11 @@ class CategoryImage(BaseModel):  # with pagination
 
 class CommissionMember(BaseModel):
     full_name = models.CharField(max_length=100, verbose_name='полное имя')
-    description = models.CharField(max_length=255, verbose_name="описание")
+    description = models.CharField(max_length=255, verbose_name="позиция")
     commission_category = models.ForeignKey(CommissionCategory, on_delete=models.CASCADE,
                                             verbose_name='Категория комиссии', related_name='commission_categories')
-    mandat = models.ForeignKey(to='MandatCategory', on_delete=models.CASCADE, related_name='mandat', null=True,
-                               blank=True, verbose_name='мандат')
+    mandat = models.ForeignKey(to='MandatCategory', on_delete=models.CASCADE, related_name='mandat',
+                               verbose_name='мандат')
     region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=True, null=True, verbose_name='регион')
     order = models.PositiveIntegerField(default=1, verbose_name="порядковый номер")
     image = models.ImageField(upload_to='commission_member/', verbose_name="изображение")
@@ -184,8 +187,7 @@ class PostCategory(BaseModel):
 
 class Post(BaseModel):
     views = models.ManyToManyField(Visitors, blank=True, verbose_name="количество просмотров")
-    category = models.ForeignKey(PostCategory, on_delete=models.CASCADE, blank=True, null=True,
-                                 verbose_name="категория")
+    category = models.ForeignKey(PostCategory, on_delete=models.CASCADE, verbose_name="категория")
     title = models.CharField(max_length=255, verbose_name="заголовок")
     image = models.ImageField(upload_to='post/', verbose_name="изображение")
     short_description = models.CharField(max_length=200, verbose_name="краткое описание")
@@ -232,8 +234,8 @@ class Video(BaseModel):
 
 
 class NormativeDocuments(BaseModel):
-    name = models.CharField(max_length=200, null=True, blank=True, verbose_name='название')
-    file = models.FileField(upload_to='normative/', verbose_name='файл', null=True, blank=True,
+    name = models.CharField(max_length=200, verbose_name='название')
+    file = models.FileField(upload_to='normative/', verbose_name='файл',
                             validators=[validate_file_type_and_size])
     doc_type = models.CharField(max_length=5, choices=DOC_TYPE_CHOICES, editable=False, verbose_name="тип документа")
 
@@ -266,9 +268,9 @@ class Management(BaseModel):
     description = models.CharField(max_length=300, verbose_name='описание')
     phone_number = models.CharField(max_length=15, verbose_name="номер телефона")
     position = models.CharField(max_length=150, verbose_name='позиция')
-    twitter_url = models.URLField(blank=True, null=True, verbose_name="телеграм_url")
-    instagram_url = models.URLField(blank=True, null=True, verbose_name="инстаграм_url")
-    facebook_url = models.URLField(blank=True, null=True, verbose_name="фейсбук_url")
+    twitter_url = models.URLField(default='twitter.com',verbose_name="твиттер_url")
+    instagram_url = models.URLField(default='instagram.com',verbose_name="инстаграм_url")
+    facebook_url = models.URLField(default='facebook.com',verbose_name="фейсбук_url")
     order = models.PositiveIntegerField(default=1)
     image = models.ImageField(upload_to='managements/')
 
