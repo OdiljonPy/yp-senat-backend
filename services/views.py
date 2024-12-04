@@ -1,5 +1,5 @@
 from datetime import date
-from django.db.models import Q
+from django.db.models import Q, Count
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -293,9 +293,13 @@ class PostViewSet(ViewSet):
         tags=['Post']
     )
     def banner(self, request):
-        posts = Post.objects.filter(is_published=True, is_banner=True).order_by('views')[:3]
+        posts = Post.objects.filter(is_published=True, is_banner=True).annotate(
+            views_count=Count('views')).order_by('views_count')[:3]
+        print('bu if ni tashi')
         if len(posts) == 0:
-            posts = Post.objects.filter(is_published=True).order_by('views')[:3]
+            posts = Post.objects.filter(is_published=True).annotate(
+            views_count=Count('views')).order_by('views_count')[:3]
+            print('bu if ni ichi')
         serializer = PostSerializer(posts, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
