@@ -8,6 +8,7 @@ from rest_framework.viewsets import ViewSet
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
 from .models import FAQ, AboutUs, AdditionalLinks, BaseInfo, Poll
+from .repository.poll_paginator import get_poll_list
 from .serializers import (
     FAQSerializer, AdditionalLinksSerializer,
     AboutUsSerializer, BaseInfoSerializer,
@@ -75,6 +76,8 @@ class PollViewSet(ViewSet):
         operation_summary='Poll',
         operation_description='Poll',
         manual_parameters=[
+            openapi.Parameter(name="page", in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER),
+            openapi.Parameter(name="page_size", in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER),
             openapi.Parameter(name='poll_name', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING,
                               description='Poll Name'),
             openapi.Parameter(name='poll_status', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER,
@@ -101,5 +104,7 @@ class PollViewSet(ViewSet):
         Poll.objects.filter(ended_at__lt=datetime.now().date()).update(status=2)
 
         return Response(
-            data={'result': PollSerializer(polls, many=True, context={'request': request}).data, 'ok': True},
+            data={'result': get_poll_list(context={"request": request}, request_data=polls,
+                                          page=param_serializer.validated_data.get('page'),
+                                          page_size=param_serializer.validated_data.get('page_size')), 'ok': True},
             status=status.HTTP_200_OK)
