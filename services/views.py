@@ -295,7 +295,7 @@ class PostViewSet(ViewSet):
         tags=['Post']
     )
     def banner(self, request):
-        posts = Post.objects.filter(is_published=True, is_banner=True).order_by('-created_at').order_by('-views')[:3]
+        posts = Post.objects.filter(is_published=True, is_banner=True).order_by('-views')[:3]
         if len(posts) == 0:
             posts = Post.objects.filter(is_published=True).order_by('-views')[:3]
         serializer = PostSerializer(posts, many=True, context={'request': request})
