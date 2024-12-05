@@ -104,6 +104,8 @@ class Poll(BaseModel):
     result = HTMLField(verbose_name='Результат')
 
     link_to_poll = models.URLField(verbose_name='Ссылка на опрос')
+    sheet_id = models.CharField(verbose_name='Эксел ид')
+    
 
     def __str__(self):
         return self.name
