@@ -1,5 +1,6 @@
 from config import settings
 from rest_framework import serializers
+from services.serializers import ParamValidateSerializer
 from .models import (FAQ, AboutUs,
                      AdditionalLinks, Poll,
                      BaseInfo, STATUS_POLL, AboutUsImage)
@@ -11,7 +12,7 @@ class AboutUsImageSerializer(serializers.ModelSerializer):
         fields = ('id', 'image', 'about_us')
 
 
-class PollParamSerializer(serializers.Serializer):
+class PollParamSerializer(ParamValidateSerializer):
     poll_name = serializers.CharField(max_length=150, required=False)
     poll_status = serializers.ChoiceField(choices=STATUS_POLL, required=False)
 
