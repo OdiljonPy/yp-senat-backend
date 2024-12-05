@@ -87,13 +87,15 @@ class PollViewSet(ViewSet):
         tags=['Base']
     )
     def poll(self, request):
+        from .google_sheets import get_google_sheet_data
+        from .utils import format_poll_results
+
         param_serializer = PollParamSerializer(data=request.query_params, context={"request": request})
         if not param_serializer.is_valid():
             raise CustomApiException(error_code=ErrorCodes.VALIDATION_FAILED, message=param_serializer.errors)
 
         param = param_serializer.validated_data.get('poll_name')
         status_ = param_serializer.validated_data.get('poll_status')
-        print(param)
         filter_ = Q()
         if param:
             filter_ &= Q(name__icontains=param)
@@ -103,8 +105,51 @@ class PollViewSet(ViewSet):
         polls = Poll.objects.filter(filter_).order_by('-created_at')
         Poll.objects.filter(ended_at__lt=datetime.now().date()).update(status=2)
 
+        for poll in range(len(polls) - 1):
+            sheet_url = polls[poll].sheet_id
+            sheet_id = sheet_url.split("/d/")[1].split("/")[0]
+
+            spreadsheet_id = sheet_id
+
+            data = get_google_sheet_data(spreadsheet_id)
+
+            header = data[0]
+            responses = data[1:]
+
+            formatted_data = []
+            for idx, question in enumerate(header[1:]):
+                answers = {}
+                for response in responses:
+                    answer = response[idx + 1]
+                    if answer in answers:
+                        answers[answer] += 1
+                    else:
+                        answers[answer] = 1
+
+                total_responses = sum(answers.values())
+                formatted_answers = [
+                    {
+                        "text": answer,
+                        "count": count,
+                        "persentage": round((count / total_responses) * 100, 2)
+
+                    }
+                    for answer, count in answers.items()
+                ]
+                formatted_data.append({
+                    "question": question,
+                    "answers": formatted_answers,
+                    "total_responses": total_responses
+                })
+                formatted_result = format_poll_results(formatted_data)
+                polls[poll].result_en = formatted_result
+                polls[poll].result_uz = formatted_result
+                polls[poll].result_ru = formatted_result
+                polls[poll].save()
+
+
         return Response(
             data={'result': get_poll_list(context={"request": request}, request_data=polls,
                                           page=param_serializer.validated_data.get('page'),
-                                          page_size=param_serializer.validated_data.get('page_size')), 'ok': True},
+                                          page_size=param_serializer.validated_data.get('page_size')),'ok': True},
             status=status.HTTP_200_OK)

@@ -101,11 +101,10 @@ class Poll(BaseModel):
 
     status = models.PositiveIntegerField(choices=STATUS_POLL, default=1, verbose_name='Состояние')
 
-    result = HTMLField(verbose_name='Результат')
+    result = HTMLField(blank=True, verbose_name='Результат')
 
     link_to_poll = models.URLField(verbose_name='Ссылка на опрос')
-    sheet_id = models.CharField(verbose_name='Эксел ид')
-    
+    sheet_url = models.URLField(verbose_name='Эксел ид')
 
     def __str__(self):
         return self.name
