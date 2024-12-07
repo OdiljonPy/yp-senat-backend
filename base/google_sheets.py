@@ -1,11 +1,11 @@
 from googleapiclient.discovery import build
 from google.oauth2.service_account import Credentials
-import os
+from django.conf import settings
 
 
 def get_google_sheet_data(spreadsheet_id):
     creds = Credentials.from_service_account_file(
-        os.getenv('GOOGLE_APPLICATION_CREDENTIALS'),
+        settings.GOOGLE_APPLICATION_CREDENTIALS,
         scopes=['https://www.googleapis.com/auth/spreadsheets.readonly']
     )
 

@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
+from services.models import PROJECT_STATUS
 from .models import FAQ, AboutUs, AdditionalLinks, BaseInfo, Poll
 from .repository.poll_paginator import get_poll_list
 from .serializers import (
@@ -88,7 +89,7 @@ class PollViewSet(ViewSet):
     )
     def poll(self, request):
         from .google_sheets import get_google_sheet_data
-        from .utils import format_poll_results
+        from .utils import process_poll_data, is_valid_sheet_data, validate_and_extract_sheet_id
 
         param_serializer = PollParamSerializer(data=request.query_params, context={"request": request})
         if not param_serializer.is_valid():
@@ -102,50 +103,33 @@ class PollViewSet(ViewSet):
         if status_:
             filter_ &= Q(status=status_)
 
-        polls = Poll.objects.filter(filter_).order_by('-created_at')
         Poll.objects.filter(ended_at__lt=datetime.now().date()).update(status=2)
 
-        for poll in range(len(polls) - 1):
-            sheet_url = polls[poll].sheet_id
-            sheet_id = sheet_url.split("/d/")[1].split("/")[0]
 
-            spreadsheet_id = sheet_id
 
-            data = get_google_sheet_data(spreadsheet_id)
+        polls = Poll.objects.filter(filter_).order_by('-created_at')
 
-            header = data[0]
-            responses = data[1:]
+        for poll in polls:
+            print(poll)
 
-            formatted_data = []
-            for idx, question in enumerate(header[1:]):
-                answers = {}
-                for response in responses:
-                    answer = response[idx + 1]
-                    if answer in answers:
-                        answers[answer] += 1
-                    else:
-                        answers[answer] = 1
+            if poll.status == 1 and poll.ended_at:
+                continue
+            sheet_id = validate_and_extract_sheet_id(poll.sheet_url)
+            if not sheet_id:
+                print(f"Invalid sheet URL for poll {poll.id}")
+                continue
 
-                total_responses = sum(answers.values())
-                formatted_answers = [
-                    {
-                        "text": answer,
-                        "count": count,
-                        "persentage": round((count / total_responses) * 100, 2)
 
-                    }
-                    for answer, count in answers.items()
-                ]
-                formatted_data.append({
-                    "question": question,
-                    "answers": formatted_answers,
-                    "total_responses": total_responses
-                })
-                formatted_result = format_poll_results(formatted_data)
-                polls[poll].result_en = formatted_result
-                polls[poll].result_uz = formatted_result
-                polls[poll].result_ru = formatted_result
-                polls[poll].save()
+            sheet_data = get_google_sheet_data(sheet_id)
+            if not is_valid_sheet_data(sheet_data):
+                print(f"Invalid or empty data for poll {poll.id}")
+                continue
+
+            formatted_result = process_poll_data(sheet_data)
+            poll.result_en = formatted_result
+            poll.result_uz = formatted_result
+            poll.result_ru = formatted_result
+            poll.save()
 
 
         return Response(
