@@ -18,6 +18,8 @@ SHOW_SWAGGER = int(os.getenv('DJANGO_SHOW_SWAGGER', 0))
 DEBUG = int(os.getenv('DEBUG', 1))
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1').split(',')
+# GOOGLE_APPLICATION_CREDENTIALS = os.getenv('GOOGLE_APPLICATION', '')
+
 
 # Application definition
 

@@ -47,7 +47,7 @@ REGIONS = [
 
 class Region(BaseModel):
     name = models.CharField(max_length=150, verbose_name='Назавние')
-    static_region = models.PositiveIntegerField(choices=REGIONS, blank=True, null=True)
+    static_region = models.PositiveIntegerField(choices=REGIONS, blank=True, null=True, verbose_name="неизменяемый область")
 
     def __str__(self):
         return self.name
