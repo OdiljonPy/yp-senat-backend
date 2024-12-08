@@ -168,7 +168,7 @@ class PollViewSet(ViewSet):
         responses={200: PollSerializer(many=True)},
         tags=['Base']
     )
-    def poll_test(self, request):
+    def poll(self, request):
         from base.utils import get_google_sheet_statistics
 
         param_serializer = PollParamSerializer(data=request.query_params, context={"request": request})
