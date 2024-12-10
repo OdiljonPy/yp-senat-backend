@@ -88,13 +88,10 @@ class CommissionViewSet(ViewSet):
         if not serializer.is_valid():
             raise CustomApiException(ErrorCodes.VALIDATION_FAILED, message=serializer.errors)
 
-        mandat = MandatCategory.objects.order_by('-created_at').first()
-
         filter_ = Q()
         data = serializer.data
         mandat_id = data.get('mandat_id')
-        if data.get('q'):
-            filter_ &= Q(full_name__icontains=data.get('q'), mandat_id=mandat.id)
+
         if not mandat_id:
             last_mandat = MandatCategory.objects.first()
             mandat_id = 0
@@ -102,6 +99,10 @@ class CommissionViewSet(ViewSet):
                 mandat_id = last_mandat.id
 
         filter_ &= Q(mandat_id=mandat_id)
+        if data.get('q'):
+            filter_ &= Q(full_name_ru__icontains=data.get('q')) | Q(full_name_uz__icontains=data.get('q')) | Q(
+                full_name_en__icontains=data.get('q'))
+
         if data.get('category_id'):
             filter_ &= Q(commission_category_id=data.get('category_id'))
 
@@ -111,7 +112,7 @@ class CommissionViewSet(ViewSet):
         if data.get('region_id'):
             filter_ &= Q(region_id=data.get('region_id'))
 
-        commission_members = CommissionMember.objects.filter(filter_)
+        commission_members = CommissionMember.objects.filter(filter_).distinct()
         result = get_commissions(
             commission_members, context={'request': request}, page=data.get('page'), page_size=data.get('page_size'))
         return Response(data={'result': result, 'ok': True}, status=status.HTTP_200_OK)
@@ -295,9 +296,11 @@ class PostViewSet(ViewSet):
         tags=['Post']
     )
     def banner(self, request):
-        posts = Post.objects.filter(is_published=True, is_banner=True).annotate(view_count=Count('views')).order_by('-view_count')[:3]
+        posts = Post.objects.filter(is_published=True, is_banner=True).annotate(view_count=Count('views')).order_by(
+            '-view_count')[:3]
         if len(posts) == 0:
-            posts = Post.objects.filter(is_published=True).annotate(view_count=Count('views')).order_by('-view_count')[:3]
+            posts = Post.objects.filter(is_published=True).annotate(view_count=Count('views')).order_by('-view_count')[
+                    :3]
         serializer = PostSerializer(posts, many=True, context={'request': request})
         return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
 
