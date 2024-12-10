@@ -221,7 +221,6 @@ class AppealStat(BaseModel):
 class Video(BaseModel):
     title = models.CharField(max_length=150, verbose_name='название')
     video = models.URLField(verbose_name='видео')
-    image = models.ImageField(verbose_name="изображение", upload_to="video/image/", null=True, blank=True)
 
     def __str__(self):
         return self.title
