@@ -18,6 +18,7 @@ from .repository.comm_pagination import get_commissions
 from .repository.get_project_filter import get_projects_filter
 from .repository.management_pagination import get_managements
 from .repository.pagination import get_post_list
+from .repository.normative_documents_paginator import get_document_list
 from .serializers import (
     RegionSerializer, CommissionMemberSerializer,
     ProjectsSerializer, CommissionCategorySerializer,
@@ -357,11 +358,24 @@ class AppealStatViewSet(ViewSet):
 
 class NormativeDocumentsViewSet(ViewSet):
     @swagger_auto_schema(
-        operation_summary="Get list documents",
+        operation_summary="Get list of documents",
+        operation_description="Get list of documents",
+        manual_parameters=[
+            openapi.Parameter(name='page', in_=openapi.IN_QUERY, description='Page number', type=openapi.TYPE_INTEGER),
+            openapi.Parameter(name='page_size', in_=openapi.IN_QUERY, description='Page size',
+                              type=openapi.TYPE_INTEGER)
+        ],
         responses={200: NormativeDocumentsSerializer(many=True)},
         tags=['NormativeDocuments']
     )
     def list(self, request):
+        param_serializer = ParamValidateSerializer(data=request.query_params, context={'request': request})
+        if not param_serializer.is_valid():
+            raise CustomApiException(error_code=ErrorCodes.VALIDATION_FAILED, message=param_serializer.errors)
+
         documents = NormativeDocuments.objects.all().order_by('-created_at')
-        serializer = NormativeDocumentsSerializer(documents, many=True, context={'request': request})
-        return Response(data={'result': serializer.data, 'ok': True}, status=status.HTTP_200_OK)
+        return Response(data={'result': get_document_list(context={'request': request},
+                                                          request_data=documents,
+                                                          page=param_serializer.validated_data.get('page'),
+                                                          page_size=param_serializer.validated_data.get('page_size')
+                                                          ), 'ok': True}, status=status.HTTP_200_OK)
