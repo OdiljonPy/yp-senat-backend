@@ -20,7 +20,7 @@ class VideoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Video
-        fields = ['id', 'title', 'video']
+        fields = ['id', 'title', 'video', 'image']
 
 
 class ParamValidateSerializer(serializers.Serializer):
